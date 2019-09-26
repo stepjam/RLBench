@@ -1,0 +1,50 @@
+dist: xenial
+language: python
+services:
+  - xvfb
+python:
+  - "3.6"
+branches:
+  only:
+    - master
+env:
+  # Will kick of 2 builds. One for units and one for tasks.
+  - TEST_DIR=unit
+  - TEST_DIR=demos
+before_install:
+  - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
+  - sudo apt-get update -qq
+  - sudo apt-get install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+  - sudo apt-get install qt5-default qttools5-dev-tools
+install:
+  - cd ../
+  - cur=`pwd`
+  # Pull V-REP
+  - wget http://coppeliarobotics.com/files/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04.tar.xz
+  - tar -xf V-REP_PRO_EDU_V3_6_2_Ubuntu16_04.tar.xz
+  - export VREP_ROOT="$cur/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04"
+  - echo $VREP_ROOT
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$VREP_ROOT:$VREP_ROOT/platforms
+  - export QT_QPA_PLATFORM_PLUGIN_PATH=$VREP_ROOT
+
+  # Install PyRep
+  - git clone https://github.com/stepjam/PyRep.git
+  - cd PyRep
+  - pip3 install -r requirements.txt
+  - python3 setup.py install
+
+  # Gi back to RLBench repo
+  - cd ../RLBench
+  - pip3 install -r requirements.txt
+# command to run tests
+script:
+  - python3 travisci_html.py $TEST_DIR
+after_script:
+  # Push generate html to gh-pages branch
+  - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
+  - cd gh-pages
+  - cp ../*.html .
+  - echo "<!DOCTYPE html><html><body><h1>RLBench Test Page</h1><ul><li><a href='unit.html'>unit</a></li><li><a href='demos.html'>demos</a></li></ul></body></html>" > index.html
+  - git add *.html
+  - git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
+  - git push -fq origin gh-pages
