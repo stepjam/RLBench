@@ -1,0 +1,12 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl 272_mtl
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.347142 0.787773 0.241591
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 272.png

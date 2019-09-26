@@ -1,0 +1,12 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl 446_mtl
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.302444 0.128154 0.541429
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 446.png

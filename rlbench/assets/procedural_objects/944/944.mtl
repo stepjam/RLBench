@@ -1,0 +1,12 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl 944_mtl
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.185060 0.237429 0.089010
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 944.png
