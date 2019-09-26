@@ -1,4 +1,4 @@
-# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?token=bQxtiYV3p3bPYhzWMoLi&branch=master)](https://travis-ci.com/stepjam/RLBench)
+# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=master)](https://travis-ci.com/stepjam/RLBench)
 
 ![task grid image missing](readme_files/task_grid.png)
 
@@ -6,10 +6,10 @@
 designed to facilitate research in a number of vision-guided manipulation
 research areas, including: reinforcement learning, imitation learning,
 multi-task learning, geometric computer vision, and in particular, 
-few-shot learning. 
-
+few-shot learning.
 
 **Contents:**
+- [Announcements](#announcements)
 - [Install](#install)
 - [Getting Started](#getting-started)
     - [Few-Shot Learning / Meta Learning](#few-shot-learningmeta-learning)
@@ -21,10 +21,25 @@ few-shot learning.
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 
+## Announcements
+
+- Given the scope of this project, we expect there to be a number of issues over
+the coming months. Please be patient during this time. 
+After the initial few weeks of release, we will tag a commit as _'V1'_, which 
+should then be used for benchmarking algorithms going forward. Once there are enough 
+significant changes in the future, we will tag a new _'V2'_ commit, 
+and so on. Versioning like this will ensure  results remain consistent and 
+reproducible as the benchmark grows.
+- Currently, only **live demos** are available when requesting demos. Stored 
+demos will be made available in the next few weeks.
+
+
 ## Install
 
 RLBench is built around PyRep and V-REP. First head to the 
 [PyRep github](https://github.com/stepjam/PyRep) page and install.
+
+**If you previously had PyRep installed, you will need to update your installation!**
 
 Hopefully you have now installed PyRep and have run one of the PyRep examples.
 Now lets install RLBench:
@@ -44,21 +59,21 @@ due to breadth of tasks available, though it can be used in numerous ways.
 ### Few-Shot Learning / Meta Learning
 
 We have created splits of tasks called 'Task Sets', which consist of a 
-collection of X training tasks and 5 tests tasks. Here X can be 10, 25, 50, or 100.
-For example, to work on the task set with 10 training tasks, we import `TS10_V1`:
+collection of X training tasks and 5 tests tasks. Here X can be 10, 25, 50, or 95.
+For example, to work on the task set with 10 training tasks, we import `FS10_V1`:
 
 ```python
 from rlbench.environment import Environment
 from rlbench.action_modes import ActionMode, ArmActionMode
-from rlbench.tasks import TS10_V1
+from rlbench.tasks import FS10_V1
 import numpy as np
 
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(action_mode)
 env.launch()
 
-train_tasks = TS10_V1['train']
-test_tasks = TS10_V1['test']
+train_tasks = FS10_V1['train']
+test_tasks = FS10_V1['test']
 task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
@@ -148,6 +163,10 @@ loss = behaviour_cloning_loss(ground_truth_actions, predicted_actions)
 A full example can be seen in [examples/imitation_learning.py](examples/imitation_learning.py).
 
 ### Multi-Task Learning
+
+We have created splits of tasks called 'Task Sets', which consist of a 
+collection of X training tasks. Here X can be 15, 30, 55, or 100.
+For example, to work on the task set with 15 training tasks, we import `MT15_V1`:
 
 ```python
 from rlbench.environment import Environment
