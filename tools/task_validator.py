@@ -13,6 +13,8 @@ import numpy as np
 import os
 import argparse
 
+DEMO_ATTEMPTS = 3
+
 
 class TaskValidationError(Exception):
     pass
@@ -51,13 +53,16 @@ def task_smoke(task: Task, scene: Scene, variation=-1, demos=4, success=0.50,
 
         print('Running task validator on variation: %d' % i)
 
-        failed_demos = run_demos(i)
-        attempt_result = (failed_demos / float(demos) <= 1. - success)
-
-        if not attempt_result:
-            print('Failed on fist attempts. Trying again...')
+        # 3 Attempts to pass validator.
+        attempt_result = False
+        failed_demos = 0
+        for j in range(DEMO_ATTEMPTS):
             failed_demos = run_demos(i)
             attempt_result = (failed_demos / float(demos) <= 1. - success)
+            if attempt_result:
+                break
+            else:
+                print('Failed on attempt %d. Trying again...' % j)
 
         # Make sure we don't fail too often
         if not attempt_result:
