@@ -6,7 +6,7 @@
 designed to facilitate research in a number of vision-guided manipulation
 research areas, including: reinforcement learning, imitation learning,
 multi-task learning, geometric computer vision, and in particular, 
-few-shot learning.
+few-shot learning. [Click here for website and paper.](https://sites.google.com/corp/view/rlbench)
 
 **Contents:**
 - [Announcements](#announcements)
@@ -20,6 +20,7 @@ few-shot learning.
 - [Task Building](#task-building)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
+- [Citation](#citation)
 
 ## Announcements
 
@@ -101,7 +102,7 @@ obs, reward, terminate = task.step(np.random.normal(8))
 ```
 
 A full example can be seen in [examples/single_task_rl.py](examples/single_task_rl.py).
-If you would like to bootsrap from demonstrations, then take a look at [examples/single_task_rl_with_demos.py](examples/single_task_rl_with_demos.py).
+If you would like to bootstrap from demonstrations, then take a look at [examples/single_task_rl_with_demos.py](examples/single_task_rl_with_demos.py).
 
 
 ### Sim-to-Real
@@ -213,3 +214,14 @@ A full contribution guide is coming soon!
 
 Models were supplied from turbosquid.com, cgtrader.com, free3d.com, 
 thingiverse.com, and cadnav.com.
+
+## Citation
+
+```
+@article{james2019rlbench,
+  title={RLBench: The Robot Learning Benchmark \& Learning Environment},
+  author={James, Stephen and Ma, Zicong and Rovick Arrojo, David and Davison, Andrew J.},
+  journal={arXiv preprint arXiv:1909.12271},
+  year={2019}
+}
+```
