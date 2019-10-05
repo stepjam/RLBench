@@ -18,9 +18,10 @@ from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 from pyquaternion import Quaternion
 
-TORQUE_MAX_VEL = 9999
-DT = 0.05
-MAX_RESET_ATTEMPTS = 20
+_TORQUE_MAX_VEL = 9999
+_DT = 0.05
+_MAX_RESET_ATTEMPTS = 40
+_MAX_DEMO_ATTEMPTS = 10
 
 
 class InvalidActionError(Exception):
@@ -66,7 +67,7 @@ class TaskEnvironment(object):
         self._scene.reset()
         try:
             desc = self._scene.init_episode(
-                self._variation_number, max_attempts=MAX_RESET_ATTEMPTS,
+                self._variation_number, max_attempts=_MAX_RESET_ATTEMPTS,
                 randomly_place=not self._static_positions)
         except (BoundaryError, WaypointError) as e:
             raise TaskEnvironmentError(
@@ -95,7 +96,7 @@ class TaskEnvironment(object):
 
     def _torque_action(self, action):
         self._robot.arm.set_joint_target_velocities(
-            [(TORQUE_MAX_VEL if t < 0 else -TORQUE_MAX_VEL)
+            [(_TORQUE_MAX_VEL if t < 0 else -_TORQUE_MAX_VEL)
              for t in action])
         self._robot.arm.set_joint_forces(np.abs(action))
 
@@ -171,7 +172,7 @@ class TaskEnvironment(object):
 
             self._assert_action_space(arm_action, (7,))
             pose = self._robot.arm.get_tip().get_pose()
-            new_pos = np.array(pose) + (arm_action * DT)
+            new_pos = np.array(pose) + (arm_action * _DT)
             self._ee_action(list(new_pos))
 
         elif self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY:
@@ -182,7 +183,7 @@ class TaskEnvironment(object):
             self._prev_ee_velocity += arm_action
             pose = self._robot.arm.get_tip().get_pose()
             pose = np.array(pose)
-            new_pose = pose + (self._prev_ee_velocity * DT)
+            new_pose = pose + (self._prev_ee_velocity * _DT)
             self._ee_action(list(new_pose))
 
         elif self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE:
@@ -240,10 +241,9 @@ class TaskEnvironment(object):
         return demos
 
     def _get_live_demos(self, amount):
-        self.reset()
         demos = []
         for i in range(amount):
-            attempts = 3
+            attempts = _MAX_DEMO_ATTEMPTS
             while attempts > 0:
                 self.reset()
                 logging.info('Collecting demo %d' % i)
