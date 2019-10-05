@@ -7,6 +7,7 @@ python:
 branches:
   only:
     - master
+    - develop
 env:
   # Will kick of 2 builds. One for units and one for tasks.
   - TEST_DIR=unit
@@ -38,13 +39,13 @@ install:
   - pip3 install -r requirements.txt
 # command to run tests
 script:
-  - python3 travisci_html.py $TEST_DIR
+  - python3 travisci_html.py $TEST_DIR $TRAVIS_BRANCH
 after_script:
   # Push generate html to gh-pages branch
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
   - cd gh-pages
   - cp ../*.html .
-  - echo "<!DOCTYPE html><html><body><h1>RLBench Test Page</h1><ul><li><a href='unit.html'>unit</a></li><li><a href='demos.html'>demos</a></li></ul></body></html>" > index.html
+  - echo "<!DOCTYPE html><html><body><h1>RLBench Test Page</h1><ul><li><a href='unit_main.html'>unit_main</a></li><li><a href='demos_main.html'>demos_main</a></li><li><a href='unit_develop.html'>unit_develop</a></li><li><a href='demos_develop.html'>demos_develop</a></li></ul></body></html>" > index.html
   - git add *.html
   - git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
   - git push -fq origin gh-pages
