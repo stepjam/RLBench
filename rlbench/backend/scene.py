@@ -345,6 +345,7 @@ class Scene(object):
             if not (rgb or depth):
                 cam.remove()
             else:
+                print('here', conf.image_size)
                 cam.set_resolution(conf.image_size)
                 cam.set_render_mode(conf.render_mode)
         _set_props(

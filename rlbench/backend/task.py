@@ -85,6 +85,7 @@ class Task(object):
         objs = self.get_base().get_objects_in_tree(
             exclude_base=True, first_generation_only=False)
         state = []
+        
         for obj in objs:
             state.extend(np.array(obj.get_pose()))
             if obj.get_type() == ObjectType.JOINT:
@@ -92,7 +93,23 @@ class Task(object):
             elif obj.get_type() == ObjectType.FORCE_SENSOR:
                 forces, torques = ForceSensor(obj.get_handle()).read()
                 state.extend(forces + torques)
+
         return np.array(state).flatten()
+    
+    def get_names_of_objects(self) -> list:
+        """Gets the name of the objects in the object tree, in same order as in task_low_dim_state
+
+        :return: list of strings, corresponding to object names.
+        """
+        objs = self.get_base().get_objects_in_tree(
+            exclude_base=True, first_generation_only=False)
+
+        names = []
+
+        for obj in objs:
+            names.append(obj.get_name())
+
+        return names
 
     def step(self) -> None:
         """Called each time the simulation is stepped. Can usually be left."""

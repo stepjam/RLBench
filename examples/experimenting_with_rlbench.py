@@ -1,7 +1,7 @@
 from rlbench.environment import Environment
 from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
-from rlbench.tasks import PickAndLift
+from rlbench.tasks import PickUpCup
 import numpy as np
 
 
@@ -16,15 +16,15 @@ class Agent(object):
 
 obs_config = ObservationConfig()
 obs_config.set_all(False)
-obs_config.left_shoulder_camera.rgb = True
-obs_config.right_shoulder_camera.rgb = True
+obs_config.left_shoulder_camera.rgb = False
+obs_config.right_shoulder_camera.rgb = False
 
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
     action_mode, obs_config=obs_config, headless=False)
 env.launch()
 
-task = env.get_task(PickAndLift)
+task = env.get_task(PickUpCup)
 
 agent = Agent(action_mode.action_size)
 

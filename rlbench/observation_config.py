@@ -1,7 +1,6 @@
 from pyrep.const import RenderMode
 from rlbench.noise_model import NoiseModel, Identity
 
-
 class CameraConfig(object):
     def __init__(self,
                  rgb=True,
@@ -9,7 +8,8 @@ class CameraConfig(object):
                  depth=True,
                  depth_noise: NoiseModel=Identity(),
                  mask=True,
-                 image_size=(128, 128),
+                #  image_size=(128, 128),
+                 image_size=(256, 256),
                  render_mode=RenderMode.OPENGL3):
         self.rgb = rgb
         self.rgb_noise = rgb_noise
@@ -41,6 +41,7 @@ class ObservationConfig(object):
                  record_gripper_closing=False,
                  task_low_dim_state=False,
                  ):
+
         self.left_shoulder_camera = (
             CameraConfig() if left_shoulder_camera is None
             else left_shoulder_camera)

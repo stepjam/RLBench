@@ -41,7 +41,7 @@ class Observation(object):
         self.task_low_dim_state = task_low_dim_state
 
     def get_low_dim_data(self) -> np.ndarray:
-        """Gets a 1D array of all the low-dimensional obseervations.
+        """Gets a 1D array of all the low-dimensional observations.
 
         :return: 1D array of observations.
         """
