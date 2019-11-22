@@ -77,24 +77,30 @@ class Task(object):
         raise NotImplementedError(
             "'variation_count' must be defined and return an int.")
 
-    def get_low_dim_state(self) -> np.ndarray:
+    def get_low_dim_state(self) -> dict:
         """Gets the pose and various other properties of objects in the task.
 
         :return: 1D array of low-dimensional task state.
         """
         objs = self.get_base().get_objects_in_tree(
             exclude_base=True, first_generation_only=False)
+        
+        state_dict = {}
         state = []
         
         for obj in objs:
+
             state.extend(np.array(obj.get_pose()))
             if obj.get_type() == ObjectType.JOINT:
                 state.extend([Joint(obj.get_handle()).get_joint_position()])
             elif obj.get_type() == ObjectType.FORCE_SENSOR:
                 forces, torques = ForceSensor(obj.get_handle()).read()
                 state.extend(forces + torques)
+            
+            state_dict[obj.get_name()] = state
+            state = []
 
-        return np.array(state).flatten()
+        return state_dict
     
     def get_names_of_objects(self) -> list:
         """Gets the name of the objects in the object tree, in same order as in task_low_dim_state

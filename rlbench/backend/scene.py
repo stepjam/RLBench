@@ -199,11 +199,12 @@ class Scene(object):
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
             gripper_touch_forces=ee_forces_flat,
-            gripper_joint_positions=np.array(
+            gripper_joint_positions=np.array(   
                 self._robot.gripper.get_joint_positions()),
             task_low_dim_state=(
                 self._active_task.get_low_dim_state() if
-                self._obs_config.task_low_dim_state else None))
+                self._obs_config.task_low_dim_state else None)
+            )
         obs = self._active_task.decorate_observation(obs)
         return obs
 

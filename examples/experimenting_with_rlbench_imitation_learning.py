@@ -6,7 +6,7 @@ import numpy as np
 import scipy.misc
 import os
 import csv
-# import cv2
+import json
 
 # Path to demonstation storage directory
 destination_dir = os.path.abspath(__file__ + "/../../../Demonstrations/")
@@ -32,7 +32,7 @@ obs_config.set_all(True)
 # obs_config.wrist_camera.image_size = (256,256)
 
 # run headless
-headless = True
+headless = False
 
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
@@ -42,7 +42,6 @@ env.launch()
 task = env.get_task(PickAndLift)
 
 demos = task.get_demos(1, live_demos=live_demos)  #robotrobot -> List[List[Observation]]
-# np.save(os.path.join(destination_dir, 'outfile.npy'), demos[0])
 
 print('Done')
 env.shutdown()
@@ -76,6 +75,11 @@ for demo_id, demo in enumerate(demos):
     #     # to save the images as png images, use scipy.misc
     #     scipy.misc.imsave(img_path_left, img_left)
     #     scipy.misc.imsave(img_path_right, img_right)
+
+    ###############################################################
+    # save low dim state dictionary
+    # with open('data.p', 'wb') as fp:
+    # pickle.dump(data, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
     ###############################################################
     # save images in one .npy file
@@ -132,8 +136,14 @@ for demo_id, demo in enumerate(demos):
     save_data(gripper_joint_positions, 'gripper_joint_position_list', demo_id, demo_dir_path)
     
     # task_low_dim_state
-    task_low_dim_state = [np.expand_dims(obs.task_low_dim_state, axis=0) for obs in demo]
-    save_data(task_low_dim_state, 'task_low_dim_state', demo_id, demo_dir_path)
+    save_path = os.path.join(demo_dir_path, 'state_dict')
+    for obs_id, obs in enumerate(demo):
+        if obs_id == 0:
+            os.remove(save_path)
+
+        with open(save_path, 'a') as f:
+            json.dump(obs.task_low_dim_state, f, sort_keys=True, indent=True)
+            f.write(os.linesep)
 
 
 

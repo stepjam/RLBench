@@ -21,7 +21,8 @@ class Observation(object):
                  gripper_pose:  np.ndarray,
                  gripper_joint_positions:  np.ndarray,
                  gripper_touch_forces:  np.ndarray,
-                 task_low_dim_state:  np.ndarray):
+                 task_low_dim_state:  dict,
+                 ):
         self.left_shoulder_rgb = left_shoulder_rgb
         self.left_shoulder_depth = left_shoulder_depth
         self.left_shoulder_mask = left_shoulder_mask
