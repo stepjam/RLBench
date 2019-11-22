@@ -32,7 +32,7 @@ obs_config.set_all(True)
 # obs_config.wrist_camera.image_size = (256,256)
 
 # run headless
-headless = False
+headless = True
 
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
@@ -136,14 +136,43 @@ for demo_id, demo in enumerate(demos):
     save_data(gripper_joint_positions, 'gripper_joint_position_list', demo_id, demo_dir_path)
     
     # task_low_dim_state
-    save_path = os.path.join(demo_dir_path, 'state_dict')
-    for obs_id, obs in enumerate(demo):
-        if obs_id == 0:
-            os.remove(save_path)
 
-        with open(save_path, 'a') as f:
-            json.dump(obs.task_low_dim_state, f, sort_keys=True, indent=True)
-            f.write(os.linesep)
+    save_path = os.path.join(demo_dir_path, 'low_dim_state.csv')
+    # if previous version of csv file exists, remove it
+    if os.path.exists(save_path):
+        os.remove(save_path)
+    f = csv.writer(open(save_path, "w"))
+
+    # Write CSV Header, If you dont need that, remove this line
+    f.writerow(["waypoint1", "waypoint2", "success_visual", "waypoint0", "stack_blocks_distractor1", "pick_and_lift_target", "pick_and_lift_boundary", "stack_blocks_distractor0", "distractors", "pick_and_lift_success"])
+
+    
+    for obs_id, obs in enumerate(demo):
+        if "waypoint0" in obs.task_low_dim_state and "waypoint0" in obs.task_low_dim_state and "pick_and_lift_target" in obs.task_low_dim_state:
+            f.writerow([obs.task_low_dim_state["waypoint1"],
+                        obs.task_low_dim_state["waypoint2"],
+                        obs.task_low_dim_state["success_visual"],
+                        obs.task_low_dim_state["waypoint0"],
+                        obs.task_low_dim_state["stack_blocks_distractor1"],
+                        obs.task_low_dim_state["pick_and_lift_target"],
+                        obs.task_low_dim_state["pick_and_lift_boundary"],
+                        obs.task_low_dim_state["stack_blocks_distractor0"],
+                        obs.task_low_dim_state["distractors"],
+                        obs.task_low_dim_state["pick_and_lift_success"],
+                        ])
+        else:
+            f.writerow([
+                -1.0,
+                obs.task_low_dim_state["waypoint2"],
+                obs.task_low_dim_state["success_visual"],
+                -1.0,
+                obs.task_low_dim_state["stack_blocks_distractor1"],
+                -1.0,
+                obs.task_low_dim_state["pick_and_lift_boundary"],
+                obs.task_low_dim_state["stack_blocks_distractor0"],
+                obs.task_low_dim_state["distractors"],
+                obs.task_low_dim_state["pick_and_lift_success"],
+            ])
 
 
 
