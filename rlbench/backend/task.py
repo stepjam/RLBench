@@ -101,21 +101,6 @@ class Task(object):
             state = []
 
         return state_dict
-    
-    def get_names_of_objects(self) -> list:
-        """Gets the name of the objects in the object tree, in same order as in task_low_dim_state
-
-        :return: list of strings, corresponding to object names.
-        """
-        objs = self.get_base().get_objects_in_tree(
-            exclude_base=True, first_generation_only=False)
-
-        names = []
-
-        for obj in objs:
-            names.append(obj.get_name())
-
-        return names
 
     def step(self) -> None:
         """Called each time the simulation is stepped. Can usually be left."""

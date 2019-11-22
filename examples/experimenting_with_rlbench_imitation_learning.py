@@ -32,14 +32,14 @@ obs_config.set_all(True)
 # obs_config.wrist_camera.image_size = (256,256)
 
 # run headless
-headless = True
+headless = False
 
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
     action_mode, DATASET, obs_config, headless)
 env.launch()
 
-task = env.get_task(PickAndLift)
+task = env.get_task(StackBlocks)
 
 demos = task.get_demos(1, live_demos=live_demos)  #robotrobot -> List[List[Observation]]
 
@@ -143,37 +143,23 @@ for demo_id, demo in enumerate(demos):
         os.remove(save_path)
     f = csv.writer(open(save_path, "w"))
 
+    rows_for_task_objects = []
+    for key in demo[0].task_low_dim_state:
+        rows_for_task_objects.append(key)
+    print(rows_for_task_objects)
+
     # Write CSV Header, If you dont need that, remove this line
-    f.writerow(["waypoint1", "waypoint2", "success_visual", "waypoint0", "stack_blocks_distractor1", "pick_and_lift_target", "pick_and_lift_boundary", "stack_blocks_distractor0", "distractors", "pick_and_lift_success"])
+    f.writerow(rows_for_task_objects)
 
-    
     for obs_id, obs in enumerate(demo):
-        if "waypoint0" in obs.task_low_dim_state and "waypoint0" in obs.task_low_dim_state and "pick_and_lift_target" in obs.task_low_dim_state:
-            f.writerow([obs.task_low_dim_state["waypoint1"],
-                        obs.task_low_dim_state["waypoint2"],
-                        obs.task_low_dim_state["success_visual"],
-                        obs.task_low_dim_state["waypoint0"],
-                        obs.task_low_dim_state["stack_blocks_distractor1"],
-                        obs.task_low_dim_state["pick_and_lift_target"],
-                        obs.task_low_dim_state["pick_and_lift_boundary"],
-                        obs.task_low_dim_state["stack_blocks_distractor0"],
-                        obs.task_low_dim_state["distractors"],
-                        obs.task_low_dim_state["pick_and_lift_success"],
-                        ])
-        else:
-            f.writerow([
-                -1.0,
-                obs.task_low_dim_state["waypoint2"],
-                obs.task_low_dim_state["success_visual"],
-                -1.0,
-                obs.task_low_dim_state["stack_blocks_distractor1"],
-                -1.0,
-                obs.task_low_dim_state["pick_and_lift_boundary"],
-                obs.task_low_dim_state["stack_blocks_distractor0"],
-                obs.task_low_dim_state["distractors"],
-                obs.task_low_dim_state["pick_and_lift_success"],
-            ])
+        data_to_write = []
+        for key in rows_for_task_objects:
+            if key not in obs.task_low_dim_state:
+                data_to_write.append(-1.0)
+            else:
+                data_to_write.append(obs.task_low_dim_state[key])
 
+        f.writerow(data_to_write)
 
 
 # different file for each demonstation
