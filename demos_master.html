@@ -11,9 +11,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <h2 class="text-capitalize">Unittest Results</h2>
-                <p class='attribute'><strong>Start Time: </strong>2019-10-05 14:00:38</p>
-                <p class='attribute'><strong>Duration: </strong>0 ms</p>
-                <p class='attribute'><strong>Summary: </strong>Total: 1, Pass: 1</p>
+                <p class='attribute'><strong>Start Time: </strong>2019-12-16 16:12:54</p>
+                <p class='attribute'><strong>Duration: </strong>4041.56 s</p>
+                <p class='attribute'><strong>Summary: </strong>Total: 1, Pass: 0, Fail: 1</p>
             </div>
         </div>
         <div class="row">
@@ -27,10 +27,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class='success'>
+                        <tr class='danger'>
                             <td class="col-xs-10">test_run_task_validator</td>
                             <td class="col-xs-1">
-                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                                <span class="label label-danger" style="display:block;width:40px;">Fail</span>
                             </td>
                             <td class="col-xs-1">
                                 <button class="btn btn-default btn-xs">View</button>
@@ -482,12 +482,29 @@
                                             </td>
                                         </tr>
                                         
-                                        <tr class='success'>
+                                        <tr class='danger'>
                                             <td class="col-xs-10">test_run_task_validator (task='put_books_on_bookshelf')</td>
                                             <td class="col-xs-1">
-                                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                                                <span class="label label-danger" style="display:block;width:40px;">Fail</span>
                                             </td>
                                             <td class="col-xs-1">
+                                                <button class="btn btn-default btn-xs">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr style="display:none;">
+                                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">TaskValidationError: Too many failed demo runs. 4 of 4 demos failed.</p><p style="color:maroon;">Traceback (most recent call last):
+  File "/home/travis/build/stepjam/RLBench/tests/demos/test_tasks.py", line 54, in test_run_task_validator
+    raise e
+  File "/home/travis/build/stepjam/RLBench/tests/demos/test_tasks.py", line 51, in test_run_task_validator
+    max_variations=2, success=0.25)
+  File "/home/travis/build/stepjam/RLBench/tools/task_validator.py", line 108, in task_smoke
+    [variation_smoke(i) for i in variations_to_test]
+  File "/home/travis/build/stepjam/RLBench/tools/task_validator.py", line 108, in <listcomp>
+    [variation_smoke(i) for i in variations_to_test]
+  File "/home/travis/build/stepjam/RLBench/tools/task_validator.py", line 71, in variation_smoke
+    failed_demos, demos))
+tools.task_validator.TaskValidationError: Too many failed demo runs. 4 of 4 demos failed.
+</p>
                                             </td>
                                         </tr>
                                         
@@ -947,7 +964,7 @@
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 1, Pass: 1 -- Duration: 0 ms
+                                Total: 1, Pass: 0, Fail: 1 -- Duration: 4041.56 s
                             </td>
                         </tr>
                     </tbody>
