@@ -1,4 +1,4 @@
-# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=develop)](https://travis-ci.com/stepjam/RLBench)
+# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=master)](https://travis-ci.com/stepjam/RLBench)
 
 ![task grid image missing](readme_files/task_grid.png)
 

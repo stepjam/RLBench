@@ -21,12 +21,12 @@ install:
   - cd ../
   - cur=`pwd`
   # Pull V-REP
-  - wget http://coppeliarobotics.com/files/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04.tar.xz
-  - tar -xf V-REP_PRO_EDU_V3_6_2_Ubuntu16_04.tar.xz
-  - export VREP_ROOT="$cur/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04"
-  - echo $VREP_ROOT
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$VREP_ROOT:$VREP_ROOT/platforms
-  - export QT_QPA_PLATFORM_PLUGIN_PATH=$VREP_ROOT
+  - wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_0_0_Ubuntu16_04.tar.xz
+  - tar -xf CoppeliaSim_Edu_V4_0_0_Ubuntu16_04.tar.xz
+  - export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_0_0_Ubuntu16_04"
+  - echo $COPPELIASIM_ROOT
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
+  - export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
   # Install PyRep
   - git clone https://github.com/stepjam/PyRep.git
