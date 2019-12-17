@@ -4,10 +4,7 @@ services:
   - xvfb
 python:
   - "3.6"
-branches:
-  only:
-    - master
-    - develop
+
 env:
   # Will kick of 2 builds. One for units and one for tasks.
   - TEST_DIR=unit
