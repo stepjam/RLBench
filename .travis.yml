@@ -44,6 +44,9 @@ after_script:
   # Push generate html to gh-pages branch
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
   - cd gh-pages
+  # Generated html files will be one directory above
+  - mv ../index.html .
+  - mv ../reports .
 
   - git add index.html reports/
   - git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
