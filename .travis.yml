@@ -31,7 +31,10 @@ install:
   - pip3 install -r requirements.txt
   - python3 setup.py install
 
-  # Gi back to RLBench repo
+  # Gym needed for some of unit tests
+  - pip3 install gym
+
+  # Go back to RLBench repo
   - cd ../RLBench
   - pip3 install -r requirements.txt
 # command to run tests
