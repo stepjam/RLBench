@@ -39,13 +39,12 @@ install:
   - pip3 install -r requirements.txt
 # command to run tests
 script:
-  - python3 travisci_html.py $TEST_DIR $TRAVIS_BRANCH
+  - python3 travisci_html.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER
 after_script:
   # Push generate html to gh-pages branch
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
   - cd gh-pages
-  - cp ../*.html .
-  - echo "<!DOCTYPE html><html><body><h1>RLBench Test Page</h1><ul><li><a href='unit_main.html'>unit_main</a></li><li><a href='demos_main.html'>demos_main</a></li><li><a href='unit_develop.html'>unit_develop</a></li><li><a href='demos_develop.html'>demos_develop</a></li></ul></body></html>" > index.html
-  - git add *.html
+
+  - git add index.html reports/
   - git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
   - git push -fq origin gh-pages
