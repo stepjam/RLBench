@@ -31,25 +31,23 @@ class TestTasks(unittest.TestCase):
     """
 
     def test_run_task_validator(self):
-        sim = PyRep()
-        ttt_file = os.path.join(
-            DIR_PATH, '..', '..', 'rlbench', TTT_FILE)
-        sim.launch(ttt_file, headless=True)
-        sim.step_ui()
-        sim.set_simulation_timestep(50.0)
-        sim.step_ui()
-        sim.start()
-        robot = Robot(Panda(), PandaGripper())
-        obs = ObservationConfig()
-        obs.set_all(False)
-        scene = Scene(sim, robot, obs)
-
         for task_file in TASKS:
             test_name = task_file.split('.py')[0]
             with self.subTest(task=test_name):
                 if test_name in FLAKY_TASKS:
                     self.skipTest('Flaky task.')
-                task_class = task_file_to_task_class(task_file)
+                sim = PyRep()
+                ttt_file = os.path.join(
+                    DIR_PATH, '..', '..', 'rlbench', TTT_FILE)
+                sim.launch(ttt_file, headless=True)
+                sim.step_ui()
+                sim.set_simulation_timestep(50.0)
+                sim.step_ui()
+                sim.start()
+                robot = Robot(Panda(), PandaGripper())
+                obs = ObservationConfig()
+                obs.set_all(False)
+                scene = Scene(sim, robot, obs)
                 sim.start()
                 task_class = task_file_to_task_class(task_file)
                 active_task = task_class(sim, robot)
@@ -58,6 +56,7 @@ class TestTasks(unittest.TestCase):
                                max_variations=2, success=0.25)
                 except Exception as e:
                     sim.stop()
+                    sim.shutdown()
                     raise e
                 sim.stop()
-        sim.shutdown()
+                sim.shutdown()
