@@ -17,6 +17,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
     - [Sim-to-Real](#sim-to-real)
     - [Imitation Learning](#imitation-learning)
     - [Multi-Task Learning](#multi-task-learning)
+    - [RLBench Gym](#rlbench-gym)
 - [Task Building](#task-building)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
@@ -24,15 +25,20 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Announcements
 
+### 17 December, 2019
+
+- Gym is now supported!
+
+### 26 September, 2019
 - Given the scope of this project, we expect there to be a number of issues over
 the coming months. Please be patient during this time. 
 After the initial few weeks of release, we will tag a commit as _'V1'_, which 
 should then be used for benchmarking algorithms going forward. Once there are enough 
 significant changes in the future, we will tag a new _'V2'_ commit, 
-and so on. Versioning like this will ensure  results remain consistent and 
+and so on. Versioning like this will ensure results remain consistent and 
 reproducible as the benchmark grows.
 - Currently, only **live demos** are available when requesting demos. Stored 
-demos will be made available in the next few weeks.
+demos will be made available soon!
 
 
 ## Install
@@ -188,6 +194,37 @@ obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
 ```
 
 A full example can be seen in [examples/multi_task_learning.py](examples/multi_task_learning.py).
+
+### RLBench Gym
+
+RLBench is __Gym__ compatible! Ensure you have gym installed (`pip3 install gym`).
+
+Simply select your task of interest from [rlbench/tasks/](rlbench/tasks/), and
+then load the task by using the task name (e.g. 'reach_target') followed by
+the observation mode: 'state' or 'vision'.
+
+```python
+import gym
+import rlbench.gym
+
+env = gym.make('reach_target-state-v0')
+# Alternatively, for vision:
+# env = gym.make('reach_target-vision-v0')
+
+training_steps = 120
+episode_length = 40
+for i in range(training_steps):
+    if i % episode_length == 0:
+        print('Reset Episode')
+        obs = env.reset()
+    obs, reward, terminate, _ = env.step(env.action_space.sample())
+    env.render()  # Note: rendering increases step time.
+
+print('Done')
+env.close()
+```
+
+A full example can be seen in [examples/rlbench_gym.py](examples/rlbench_gym.py).
 
 ## Task Building
 

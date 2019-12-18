@@ -4,10 +4,7 @@ services:
   - xvfb
 python:
   - "3.6"
-branches:
-  only:
-    - master
-    - develop
+
 env:
   # Will kick of 2 builds. One for units and one for tasks.
   - TEST_DIR=unit
@@ -34,18 +31,31 @@ install:
   - pip3 install -r requirements.txt
   - python3 setup.py install
 
-  # Gi back to RLBench repo
+  # Gym needed for some of unit tests
+  - pip3 install gym
+
+  # Go back to RLBench repo
   - cd ../RLBench
   - pip3 install -r requirements.txt
 # command to run tests
 script:
-  - python3 travisci_html.py $TEST_DIR $TRAVIS_BRANCH
+  # Runs unit tests and generates reports
+  - python3 travisci_run_tests.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER
+  - EXITCODE=$?
 after_script:
-  # Push generate html to gh-pages branch
+  # Get previously generated index file
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
   - cd gh-pages
-  - cp ../*.html .
-  - echo "<!DOCTYPE html><html><body><h1>RLBench Test Page</h1><ul><li><a href='unit_main.html'>unit_main</a></li><li><a href='demos_main.html'>demos_main</a></li><li><a href='unit_develop.html'>unit_develop</a></li><li><a href='demos_develop.html'>demos_develop</a></li></ul></body></html>" > index.html
-  - git add *.html
+
+  # Generated html files will be one directory above
+  - cp -r ../reports .
+  # Move script that will amend the index
+  - mv ../travisci_generate_index.py .
+
+  # Generated new index.html
+  - python3 travisci_generate_index.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER $EXITCODE
+
+  # Push generate html to gh-pages branch
+  - git add index.html reports/
   - git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
   - git push -fq origin gh-pages
