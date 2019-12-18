@@ -48,13 +48,12 @@ after_script:
   - cd gh-pages
 
   # Generated html files will be one directory above
-  - mv ../index.html .
-  - mv ../reports .
+  - cp -r ../reports .
   # Move script that will amend the index
   - mv ../travisci_generate_index.py .
 
   # Generated new index.html
-  - python3 travisci_run_tests.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER $EXITCODE
+  - python3 travisci_generate_index.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER $EXITCODE
 
   # Push generate html to gh-pages branch
   - git add index.html reports/
