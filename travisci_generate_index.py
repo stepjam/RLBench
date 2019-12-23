@@ -16,7 +16,7 @@ if __name__ == '__main__':
     build_num = sys.argv[3]
     exit_code = sys.argv[4]
 
-    fail = exit_code != 0
+    fail = int(exit_code) != 0
 
     assert test_type in TEST_TYPES
 
