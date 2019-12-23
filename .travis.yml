@@ -41,7 +41,6 @@ install:
 script:
   # Runs unit tests and generates reports
   - python3 travisci_run_tests.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER
-  - EXITCODE=$?
 after_script:
   # Get previously generated index file
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
@@ -53,7 +52,7 @@ after_script:
   - mv ../travisci_generate_index.py .
 
   # Generated new index.html
-  - python3 travisci_generate_index.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER $EXITCODE
+  - python3 travisci_generate_index.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER $TRAVIS_TEST_RESULT
 
   # Push generate html to gh-pages branch
   - git add index.html reports/
