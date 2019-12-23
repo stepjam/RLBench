@@ -12,7 +12,8 @@ setup(name='rlbench',
             'rlbench.tasks',
             'rlbench.task_ttms',
             'rlbench.sim2real',
-            'rlbench.assets'
+            'rlbench.assets',
+            'rlbench.gym'
       ],
       package_data={'': ['*.ttm', '*.obj'],
                     'rlbench': ['task_design.ttt']},
