@@ -1,19 +1,34 @@
-from os.path import join
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
+from pyrep.robots.arms.jaco import Jaco
+from pyrep.robots.arms.mico import Mico
+from pyrep.robots.arms.sawyer import Sawyer
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
+from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
+from pyrep.robots.end_effectors.mico_gripper import MicoGripper
+from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
 from rlbench.backend.scene import Scene
 from rlbench.backend.task import Task
 from rlbench.backend.const import *
 from rlbench.backend.robot import Robot
-from os.path import exists, dirname, abspath
+from os.path import exists, dirname, abspath, join
 import importlib
 from typing import Type
 from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.action_modes import ActionMode, ArmActionMode
 
+
 DIR_PATH = dirname(abspath(__file__))
+
+# Arms from PyRep need to be modified to include a wrist camera.
+# Currently, only the arms/grippers below are supported.
+SUPPORTED_ROBOTS = {
+    'panda': (Panda, PandaGripper),
+    'jaco': (Jaco, JacoGripper),
+    'mico': (Mico, MicoGripper),
+    'sawyer': (Sawyer, BaxterGripper),
+}
 
 
 class Environment(object):
@@ -21,13 +36,20 @@ class Environment(object):
 
     def __init__(self, action_mode: ActionMode, dataset_root: str= '',
                  obs_config=ObservationConfig(), headless=False,
-                 static_positions: bool = False):
+                 static_positions: bool = False,
+                 robot_configuration='panda'):
 
         self._dataset_root = dataset_root
         self._action_mode = action_mode
         self._obs_config = obs_config
         self._headless = headless
         self._static_positions = static_positions
+        self._robot_configuration = robot_configuration
+
+        if robot_configuration not in SUPPORTED_ROBOTS.keys():
+            raise ValueError('robot_configuration must be one of %s' %
+                             str(SUPPORTED_ROBOTS.keys()))
+
         self._check_dataset_structure()
 
         self._pyrep = None
@@ -78,12 +100,29 @@ class Environment(object):
         self._pyrep.launch(join(DIR_PATH, TTT_FILE), headless=self._headless)
         self._pyrep.set_simulation_timestep(0.005)
 
-        self._robot = Robot(Panda(), PandaGripper())
+        arm_class, gripper_class = SUPPORTED_ROBOTS[self._robot_configuration]
+
+        # We assume the panda is already loaded in the scene.
+        if self._robot_configuration is not 'panda':
+            # Remove the panda from the scene
+            panda_arm = Panda()
+            panda_pos = panda_arm.get_position()
+            panda_arm.remove()
+            arm_path = join(DIR_PATH,
+                            'robot_ttms', self._robot_configuration + '.ttm')
+            self._pyrep.import_model(arm_path)
+            arm, gripper = arm_class(), gripper_class()
+            arm.set_position(panda_pos)
+        else:
+            arm, gripper = arm_class(), gripper_class()
+
+        self._robot = Robot(arm, gripper)
         self._scene = Scene(self._pyrep, self._robot, self._obs_config)
         self._set_arm_control_action()
 
     def shutdown(self):
-        self._pyrep.shutdown()
+        if self._pyrep is not None:
+            self._pyrep.shutdown()
         self._pyrep = None
 
     def get_task(self, task_class: Type[Task]) -> TaskEnvironment:
@@ -96,4 +135,3 @@ class Environment(object):
             self._pyrep, self._robot, self._scene, task,
             self._action_mode, self._dataset_root, self._obs_config,
             self._static_positions)
-

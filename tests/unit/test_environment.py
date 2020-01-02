@@ -1,6 +1,6 @@
 import unittest
 from os import path
-from rlbench.environment import Environment
+from rlbench import environment
 from rlbench.task_environment import TaskEnvironment
 from rlbench.tasks.reach_target import ReachTarget
 from rlbench.action_modes import ArmActionMode, ActionMode
@@ -20,7 +20,7 @@ class TestEnvironment(unittest.TestCase):
         obs_config.set_all_low_dim(True)
         obs_config.right_shoulder_camera.rgb = True
         action_mode = ActionMode(arm_action_mode)
-        self.env = Environment(
+        self.env = environment.Environment(
             action_mode, ASSET_DIR, obs_config, headless=True)
         self.env.launch()
         return self.env.get_task(task_class)
@@ -193,3 +193,14 @@ class TestEnvironment(unittest.TestCase):
         [task.step(action) for _ in range(2)]
         obs, reward, term = task.step(action)
         # Difficult to test given gravity, so just check for exceptions.
+
+    def test_swap_arm(self):
+        # Checks if the environment can be setup with each arm
+        action_mode = ActionMode(ArmActionMode.DELTA_JOINT_VELOCITY)
+        for robot_config in environment.SUPPORTED_ROBOTS.keys():
+            with self.subTest(robot_config=robot_config):
+                self.env = environment.Environment(
+                    action_mode, headless=True,
+                    robot_configuration=robot_config)
+                self.env.launch()
+                self.env.shutdown()

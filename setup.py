@@ -11,6 +11,7 @@ setup(name='rlbench',
             'rlbench.backend',
             'rlbench.tasks',
             'rlbench.task_ttms',
+            'rlbench.robot_ttms',
             'rlbench.sim2real',
             'rlbench.assets',
             'rlbench.gym'
