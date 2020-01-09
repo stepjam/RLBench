@@ -192,15 +192,20 @@ class Scene(object):
                 self._obs_config.joint_positions_noise.apply(
                     np.array(self._robot.arm.get_joint_positions()))
                 if self._obs_config.joint_positions else None),
-            joint_forces=joint_forces,
+            joint_forces=(joint_forces
+                          if self._obs_config.joint_forces else None),
             gripper_open_amount=(
-                1.0 if self._robot.gripper.get_open_amount()[0] > 0.9 else 0.0),
+                (1.0 if self._robot.gripper.get_open_amount()[0] > 0.9 else 0.0)
+                if self._obs_config.gripper_open_amount else None),
             gripper_pose=(
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
-            gripper_touch_forces=ee_forces_flat,
-            gripper_joint_positions=np.array(
-                self._robot.gripper.get_joint_positions()),
+            gripper_touch_forces=(
+                ee_forces_flat
+                if self._obs_config.gripper_touch_forces else None),
+            gripper_joint_positions=(
+                np.array(self._robot.gripper.get_joint_positions())
+                if self._obs_config.gripper_joint_positions else None),
             task_low_dim_state=(
                 self._active_task.get_low_dim_state() if
                 self._obs_config.task_low_dim_state else None))

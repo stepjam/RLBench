@@ -126,6 +126,11 @@ class Environment(object):
         self._pyrep = None
 
     def get_task(self, task_class: Type[Task]) -> TaskEnvironment:
+
+        # If user hasn't called launch, implicitly call it.
+        if self._pyrep is None:
+            self.launch()
+
         # Str comparison because sometimes class comparison doesn't work.
         if self._prev_task is not None:
             self._prev_task.unload()
