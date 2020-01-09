@@ -42,3 +42,7 @@ class ReachTarget(Task):
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
         return [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
+
+    def get_low_dim_state(self) -> np.ndarray:
+        # One of the few tasks that have a custom low_dim_state function.
+        return np.array(self.target.get_position())

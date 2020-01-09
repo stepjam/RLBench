@@ -61,6 +61,16 @@ class TaskEnvironment(object):
             0, self._task.variation_count())
         return self._variation_number
 
+    def set_variation(self, v: int) -> None:
+        if v >= self.variation_count():
+            raise TaskEnvironmentError(
+                'Requested variation %d, but there are only %d variations.' % (
+                    v, self.variation_count()))
+        self._variation_number = v
+
+    def variation_count(self) -> int:
+        return self._task.variation_count()
+
     def reset(self) -> (List[str], Observation):
         logging.info('Resetting task: %s' % self._task.get_name())
 
@@ -331,6 +341,25 @@ class TaskEnvironment(object):
                     obs[i].wrist_depth = join(wrist_depth_f, si)
                 if obs_config.wrist_camera.depth:
                     obs[i].wrist_mask = join(wrist_mask_f, si)
+
+                # Remove low dim info if necessary
+                if not obs_config.joint_velocities:
+                    obs[i].joint_velocities = None
+                if not obs_config.joint_positions:
+                    obs[i].joint_positions = None
+                if not obs_config.joint_forces:
+                    obs[i].joint_forces = None
+                if not obs_config.gripper_open_amount:
+                    obs[i].gripper_open_amount = None
+                if not obs_config.gripper_pose:
+                    obs[i].gripper_pose = None
+                if not obs_config.gripper_joint_positions:
+                    obs[i].gripper_joint_positions = None
+                if not obs_config.gripper_touch_forces:
+                    obs[i].gripper_touch_forces = None
+                if not obs_config.task_low_dim_state:
+                    obs[i].task_low_dim_state = None
+
             if not image_paths:
                 for i in range(num_steps):
                     if obs_config.left_shoulder_camera.rgb:

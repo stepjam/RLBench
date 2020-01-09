@@ -1,7 +1,12 @@
 from distutils.core import setup
 
+# Version meaning (X.Y.Z)
+# X: Major version (e.g. vastly different scene, platform, etc)
+# Y: Minor version (e.g. new tasks, major changes to existing tasks, etc)
+# Z: Patch version (e.g. small changes to tasks, bug fixes, etc)
+
 setup(name='rlbench',
-      version='1.0',
+      version='1.0.1',
       description='RLBench',
       author='Stephen James',
       author_email='slj12@ic.ac.uk',
