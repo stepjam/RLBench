@@ -41,6 +41,7 @@ class Task(object):
         self._waypoint_abilities_start = {}
         self._waypoint_abilities_end = {}
         self._waypoints_should_repeat = lambda: False
+        self._initial_objs_in_scene = None
 
     ########################
     # Overriding functions #
@@ -82,16 +83,29 @@ class Task(object):
 
         :return: 1D array of low-dimensional task state.
         """
-        objs = self.get_base().get_objects_in_tree(
-            exclude_base=True, first_generation_only=False)
+
+        # Corner cases:
+        # (1) Object has been deleted.
+        # (2) Object has been grasped (and is now child of gripper).
+
         state = []
-        for obj in objs:
-            state.extend(np.array(obj.get_pose()))
-            if obj.get_type() == ObjectType.JOINT:
-                state.extend([Joint(obj.get_handle()).get_joint_position()])
-            elif obj.get_type() == ObjectType.FORCE_SENSOR:
-                forces, torques = ForceSensor(obj.get_handle()).read()
-                state.extend(forces + torques)
+        for obj, objtype in self._initial_objs_in_scene:
+            if not obj.still_exists():
+                # It has been deleted
+                empty_len = 7
+                if objtype == ObjectType.JOINT:
+                    empty_len += 1
+                elif objtype == ObjectType.FORCE_SENSOR:
+                    empty_len += 6
+                state.extend(np.zeros((empty_len,)).tolist())
+            else:
+                state.extend(np.array(obj.get_pose()))
+                if obj.get_type() == ObjectType.JOINT:
+                    state.extend([Joint(obj.get_handle()).get_joint_position()])
+                elif obj.get_type() == ObjectType.FORCE_SENSOR:
+                    forces, torques = ForceSensor(obj.get_handle()).read()
+                    state.extend(forces + torques)
+
         return np.array(state).flatten()
 
     def step(self) -> None:
@@ -144,6 +158,13 @@ class Task(object):
         :return: True if the task pose should not be sampled.
         """
         return False
+
+    def set_initial_objects_in_scene(self):
+        objs = self.get_base().get_objects_in_tree(
+            exclude_base=True, first_generation_only=False)
+        types = [ob.get_type() for ob in objs]
+        self._initial_objs_in_scene = list(zip(objs, types))
+
 
     #########################
     # Registering functions #

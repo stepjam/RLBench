@@ -127,6 +127,7 @@ class Scene(object):
             self._active_task.cleanup_()
             self._active_task.restore_state(self._inital_task_state)
         [self._pyrep.step_ui() for _ in range(20)]
+        self._active_task.set_initial_objects_in_scene()
 
     def get_observation(self) -> Observation:
         tip = self._robot.arm.get_tip()
