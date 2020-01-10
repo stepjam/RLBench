@@ -2,7 +2,7 @@ import unittest
 from os import path
 from rlbench import environment
 from rlbench.task_environment import TaskEnvironment
-from rlbench.tasks.reach_target import ReachTarget
+from rlbench.tasks import TakeLidOffSaucepan, ReachTarget
 from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 import numpy as np
@@ -80,6 +80,17 @@ class TestEnvironment(unittest.TestCase):
         self.assertEqual(len(demos), 2)
         self.assertGreater(len(demos[0]), 0)
         self.assertIsInstance(demos[0][0].right_shoulder_rgb, np.ndarray)
+
+    def test_observation_shape_constant_across_demo(self):
+        task = self.get_task(
+            TakeLidOffSaucepan, ArmActionMode.ABS_JOINT_VELOCITY)
+        demos = task.get_demos(1, live_demos=True)
+        self.assertEqual(len(demos), 1)
+        self.assertGreater(len(demos[0]), 0)
+        self.assertGreater(demos[0][0].task_low_dim_state.size, 0)
+        shapes = [step.task_low_dim_state.shape for step in demos[0]]
+        first_shape = shapes[0]
+        self.assertListEqual(shapes, [first_shape] * len(demos[0]))
 
     def test_action_mode_abs_joint_velocity(self):
         task = self.get_task(
