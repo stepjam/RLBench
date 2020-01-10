@@ -7,6 +7,11 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
 from pyrep.robots.end_effectors.mico_gripper import MicoGripper
 from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
+from rlbench.sim2real.domain_randomization import RandomizeEvery, \
+    VisualRandomizationConfig, DynamicsRandomizationConfig
+
+from rlbench.sim2real.domain_randomization_scene import DomainRandomizationScene
+
 from rlbench.backend.scene import Scene
 from rlbench.backend.task import Task
 from rlbench.backend.const import *
@@ -34,10 +39,15 @@ SUPPORTED_ROBOTS = {
 class Environment(object):
     """Each environment has a scene."""
 
-    def __init__(self, action_mode: ActionMode, dataset_root: str= '',
+    def __init__(self, action_mode: ActionMode, dataset_root: str='',
                  obs_config=ObservationConfig(), headless=False,
-                 static_positions: bool = False,
-                 robot_configuration='panda'):
+                 static_positions: bool=False,
+                 robot_configuration='panda',
+                 randomize_every: RandomizeEvery=None,
+                 frequency: int=1,
+                 visual_randomization_config: VisualRandomizationConfig=None,
+                 dynamics_randomization_config: DynamicsRandomizationConfig=None,
+                 ):
 
         self._dataset_root = dataset_root
         self._action_mode = action_mode
@@ -46,9 +56,21 @@ class Environment(object):
         self._static_positions = static_positions
         self._robot_configuration = robot_configuration
 
+        self._randomize_every = randomize_every
+        self._frequency = frequency
+        self._visual_randomization_config = visual_randomization_config
+        self._dynamics_randomization_config = dynamics_randomization_config
+
         if robot_configuration not in SUPPORTED_ROBOTS.keys():
             raise ValueError('robot_configuration must be one of %s' %
                              str(SUPPORTED_ROBOTS.keys()))
+
+        if (randomize_every is not None and
+                    visual_randomization_config is None and
+                    dynamics_randomization_config is None):
+            raise ValueError(
+                'If domain randomization is enabled, must supply either '
+                'visual_randomization_config or dynamics_randomization_config')
 
         self._check_dataset_structure()
 
@@ -117,7 +139,15 @@ class Environment(object):
             arm, gripper = arm_class(), gripper_class()
 
         self._robot = Robot(arm, gripper)
-        self._scene = Scene(self._pyrep, self._robot, self._obs_config)
+        if self._randomize_every is None:
+            self._scene = Scene(self._pyrep, self._robot, self._obs_config)
+        else:
+            self._scene = DomainRandomizationScene(
+                self._pyrep, self._robot, self._obs_config,
+                self._randomize_every, self._frequency,
+                self._visual_randomization_config,
+                self._dynamics_randomization_config)
+
         self._set_arm_control_action()
 
     def shutdown(self):
