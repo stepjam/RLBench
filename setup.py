@@ -21,6 +21,6 @@ setup(name='rlbench',
             'rlbench.assets',
             'rlbench.gym'
       ],
-      package_data={'': ['*.ttm', '*.obj'],
+      package_data={'': ['**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
       )
