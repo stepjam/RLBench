@@ -35,6 +35,11 @@ class Scene(object):
         self._cam_over_shoulder_left = VisionSensor('cam_over_shoulder_left')
         self._cam_over_shoulder_right = VisionSensor('cam_over_shoulder_right')
         self._cam_wrist = VisionSensor('cam_wrist')
+        self._cam_over_shoulder_left_mask = VisionSensor(
+            'cam_over_shoulder_left_mask')
+        self._cam_over_shoulder_right_mask = VisionSensor(
+            'cam_over_shoulder_right_mask')
+        self._cam_wrist_mask = VisionSensor('cam_wrist_mask')
         self._has_init_task = self._has_init_episode = False
         self._variation_index = 0
 
@@ -42,9 +47,6 @@ class Scene(object):
                                      robot.gripper.get_configuration_tree())
 
         # Set camera properties from observation config
-        self._cam_shoulder_left_mask = None
-        self._cam_shoulder_right_mask = None
-        self._cam_wrist_mask = None
         self._set_camera_properties()
 
     def load(self, task: Task) -> None:
@@ -176,10 +178,10 @@ class Scene(object):
                 if wc_ob.depth else None),
 
             left_shoulder_mask=(
-                self._cam_shoulder_left_mask.capture_rgb()
+                self._cam_over_shoulder_left_mask.capture_rgb()
                 if lsc_ob.mask else None),
             right_shoulder_mask=(
-                self._cam_shoulder_right_mask.capture_rgb()
+                self._cam_over_shoulder_right_mask.capture_rgb()
                 if rsc_ob.mask else None),
             wrist_mask=(
                 self._cam_wrist_mask.capture_rgb()
@@ -346,40 +348,45 @@ class Scene(object):
             func()
 
     def _set_camera_properties(self) -> None:
-        def _set_props(cam: VisionSensor, rgb: bool, depth: bool,
-                       conf: CameraConfig):
+        def _set_rgb_props(rgb_cam: VisionSensor,
+                           rgb: bool, depth: bool, conf: CameraConfig):
             if not (rgb or depth):
-                cam.remove()
+                rgb_cam.remove()
             else:
-                cam.set_resolution(conf.image_size)
-                cam.set_render_mode(conf.render_mode)
-        _set_props(
+                rgb_cam.set_resolution(conf.image_size)
+                rgb_cam.set_render_mode(conf.render_mode)
+
+        def _set_mask_props(mask_cam: VisionSensor, mask: bool,
+                            conf: CameraConfig):
+                if not mask:
+                    mask_cam.remove()
+                else:
+                    mask_cam.set_resolution(conf.image_size)
+        _set_rgb_props(
             self._cam_over_shoulder_left,
             self._obs_config.left_shoulder_camera.rgb,
             self._obs_config.left_shoulder_camera.depth,
             self._obs_config.left_shoulder_camera)
-        _set_props(
+        _set_rgb_props(
             self._cam_over_shoulder_right,
             self._obs_config.right_shoulder_camera.rgb,
             self._obs_config.right_shoulder_camera.depth,
             self._obs_config.right_shoulder_camera)
-        _set_props(
+        _set_rgb_props(
             self._cam_wrist, self._obs_config.wrist_camera.rgb,
             self._obs_config.wrist_camera.depth,
             self._obs_config.wrist_camera)
-
-        if self._obs_config.left_shoulder_camera.mask:
-            self._cam_shoulder_left_mask = self._cam_over_shoulder_left.copy()
-            self._cam_shoulder_left_mask.set_render_mode(
-                RenderMode.OPENGL_COLOR_CODED)
-        if self._obs_config.right_shoulder_camera.mask:
-            self._cam_shoulder_right_mask = self._cam_over_shoulder_right.copy()
-            self._cam_shoulder_right_mask.set_render_mode(
-                RenderMode.OPENGL_COLOR_CODED)
-        if self._obs_config.wrist_camera.mask:
-            self._cam_wrist_mask = self._cam_wrist.copy()
-            self._cam_wrist_mask.set_render_mode(
-                RenderMode.OPENGL_COLOR_CODED)
+        _set_mask_props(
+            self._cam_over_shoulder_left_mask,
+            self._obs_config.left_shoulder_camera.mask,
+            self._obs_config.left_shoulder_camera)
+        _set_mask_props(
+            self._cam_over_shoulder_right_mask,
+            self._obs_config.right_shoulder_camera.mask,
+            self._obs_config.right_shoulder_camera)
+        _set_mask_props(
+            self._cam_wrist_mask, self._obs_config.wrist_camera.mask,
+            self._obs_config.wrist_camera)
 
     def _place_task(self) -> None:
         self._workspace_boundary.clear()
