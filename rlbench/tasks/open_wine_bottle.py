@@ -1,5 +1,6 @@
 from typing import List
 import numpy as np
+from pyrep.objects.force_sensor import ForceSensor
 from pyrep.objects.shape import Shape
 from pyrep.objects.joint import Joint
 from pyrep.objects.proximity_sensor import ProximitySensor
@@ -15,6 +16,7 @@ class OpenWineBottle(Task):
         cap_detector = ProximitySensor("cap_detector")
         bottle = Shape('bottle')
         self.joint = Joint('joint')
+        self.force_sensor = ForceSensor('Force_sensor')
         self.cap = Shape('cap')
         self.register_success_conditions(
             [DetectedCondition(bottle, bottle_detector),
@@ -24,6 +26,7 @@ class OpenWineBottle(Task):
             self.joint, np.deg2rad(150))
 
     def init_episode(self, index: int) -> List[str]:
+        self.cap.set_parent(self.force_sensor)
         self.cap_turned = False
         return ['open wine bottle',
                 'screw open the wine bottle',
@@ -37,3 +40,6 @@ class OpenWineBottle(Task):
             self.cap_turned = self.cap_turned_condition.condition_met()[0]
             if self.cap_turned:
                 self.cap.set_parent(self.joint)
+
+    def cleanup(self):
+        self.cap.set_parent(self.force_sensor)
