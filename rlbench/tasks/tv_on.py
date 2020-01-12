@@ -14,7 +14,7 @@ class TvOn(Task):
         self.screen_on = Shape('tv_screen_on')
         self.remote = Shape('tv_remote')
         self.boundary = Shape('spawn_boundary')
-        self.condition = JointCondition(Joint('target_button_joint0'), 0.005)
+        self.condition = JointCondition(Joint('target_button_joint0'), 0.003)
 
     def init_episode(self, index: int) -> List[str]:
         self.register_success_conditions([self.condition])

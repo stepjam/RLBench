@@ -36,7 +36,7 @@ class PushButton(Task):
         self.target_topPlate = Shape('target_button_topPlate')
         self.joint = Joint('target_button_joint')
         self.target_wrap = Shape('target_button_wrap')
-        self.goal_condition = JointCondition(self.joint, 0.005)
+        self.goal_condition = JointCondition(self.joint, 0.003)
 
     def init_episode(self, index: int) -> List[str]:
         self._variation_index = index
