@@ -19,8 +19,8 @@ class ChangeChannel(Task):
         self.remote = Shape('tv_remote')
         self.boundary = Shape('spawn_boundary')
         self.joint_conditions = [
-            JointCondition(Joint('target_button_joint1'), 0.005),
-            JointCondition(Joint('target_button_joint2'), 0.005)
+            JointCondition(Joint('target_button_joint1'), 0.003),
+            JointCondition(Joint('target_button_joint2'), 0.003)
         ]
 
     def init_episode(self, index: int) -> List[str]:
