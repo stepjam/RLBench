@@ -11,7 +11,7 @@ class LampOn(Task):
         self.bulb_glass_visual = Shape('bulb')
         self.bulb_glass_visual.set_color([0, 0, 0])
         self.joint = Joint('target_button_joint')
-        self.condition = JointCondition(self.joint, 0.005)
+        self.condition = JointCondition(self.joint, 0.003)
 
     def init_episode(self, index: int) -> List[str]:
         self.bulb_glass_visual.set_color([0, 0, 0])
