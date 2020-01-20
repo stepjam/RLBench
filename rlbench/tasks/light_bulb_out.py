@@ -58,7 +58,7 @@ class LightBulbOut(Task):
                 % target_color_name]
 
     def variation_count(self) -> int:
-        return 2 * len(colors)
+        return len(colors)
 
     def step(self) -> None:
         if DetectedCondition(self.bulb, ProximitySensor('lamp_detector'),

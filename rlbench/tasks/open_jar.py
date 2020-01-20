@@ -48,7 +48,7 @@ class OpenJar(Task):
                 'table' % target_color_name]
 
     def variation_count(self) -> int:
-        return 2 * len(colors)
+        return len(colors)
 
     def cleanup(self) -> None:
         self.conditions = [NothingGrasped(self.robot.gripper)]

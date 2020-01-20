@@ -79,7 +79,7 @@ class EmptyContainer(Task):
                 % target_color_name]
 
     def variation_count(self) -> int:
-        return 2*len(colors)
+        return len(colors)
 
     def cleanup(self) -> None:
         [ob.remove() for ob in self.bin_objects if ob.still_exists()]

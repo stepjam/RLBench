@@ -46,7 +46,7 @@ class TestTasks(unittest.TestCase):
                 active_task = task_class(sim, robot)
                 try:
                     task_smoke(active_task, scene, variation=-1,
-                               test_demos=False)
+                               test_demos=False, max_variations=9999)
                 except Exception as e:
                     sim.stop()
                     raise e

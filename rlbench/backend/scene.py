@@ -101,6 +101,7 @@ class Scene(object):
                 break
             except (BoundaryError, WaypointError) as e:
                 self._active_task.cleanup_()
+                self._active_task.restore_state(self._inital_task_state)
                 attempts += 1
                 if attempts >= max_attempts:
                     raise e
