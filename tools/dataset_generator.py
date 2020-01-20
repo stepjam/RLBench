@@ -40,52 +40,73 @@ def save_demo(demo, example_path):
         example_path, LEFT_SHOULDER_RGB_FOLDER)
     left_shoulder_depth_path = os.path.join(
         example_path, LEFT_SHOULDER_DEPTH_FOLDER)
+    left_shoulder_mask_path = os.path.join(
+        example_path, LEFT_SHOULDER_MASK_FOLDER)
     right_shoulder_rgb_path = os.path.join(
         example_path, RIGHT_SHOULDER_RGB_FOLDER)
     right_shoulder_depth_path = os.path.join(
         example_path, RIGHT_SHOULDER_DEPTH_FOLDER)
+    right_shoulder_mask_path = os.path.join(
+        example_path, RIGHT_SHOULDER_MASK_FOLDER)
     wrist_rgb_path = os.path.join(example_path, WRIST_RGB_FOLDER)
     wrist_depth_path = os.path.join(example_path, WRIST_DEPTH_FOLDER)
+    wrist_mask_path = os.path.join(example_path, WRIST_MASK_FOLDER)
 
     check_and_make(left_shoulder_rgb_path)
     check_and_make(left_shoulder_depth_path)
+    check_and_make(left_shoulder_mask_path)
     check_and_make(right_shoulder_rgb_path)
     check_and_make(right_shoulder_depth_path)
+    check_and_make(right_shoulder_mask_path)
     check_and_make(wrist_rgb_path)
     check_and_make(wrist_depth_path)
+    check_and_make(wrist_mask_path)
 
     for i, obs in enumerate(demo):
         left_shoulder_rgb = Image.fromarray(
             (obs.left_shoulder_rgb * 255).astype(np.uint8))
         left_shoulder_depth = utils.float_array_to_grayscale_image(
             obs.left_shoulder_depth, scale_factor=DEPTH_SCALE)
+        left_shoulder_mask = Image.fromarray(
+            (obs.left_shoulder_mask * 255).astype(np.uint8))
         right_shoulder_rgb = Image.fromarray(
             (obs.right_shoulder_rgb * 255).astype(np.uint8))
         right_shoulder_depth = utils.float_array_to_grayscale_image(
             obs.right_shoulder_depth, scale_factor=DEPTH_SCALE)
+        right_shoulder_mask = Image.fromarray(
+            (obs.right_shoulder_mask * 255).astype(np.uint8))
 
         wrist_rgb = Image.fromarray((obs.wrist_rgb * 255).astype(np.uint8))
         wrist_depth = utils.float_array_to_grayscale_image(
             obs.wrist_depth, scale_factor=DEPTH_SCALE)
+        wrist_mask = Image.fromarray((obs.wrist_mask * 255).astype(np.uint8))
 
         left_shoulder_rgb.save(
             os.path.join(left_shoulder_rgb_path, IMAGE_FORMAT % i))
         left_shoulder_depth.save(
             os.path.join(left_shoulder_depth_path, IMAGE_FORMAT % i))
+        left_shoulder_mask.save(
+            os.path.join(left_shoulder_mask_path, IMAGE_FORMAT % i))
         right_shoulder_rgb.save(
             os.path.join(right_shoulder_rgb_path, IMAGE_FORMAT % i))
         right_shoulder_depth.save(
             os.path.join(right_shoulder_depth_path, IMAGE_FORMAT % i))
+        right_shoulder_mask.save(
+            os.path.join(right_shoulder_mask_path, IMAGE_FORMAT % i))
         wrist_rgb.save(os.path.join(wrist_rgb_path, IMAGE_FORMAT % i))
         wrist_depth.save(os.path.join(wrist_depth_path, IMAGE_FORMAT % i))
+        wrist_mask.save(os.path.join(wrist_mask_path, IMAGE_FORMAT % i))
 
         # We save the images separately, so set these to None for pickling.
         obs.left_shoulder_rgb = None
         obs.left_shoulder_depth = None
+        obs.left_shoulder_mask = None
         obs.right_shoulder_rgb = None
         obs.right_shoulder_depth = None
+        obs.right_shoulder_mask = None
         obs.wrist_rgb = None
         obs.wrist_depth = None
+        obs.wrist_mask = None
 
     # Save the low-dimension data
     with open(os.path.join(example_path, LOW_DIM_PICKLE), 'wb') as f:
