@@ -72,14 +72,17 @@ class Environment(object):
         return getattr(mod, class_name)
 
     def launch(self):
+        print('lsfkjsdlkjlksjlsdjglkgdjsggggggdlkjsljljslk')
         if self._pyrep is not None:
             raise RuntimeError('Already called launch!')
         self._pyrep = PyRep()
         self._pyrep.launch(join(DIR_PATH, TTT_FILE), headless=self._headless)
-        
+
         # self._pyrep.set_simulation_timestep(0.05)
         self._pyrep.set_simulation_timestep(0.04) # 25 Hz frequency
         self._robot = Robot(Panda(), PandaGripper())
+
+        print('hiiiiiiiiiiiii', self._robot.arm.joints)
         self._scene = Scene(self._pyrep, self._robot, self._obs_config)
         self._set_arm_control_action()
 
