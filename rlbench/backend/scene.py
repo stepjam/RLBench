@@ -69,6 +69,8 @@ class Scene(object):
         """Clears the scene. i.e. removes all tasks. """
         if self._active_task is not None:
             self._robot.gripper.release()
+            if self._has_init_task:
+                self._active_task.cleanup_()
             self._active_task.unload()
         self._active_task = None
         self._variation_index = 0

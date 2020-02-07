@@ -34,8 +34,7 @@ class RLBenchEnv(gym.Env):
         _, obs = self.task.reset()
 
         self.action_space = spaces.Box(
-            low=-1.0, high=1.0, shape=(action_mode.action_size,),
-            dtype=np.float32)
+            low=-1.0, high=1.0, shape=(action_mode.action_size,))
 
         if observation_mode == 'state':
             self.observation_space = spaces.Box(

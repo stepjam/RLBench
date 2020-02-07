@@ -161,9 +161,7 @@ class Environment(object):
         if self._pyrep is None:
             self.launch()
 
-        # Str comparison because sometimes class comparison doesn't work.
-        if self._prev_task is not None:
-            self._prev_task.unload()
+        self._scene.unload()
         task = task_class(self._pyrep, self._robot)
         self._prev_task = task
         return TaskEnvironment(

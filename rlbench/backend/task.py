@@ -280,7 +280,6 @@ class Task(object):
         return self._base_object
 
     def unload(self) -> None:
-        self.cleanup()
         self._waypoints = None
         self.get_base().remove()
         self.clear_registerings()
