@@ -12,7 +12,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 - [Announcements](#announcements)
 - [Install](#install)
 - [Getting Started](#getting-started)
-    - [Few-Shot Learning / Meta Learning](#few-shot-learning-meta-learning)
+    - [Few-Shot Learning and Meta Learning](#few-shot-learning-and-meta-learning)
     - [Reinforcement Learning](#reinforcement-learning)
     - [Sim-to-Real](#sim-to-real)
     - [Imitation Learning](#imitation-learning)
@@ -25,6 +25,11 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 - [Citation](#citation)
 
 ## Announcements
+
+### 28 January, 2020
+
+- RLBench has been accepted to RA-L with presentation at ICRA!
+- Ability to easily swap out arms added. [See here](#swapping-arms).
 
 ### 17 December, 2019
 
@@ -64,7 +69,7 @@ And that's it!
 The benchmark places particular emphasis on few-shot learning and meta learning 
 due to breadth of tasks available, though it can be used in numerous ways.
 
-### Few-Shot Learning / Meta Learning
+### Few-Shot Learning and Meta Learning
 
 We have created splits of tasks called 'Task Sets', which consist of a 
 collection of X training tasks and 5 tests tasks. Here X can be 10, 25, 50, or 95.
