@@ -2,9 +2,11 @@ import os
 from os.path import join, dirname, abspath, isfile
 import sys
 import traceback
+import readline
 
 from pyrep.const import RenderMode
 
+from rlbench.backend import task
 from rlbench.backend.const import TTT_FILE
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
@@ -16,7 +18,7 @@ from rlbench.backend.exceptions import *
 from rlbench.observation_config import ObservationConfig, CameraConfig
 from rlbench.backend.robot import Robot
 from rlbench.utils import name_to_task_class
-from tools.task_validator import task_smoke, TaskValidationError
+from task_validator import task_smoke, TaskValidationError
 
 CURRENT_DIR = dirname(abspath(__file__))
 
@@ -24,6 +26,22 @@ CURRENT_DIR = dirname(abspath(__file__))
 def print_fail(message, end='\n'):
     message = str(message)
     sys.stderr.write('\x1b[1;31m' + message.strip() + '\x1b[0m' + end)
+
+
+def setup_list_completer():
+    task_files = [t.replace('.py', '') for t in os.listdir(task.TASKS_PATH)
+                  if t != '__init__.py' and t.endswith('.py')]
+
+    def list_completer(_, state):
+        line = readline.get_line_buffer()
+        if not line:
+            return [c + " " for c in task_files][state]
+
+        else:
+            return [c + " " for c in task_files if c.startswith(line)][state]
+
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(list_completer)
 
 
 class LoadedTask(object):
@@ -51,6 +69,7 @@ class LoadedTask(object):
 
     def _edit_new_task(self):
         task_file = input('What task would you like to edit?\n')
+        task_file = task_file.strip(' ')
         if len(task_file) > 3 and task_file[-3:] != '.py':
             task_file += '.py'
         try:
@@ -199,6 +218,8 @@ class LoadedTask(object):
 
 
 if __name__ == '__main__':
+
+    setup_list_completer()
 
     pr = PyRep()
     ttt_file = join(CURRENT_DIR, '..', 'rlbench', TTT_FILE)
