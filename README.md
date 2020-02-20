@@ -20,6 +20,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
     - [RLBench Gym](#rlbench-gym)
     - [Swapping Arms](#swapping-arms)
 - [Task Building](#task-building)
+- [Gotchas!](#gotchas)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 - [Citation](#citation)
@@ -67,7 +68,8 @@ And that's it!
 ## Getting Started
 
 The benchmark places particular emphasis on few-shot learning and meta learning 
-due to breadth of tasks available, though it can be used in numerous ways.
+due to breadth of tasks available, though it can be used in numerous ways. Before using RLBench, 
+checkout the [Gotchas](#gotchas) section.
 
 ### Few-Shot Learning and Meta Learning
 
@@ -276,6 +278,26 @@ Here are some in-depth tutorials:
 - [Simple Task](tutorials/simple_task.md)
 - [Complex Task](tutorials/complex_task.md)
 
+## Gotchas!
+
+- **Using low-dimensional task observations (rather than images):** RLBench was designed to be challenging, putting emphasis on vision rather than 
+toy-based low dimensional inputs. Although each task does supply a low-dimensional
+output this should be used with extreme caution!
+    - Why? Imagine you are training a reinforcement learning agent to pick up a block; halfway through
+    training, the block slips from the gripper and falls of the table. These low-dimensional values
+    will now be out of distribution. I.e. RLBench does not safeguard against objects going out of the 
+    workspace. This issue does not arise when using image-based observations. 
+    
+- **Using non-standard image size:** RLBench by default uses image observation sizes of 128x128.
+When using an alternative size, be aware that you may need to collect your saved demonstrations again.
+    - Why? If we instead specify a 64x64 image observation size to the `ObservationConfig` then the
+    scene cameras will now render to that size. However, the saved demos on disk will now be **resized**
+    to be 64x64.
+    This resizing will of course mean that small artifacts may be present in stored demos
+    that may not be present in the 'live' observations from the scene. Instead, prefer to re-collect demos
+    using the image observation sized you plan to use in the 'live' environment.
+    
+
 ## Contributing
 
 New tasks using our task building tool, in addition to bug fixes, are very 
@@ -295,7 +317,7 @@ thingiverse.com, and cadnav.com.
 @article{james2019rlbench,
   title={RLBench: The Robot Learning Benchmark \& Learning Environment},
   author={James, Stephen and Ma, Zicong and Rovick Arrojo, David and Davison, Andrew J.},
-  journal={arXiv preprint arXiv:1909.12271},
-  year={2019}
+  journal={IEEE Robotics and Automation Letters},
+  year={2020}
 }
 ```
