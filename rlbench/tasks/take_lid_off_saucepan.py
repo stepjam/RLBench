@@ -9,7 +9,7 @@ from rlbench.backend.conditions import DetectedCondition, ConditionSet, \
 class TakeLidOffSaucepan(Task):
 
     def init_task(self) -> None:
-        self.lid = Shape('saucepan_lid')
+        self.lid = Shape('saucepan_lid_grasp_point')
         success_detector = ProximitySensor('success')
         self.register_graspable_objects([self.lid])
         cond_set = ConditionSet([
