@@ -41,7 +41,7 @@ class TakeOffWeighingScales(Task):
         self.register_success_conditions(self.success_conditions)
         b = SpawnBoundary([self.boundary])
         for p in self.peppers:
-            b.sample(p, ignore_collisions=False, min_distance=0.05,
+            b.sample(p, ignore_collisions=False, min_distance=0.09,
                      min_rotation=(0.00, 0.00, -3.14),
                      max_rotation=(0.00, 0.00, +3.14)
                      )
@@ -70,7 +70,6 @@ class TakeOffWeighingScales(Task):
                 % index_dic[self.target_pepper_index]]
         else:
             raise ValueError('Invalid pepper index, should not be here')
-            return -1
 
     def variation_count(self) -> int:
         return UNIQUE_PEPPERS_TO_TAKE_OFF
