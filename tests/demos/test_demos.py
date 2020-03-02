@@ -17,8 +17,7 @@ TASKS = [t for t in os.listdir(task.TASKS_PATH)
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Task does work, but fails demos often. These should eventually be improved.
-FLAKY_TASKS = ['put_books_on_bookshelf', 'take_off_weighing_scales',
-               'hang_frame_on_hanger']
+FLAKY_TASKS = ['take_off_weighing_scales', 'hang_frame_on_hanger']
 
 
 class TestTasks(unittest.TestCase):
