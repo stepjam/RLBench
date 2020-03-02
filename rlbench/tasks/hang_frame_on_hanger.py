@@ -2,7 +2,7 @@ from typing import List, Tuple
 from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
 from rlbench.backend.task import Task
-from rlbench.backend.conditions import DetectedCondition
+from rlbench.backend.conditions import DetectedCondition, NothingGrasped
 
 
 class HangFrameOnHanger(Task):
@@ -13,7 +13,8 @@ class HangFrameOnHanger(Task):
         frame_detector = Shape('frame_detector')
         self.register_graspable_objects([frame])
         self.register_success_conditions(
-            [DetectedCondition(frame_detector, success_sensor)])
+            [DetectedCondition(frame_detector, success_sensor),
+             NothingGrasped(self.robot.gripper)])
 
     def init_episode(self, index: int) -> List[str]:
         return ['hang frame on hanger',
