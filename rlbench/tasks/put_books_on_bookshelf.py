@@ -28,4 +28,4 @@ class PutBooksOnBookshelf(Task):
         return 1
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
-        return [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
+        return [0.0, 0.0, -3.14/2], [0.0, 0.0, 3.14/2]
