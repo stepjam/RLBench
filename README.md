@@ -91,7 +91,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=action_mode.action_size))
 ```
 
 A full example can be seen in [examples/few_shot_rl.py](examples/few_shot_rl.py).
@@ -110,7 +110,7 @@ env.launch()
 
 task = env.get_task(ReachTarget)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(8))
+obs, reward, terminate = task.step(np.random.normal(size=action_mode.action_size))
 ```
 
 A full example can be seen in [examples/single_task_rl.py](examples/single_task_rl.py).
@@ -140,7 +140,7 @@ env.launch()
 
 task = env.get_task(OpenDoor)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=action_mode.action_size))
 ```
 
 A full example can be seen in [examples/single_task_rl_domain_randomization.py](examples/single_task_rl_domain_randomization.py).
@@ -196,7 +196,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=action_mode.action_size))
 ```
 
 A full example can be seen in [examples/multi_task_learning.py](examples/multi_task_learning.py).
