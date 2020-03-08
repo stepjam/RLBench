@@ -123,6 +123,10 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
 
     obs_config = ObservationConfig()
     obs_config.set_all(True)
+    # We want to save the masks as rgb encodings.
+    obs_config.left_shoulder_camera.masks_as_one_channel = False
+    obs_config.right_shoulder_camera.masks_as_one_channel = False
+    obs_config.wrist_camera.masks_as_one_channel = False
 
     rlbench_env = Environment(
         action_mode=ActionMode(),

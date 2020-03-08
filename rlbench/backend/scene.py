@@ -7,6 +7,7 @@ from rlbench.backend.spawn_boundary import SpawnBoundary
 from rlbench.backend.observation import Observation
 from rlbench.backend.exceptions import (
     WaypointError, BoundaryError, NoWaypointsError, DemoError)
+from rlbench.backend.utils import rgb_handles_to_mask
 from rlbench.demo import Demo
 from rlbench.observation_config import ObservationConfig, CameraConfig
 from rlbench.backend.task import Task
@@ -156,6 +157,13 @@ class Scene(object):
         rsc_ob = self._obs_config.right_shoulder_camera
         wc_ob = self._obs_config.wrist_camera
 
+        lsc_mask_fn = (
+            rgb_handles_to_mask if lsc_ob.masks_as_one_channel else lambda x: x)
+        rsc_mask_fn = (
+            rgb_handles_to_mask if rsc_ob.masks_as_one_channel else lambda x: x)
+        wc_mask_fn = (
+            rgb_handles_to_mask if wc_ob.masks_as_one_channel else lambda x: x)
+
         obs = Observation(
             left_shoulder_rgb=(
                 lsc_ob.rgb_noise.apply(
@@ -181,13 +189,16 @@ class Scene(object):
                 if wc_ob.depth else None),
 
             left_shoulder_mask=(
-                self._cam_over_shoulder_left_mask.capture_rgb()
+                lsc_mask_fn(
+                    self._cam_over_shoulder_left_mask.capture_rgb())
                 if lsc_ob.mask else None),
             right_shoulder_mask=(
-                self._cam_over_shoulder_right_mask.capture_rgb()
+                rsc_mask_fn(
+                    self._cam_over_shoulder_right_mask.capture_rgb())
                 if rsc_ob.mask else None),
             wrist_mask=(
-                self._cam_wrist_mask.capture_rgb()
+                wc_mask_fn(
+                    self._cam_wrist_mask.capture_rgb())
                 if wc_ob.mask else None),
 
             joint_velocities=(
