@@ -9,7 +9,7 @@ from rlbench.backend.exceptions import BoundaryError, WaypointError
 from rlbench.backend.scene import Scene
 from rlbench.backend.task import Task
 from rlbench.backend.const import *
-from rlbench.backend.utils import image_to_float_array
+from rlbench.backend.utils import image_to_float_array, rgb_handles_to_mask
 from rlbench.backend.robot import Robot
 import logging
 from typing import List
@@ -374,48 +374,54 @@ class TaskEnvironment(object):
                             self._resize_if_needed(
                                 Image.open(obs[i].left_shoulder_rgb),
                                 obs_config.left_shoulder_camera.image_size))
-                    if obs_config.left_shoulder_camera.depth:
-                        obs[i].left_shoulder_depth = image_to_float_array(
-                            self._resize_if_needed(
-                                Image.open(obs[i].left_shoulder_depth),
-                                obs_config.left_shoulder_camera.image_size),
-                            DEPTH_SCALE)
-                    if obs_config.left_shoulder_camera.mask:
-                        obs[i].left_shoulder_mask = np.array(
-                            self._resize_if_needed(Image.open(
-                                obs[i].left_shoulder_mask),
-                                obs_config.left_shoulder_camera.image_size))
                     if obs_config.right_shoulder_camera.rgb:
                         obs[i].right_shoulder_rgb = np.array(
                             self._resize_if_needed(Image.open(
                             obs[i].right_shoulder_rgb),
-                                obs_config.right_shoulder_camera.image_size))
-                    if obs_config.right_shoulder_camera.depth:
-                        obs[i].right_shoulder_depth = image_to_float_array(
-                            self._resize_if_needed(
-                                Image.open(obs[i].right_shoulder_depth),
-                                obs_config.right_shoulder_camera.image_size),
-                            DEPTH_SCALE)
-                    if obs_config.right_shoulder_camera.mask:
-                        obs[i].right_shoulder_mask = np.array(
-                            self._resize_if_needed(Image.open(
-                                obs[i].right_shoulder_mask),
                                 obs_config.right_shoulder_camera.image_size))
                     if obs_config.wrist_camera.rgb:
                         obs[i].wrist_rgb = np.array(
                             self._resize_if_needed(
                                 Image.open(obs[i].wrist_rgb),
                                 obs_config.wrist_camera.image_size))
+
+                    if obs_config.left_shoulder_camera.depth:
+                        obs[i].left_shoulder_depth = image_to_float_array(
+                            self._resize_if_needed(
+                                Image.open(obs[i].left_shoulder_depth),
+                                obs_config.left_shoulder_camera.image_size),
+                            DEPTH_SCALE)
+                    if obs_config.right_shoulder_camera.depth:
+                        obs[i].right_shoulder_depth = image_to_float_array(
+                            self._resize_if_needed(
+                                Image.open(obs[i].right_shoulder_depth),
+                                obs_config.right_shoulder_camera.image_size),
+                            DEPTH_SCALE)
                     if obs_config.wrist_camera.depth:
                         obs[i].wrist_depth = image_to_float_array(
                             self._resize_if_needed(
                                 Image.open(obs[i].wrist_depth),
-                                obs_config.wrist_camera.image_size), DEPTH_SCALE)
+                                obs_config.wrist_camera.image_size),
+                            DEPTH_SCALE)
+
+                    # Masks are stored as coded RGB images.
+                    # Here we transform them into 1 channel handles.
+                    if obs_config.left_shoulder_camera.mask:
+                        obs[i].left_shoulder_mask = rgb_handles_to_mask(
+                            np.array(self._resize_if_needed(Image.open(
+                                obs[i].left_shoulder_mask),
+                                obs_config.left_shoulder_camera.image_size)))
+                    if obs_config.right_shoulder_camera.mask:
+                        obs[i].right_shoulder_mask = rgb_handles_to_mask(
+                            np.array(self._resize_if_needed(Image.open(
+                                obs[i].right_shoulder_mask),
+                                obs_config.right_shoulder_camera.image_size)))
                     if obs_config.wrist_camera.mask:
-                        obs[i].wrist_mask = np.array(
+                        obs[i].wrist_mask = rgb_handles_to_mask(np.array(
                             self._resize_if_needed(Image.open(
                                 obs[i].wrist_mask),
-                                obs_config.wrist_camera.image_size))
+                                obs_config.wrist_camera.image_size)))
+
             demos.append(obs)
         return demos
 
