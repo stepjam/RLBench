@@ -15,13 +15,13 @@ class Observation(object):
                  wrist_depth: np.ndarray,
                  wrist_mask: np.ndarray,
                  joint_velocities: np.ndarray,
-                 joint_positions:  np.ndarray,
+                 joint_positions: np.ndarray,
                  joint_forces: np.ndarray,
                  gripper_open_amount: float,
-                 gripper_pose:  np.ndarray,
-                 gripper_joint_positions:  np.ndarray,
-                 gripper_touch_forces:  np.ndarray,
-                 task_low_dim_state:  np.ndarray):
+                 gripper_pose: np.ndarray,
+                 gripper_joint_positions: np.ndarray,
+                 gripper_touch_forces: np.ndarray,
+                 task_low_dim_state: np.ndarray):
         self.left_shoulder_rgb = left_shoulder_rgb
         self.left_shoulder_depth = left_shoulder_depth
         self.left_shoulder_mask = left_shoulder_mask

@@ -1,6 +1,5 @@
 from typing import List
 from pyrep import PyRep
-from pyrep.const import RenderMode
 from pyrep.errors import ConfigurationPathError
 from pyrep.objects.shape import Shape
 from pyrep.objects.vision_sensor import VisionSensor
@@ -8,6 +7,7 @@ from rlbench.backend.spawn_boundary import SpawnBoundary
 from rlbench.backend.observation import Observation
 from rlbench.backend.exceptions import (
     WaypointError, BoundaryError, NoWaypointsError, DemoError)
+from rlbench.demo import Demo
 from rlbench.observation_config import ObservationConfig, CameraConfig
 from rlbench.backend.task import Task
 from rlbench.backend.robot import Robot
@@ -223,7 +223,7 @@ class Scene(object):
         self._active_task.step()
 
     def get_demo(self, record: bool=True, func=None,
-                 randomly_place: bool=True) -> List[Observation]:
+                 randomly_place: bool=True) -> Demo:
         """Returns a demo (list of observations)"""
 
         if not self._has_init_task:
@@ -338,8 +338,7 @@ class Scene(object):
         if not success:
             raise DemoError('Demo was completed, but was not successful.',
                             self._active_task)
-
-        return demo
+        return Demo(demo)
 
     def get_observation_config(self) -> ObservationConfig:
         return self._obs_config
