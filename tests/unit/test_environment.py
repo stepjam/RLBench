@@ -92,6 +92,22 @@ class TestEnvironment(unittest.TestCase):
         first_shape = shapes[0]
         self.assertListEqual(shapes, [first_shape] * len(demos[0]))
 
+    def test_reset_to_demos(self):
+        task = self.get_task(
+            TakeLidOffSaucepan, ArmActionMode.ABS_JOINT_VELOCITY)
+        demo = task.get_demos(1, live_demos=True)[0]
+        obs = demo[0]
+        task.reset_to_demo(demo)
+        reset_obs = task.get_observation()
+
+        # Now check that the state has been properly restored
+        np.testing.assert_allclose(
+            reset_obs.joint_positions, obs.joint_positions, atol=1e-1)
+        np.testing.assert_allclose(
+            reset_obs.task_low_dim_state, obs.task_low_dim_state, atol=1e-1)
+        np.testing.assert_allclose(
+            reset_obs.gripper_open, obs.gripper_open, atol=1e-1)
+
     def test_action_mode_abs_joint_velocity(self):
         task = self.get_task(
             ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)

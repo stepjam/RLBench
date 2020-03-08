@@ -15,6 +15,7 @@ import logging
 from typing import List
 from rlbench.backend.observation import Observation
 from rlbench.action_modes import ArmActionMode, ActionMode
+from rlbench.demo import Demo
 from rlbench.observation_config import ObservationConfig
 from pyquaternion import Quaternion
 
@@ -98,6 +99,9 @@ class TaskEnvironment(object):
         # Returns a list of descriptions and the first observation
         return desc, self._scene.get_observation()
 
+    def get_observation(self) -> Observation:
+        return self._scene.get_observation()
+
     def _assert_action_space(self, action, expected_shape):
         if np.shape(action) != expected_shape:
             raise RuntimeError(
@@ -173,7 +177,8 @@ class TaskEnvironment(object):
             self._assert_action_space(arm_action, (7,))
             a_x, a_y, a_z, a_qx, a_qy, a_qz, a_qw = arm_action
             x, y, z, qx, qy, qz, qw = self._robot.arm.get_tip().get_pose()
-            new_rot = Quaternion(a_qw, a_qx, a_qy, a_qz) * Quaternion(qw, qx, qy, qz)
+            new_rot = Quaternion(a_qw, a_qx, a_qy, a_qz) * Quaternion(
+                qw, qx, qy, qz)
             qw, qx, qy, qz = list(new_rot)
             new_pose = [a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw]
             self._ee_action(list(new_pose))
@@ -198,7 +203,8 @@ class TaskEnvironment(object):
 
         elif self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE:
 
-            self._assert_action_space(arm_action, (len(self._robot.arm.joints),))
+            self._assert_action_space(
+                arm_action, (len(self._robot.arm.joints),))
             self._torque_action(arm_action)
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE:
@@ -225,12 +231,11 @@ class TaskEnvironment(object):
                 self._robot.gripper.release()
 
         self._scene.step()
-
         success, terminate = self._task.success()
         return self._scene.get_observation(), int(success), terminate
 
     def get_demos(self, amount: int, live_demos=False,
-                  image_paths=True) -> List[List[Observation]]:
+                  image_paths=True) -> List[Demo]:
         """Negative means all demos"""
 
         if not live_demos and (self._dataset_root is None
@@ -250,16 +255,18 @@ class TaskEnvironment(object):
             self._robot.arm.joints[0].set_control_loop_enabled(ctr_loop)
         return demos
 
-    def _get_live_demos(self, amount):
+    def _get_live_demos(self, amount) -> List[Demo]:
         demos = []
         for i in range(amount):
             attempts = _MAX_DEMO_ATTEMPTS
             while attempts > 0:
+                random_seed = np.random.get_state()
                 self.reset()
                 logging.info('Collecting demo %d' % i)
                 try:
-                    obs = self._scene.get_demo()
-                    demos.append(obs)
+                    demo = self._scene.get_demo()
+                    demo.random_seed = random_seed
+                    demos.append(demo)
                     break
                 except Exception as e:
                     attempts -= 1
@@ -274,7 +281,7 @@ class TaskEnvironment(object):
             image = image.resize(size)
         return image
 
-    def _get_stored_demos(self, amount: int, image_paths: bool):
+    def _get_stored_demos(self, amount: int, image_paths: bool) -> List[Demo]:
 
         task_root = join(self._dataset_root, self._task.get_name())
         if not exists(task_root):
@@ -411,3 +418,7 @@ class TaskEnvironment(object):
                                 obs_config.wrist_camera.image_size))
             demos.append(obs)
         return demos
+
+    def reset_to_demo(self, demo: Demo) -> None:
+        demo.restore_state()
+        self.reset()
