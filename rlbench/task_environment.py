@@ -108,6 +108,10 @@ class TaskEnvironment(object):
                 'Expected the action shape to be: %s, but was shape: %s' % (
                     str(expected_shape), str(np.shape(action))))
 
+    def _assert_unit_quaternion(self, quat):
+        if not np.isclose(np.linalg.norm(quat), 1.0):
+            raise RuntimeError('Action contained non unit quaternion!')
+
     def _torque_action(self, action):
         self._robot.arm.set_joint_target_velocities(
             [(_TORQUE_MAX_VEL if t < 0 else -_TORQUE_MAX_VEL)
@@ -115,6 +119,7 @@ class TaskEnvironment(object):
         self._robot.arm.set_joint_forces(np.abs(action))
 
     def _ee_action(self, action):
+        self._assert_unit_quaternion(action[3:])
         try:
             joint_positions = self._robot.arm.solve_ik(
                 action[:3], quaternion=action[3:])
@@ -122,6 +127,21 @@ class TaskEnvironment(object):
         except IKError as e:
             raise InvalidActionError('Could not find a path.') from e
         self._pyrep.step()
+
+    def _path_action(self, action):
+        self._assert_unit_quaternion(action[3:])
+        try:
+            path = self._robot.arm.get_path(
+                action[:3], quaternion=action[3:], ignore_collisions=True)
+            done = False
+            observations = []
+            while not done:
+                done = path.step()
+                self._pyrep.step()
+                observations.append(self._scene.get_observation())
+            return observations
+        except IKError as e:
+            raise InvalidActionError('Could not find a path.') from e
 
     def step(self, action) -> (Observation, int, bool):
         # returns observation, reward, done, info
@@ -171,6 +191,24 @@ class TaskEnvironment(object):
 
             self._assert_action_space(arm_action, (7,))
             self._ee_action(list(arm_action))
+
+        elif self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN:
+
+            self._assert_action_space(arm_action, (7,))
+            self._path_observations = []
+            self._path_observations = self._path_action(list(arm_action))
+
+        elif self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN:
+
+            self._assert_action_space(arm_action, (7,))
+            a_x, a_y, a_z, a_qx, a_qy, a_qz, a_qw = arm_action
+            x, y, z, qx, qy, qz, qw = self._robot.arm.get_tip().get_pose()
+            new_rot = Quaternion(a_qw, a_qx, a_qy, a_qz) * Quaternion(qw, qx,
+                                                                      qy, qz)
+            qw, qx, qy, qz = list(new_rot)
+            new_pose = [a_x + x, a_y + y, a_z + z] + [qx, qy, qz, qw]
+            self._path_observations = []
+            self._path_observations = self._path_action(list(new_pose))
 
         elif self._action_mode.arm == ArmActionMode.DELTA_EE_POSE:
 
@@ -227,12 +265,19 @@ class TaskEnvironment(object):
                 for g_obj in self._task.get_graspable_objects():
                     self._robot.gripper.grasp(g_obj)
             else:
-                # If gripper opem action, the check for ungrasp.
+                # If gripper open action, the check for ungrasp.
                 self._robot.gripper.release()
 
         self._scene.step()
         success, terminate = self._task.success()
         return self._scene.get_observation(), int(success), terminate
+
+    def get_path_observations(self):
+        if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN):
+            raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
+                               'ABS_EE_POSE_PLAN action mode.')
+        return self._path_observations
 
     def get_demos(self, amount: int, live_demos=False,
                   image_paths=True) -> List[Demo]:

@@ -90,7 +90,9 @@ class Environment(object):
                 self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
                 self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
                 self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
-                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY):
+                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY or
+                self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
             self._robot.arm.set_control_loop_enabled(True)
         elif (self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
                 self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE):

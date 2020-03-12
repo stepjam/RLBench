@@ -265,7 +265,7 @@ class Task(object):
             met, terminate = cond.condition_met()
             all_met &= met
             one_terminate |= terminate
-        return all_met, one_terminate
+        return all_met, all_met
 
     def load(self) -> Object:
         if Object.exists(self.get_name()):

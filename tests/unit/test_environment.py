@@ -172,6 +172,29 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.001)
          for a, p in zip(expected_pose, obs.gripper_pose)]
 
+    def test_action_mode_abs_ee_position_plan(self):
+        task = self.get_task(
+            ReachTarget, ArmActionMode.ABS_EE_POSE_PLAN)
+        _, obs = task.reset()
+        init_pose = obs.gripper_pose
+        new_pose = np.append(init_pose, 0.0)  # for gripper
+        new_pose[2] -= 0.1  # 10cm down
+        obs, reward, term = task.step(new_pose)
+        [self.assertAlmostEqual(a, p, delta=0.001)
+         for a, p in zip(new_pose, obs.gripper_pose)]
+
+    def test_action_mode_delta_ee_position_plan(self):
+        task = self.get_task(
+            ReachTarget, ArmActionMode.DELTA_EE_POSE_PLAN)
+        _, obs = task.reset()
+        init_pose = obs.gripper_pose
+        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 0.0]  # 10cm down
+        expected_pose = list(init_pose)
+        expected_pose[2] -= 0.1
+        obs, reward, term = task.step(new_pose)
+        [self.assertAlmostEqual(a, p, delta=0.001)
+         for a, p in zip(expected_pose, obs.gripper_pose)]
+
     def test_action_mode_abs_ee_velocity(self):
         VEL = -0.2  # move down with velocity 0.1
         task = self.get_task(

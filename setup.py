@@ -6,7 +6,7 @@ from distutils.core import setup
 # Z: Patch version (e.g. small changes to tasks, bug fixes, etc)
 
 setup(name='rlbench',
-      version='1.0.5',
+      version='1.0.6',
       description='RLBench',
       author='Stephen James',
       author_email='slj12@ic.ac.uk',

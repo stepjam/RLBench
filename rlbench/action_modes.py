@@ -36,6 +36,14 @@ class ArmActionMode(Enum):
     # Change in end-effector pose (position (3) and quaternion (4))
     DELTA_EE_POSE = (9, EE_SIZE,)
 
+    # Absolute end-effector pose (position (3) and quaternion (4))
+    # But does path planning between these points
+    ABS_EE_POSE_PLAN = (10, EE_SIZE,)
+
+    # Change in end-effector pose (position (3) and quaternion (4))
+    # But does path planning between these points
+    DELTA_EE_POSE_PLAN = (11, EE_SIZE,)
+
     def __init__(self, id, action_size):
         self.id = id
         self.action_size = action_size
