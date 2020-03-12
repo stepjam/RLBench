@@ -151,14 +151,18 @@ class TaskEnvironment(object):
 
         # action should contain 1 extra value for gripper open close state
         arm_action = np.array(action[:-1])
-
         ee_action = action[-1]
+
+        if 0.0 > ee_action > 1.0:
+            raise ValueError('Gripper action expected to be within 0 and 1.')
+
+        # Discretize the gripper action
         current_ee = (1.0 if self._robot.gripper.get_open_amount()[0] > 0.9
                       else 0.0)
 
-        if ee_action > 0.0:
+        if ee_action > 0.5:
             ee_action = 1.0
-        elif ee_action < -0.0:
+        elif ee_action < 0.5:
             ee_action = 0.0
 
         if self._action_mode.arm == ArmActionMode.ABS_JOINT_VELOCITY:
