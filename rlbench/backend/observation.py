@@ -14,6 +14,9 @@ class Observation(object):
                  wrist_rgb: np.ndarray,
                  wrist_depth: np.ndarray,
                  wrist_mask: np.ndarray,
+                 front_rgb: np.ndarray,
+                 front_depth: np.ndarray,
+                 front_mask: np.ndarray,
                  joint_velocities: np.ndarray,
                  joint_positions: np.ndarray,
                  joint_forces: np.ndarray,
@@ -31,6 +34,9 @@ class Observation(object):
         self.wrist_rgb = wrist_rgb
         self.wrist_depth = wrist_depth
         self.wrist_mask = wrist_mask
+        self.front_rgb = front_rgb
+        self.front_depth = front_depth
+        self.front_mask = front_mask
         self.joint_velocities = joint_velocities
         self.joint_positions = joint_positions
         self.joint_forces = joint_forces

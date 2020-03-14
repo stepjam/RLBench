@@ -368,13 +368,17 @@ class TaskEnvironment(object):
             wrist_rgb_f = join(example_path, WRIST_RGB_FOLDER)
             wrist_depth_f = join(example_path, WRIST_DEPTH_FOLDER)
             wrist_mask_f = join(example_path, WRIST_MASK_FOLDER)
+            front_rgb_f = join(example_path, FRONT_RGB_FOLDER)
+            front_depth_f = join(example_path, FRONT_DEPTH_FOLDER)
+            front_mask_f = join(example_path, FRONT_MASK_FOLDER)
 
             num_steps = len(obs)
 
             if not (num_steps == len(listdir(l_sh_rgb_f)) == len(
                     listdir(l_sh_depth_f)) == len(listdir(r_sh_rgb_f)) == len(
                     listdir(r_sh_depth_f)) == len(listdir(wrist_rgb_f)) == len(
-                    listdir(wrist_depth_f))):
+                    listdir(wrist_depth_f)) == len(listdir(front_rgb_f)) == len(
+                    listdir(front_depth_f))):
                 raise RuntimeError('Broken dataset assumption')
 
             for i in range(num_steps):
@@ -389,14 +393,20 @@ class TaskEnvironment(object):
                     obs[i].right_shoulder_rgb = join(r_sh_rgb_f, si)
                 if obs_config.right_shoulder_camera.depth:
                     obs[i].right_shoulder_depth = join(r_sh_depth_f, si)
-                if obs_config.right_shoulder_camera.depth:
+                if obs_config.right_shoulder_camera.mask:
                     obs[i].right_shoulder_mask = join(r_sh_mask_f, si)
                 if obs_config.wrist_camera.rgb:
                     obs[i].wrist_rgb = join(wrist_rgb_f, si)
                 if obs_config.wrist_camera.depth:
                     obs[i].wrist_depth = join(wrist_depth_f, si)
-                if obs_config.wrist_camera.depth:
+                if obs_config.wrist_camera.mask:
                     obs[i].wrist_mask = join(wrist_mask_f, si)
+                if obs_config.front_camera.rgb:
+                    obs[i].front_rgb = join(front_rgb_f, si)
+                if obs_config.front_camera.depth:
+                    obs[i].front_depth = join(front_depth_f, si)
+                if obs_config.front_camera.mask:
+                    obs[i].front_mask = join(front_mask_f, si)
 
                 # Remove low dim info if necessary
                 if not obs_config.joint_velocities:
@@ -433,6 +443,11 @@ class TaskEnvironment(object):
                             self._resize_if_needed(
                                 Image.open(obs[i].wrist_rgb),
                                 obs_config.wrist_camera.image_size))
+                    if obs_config.front_camera.rgb:
+                        obs[i].front_rgb = np.array(
+                            self._resize_if_needed(
+                                Image.open(obs[i].front_rgb),
+                                obs_config.front_camera.image_size))
 
                     if obs_config.left_shoulder_camera.depth:
                         obs[i].left_shoulder_depth = image_to_float_array(
@@ -452,6 +467,12 @@ class TaskEnvironment(object):
                                 Image.open(obs[i].wrist_depth),
                                 obs_config.wrist_camera.image_size),
                             DEPTH_SCALE)
+                    if obs_config.front_camera.depth:
+                        obs[i].front_depth = image_to_float_array(
+                            self._resize_if_needed(
+                                Image.open(obs[i].front_depth),
+                                obs_config.front_camera.image_size),
+                            DEPTH_SCALE)
 
                     # Masks are stored as coded RGB images.
                     # Here we transform them into 1 channel handles.
@@ -470,6 +491,11 @@ class TaskEnvironment(object):
                             self._resize_if_needed(Image.open(
                                 obs[i].wrist_mask),
                                 obs_config.wrist_camera.image_size)))
+                    if obs_config.front_camera.mask:
+                        obs[i].front_mask = rgb_handles_to_mask(np.array(
+                            self._resize_if_needed(Image.open(
+                                obs[i].front_mask),
+                                obs_config.front_camera.image_size)))
 
             demos.append(obs)
         return demos

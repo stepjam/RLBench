@@ -1,4 +1,7 @@
 from multiprocessing import Process, Manager
+
+from pyrep.const import RenderMode
+
 from rlbench import ObservationConfig
 from rlbench.action_modes import ActionMode
 from rlbench.backend.utils import task_file_to_task_class
@@ -22,6 +25,11 @@ flags.DEFINE_string('save_path',
                     'Where to save the demos.')
 flags.DEFINE_list('tasks', [],
                   'The tasks to collect. If empty, all tasks are collected.')
+flags.DEFINE_list('image_size', [128, 128],
+                  'The size of the images tp save.')
+flags.DEFINE_enum('renderer',  'opengl3', ['opengl', 'opengl3'],
+                  'The renderer to use. opengl does not include shadows, '
+                  'but is faster.')
 flags.DEFINE_integer('processes', 1,
                      'The number of parallel processes during collection.')
 flags.DEFINE_integer('episodes_per_task', 10,
@@ -51,6 +59,9 @@ def save_demo(demo, example_path):
     wrist_rgb_path = os.path.join(example_path, WRIST_RGB_FOLDER)
     wrist_depth_path = os.path.join(example_path, WRIST_DEPTH_FOLDER)
     wrist_mask_path = os.path.join(example_path, WRIST_MASK_FOLDER)
+    front_rgb_path = os.path.join(example_path, FRONT_RGB_FOLDER)
+    front_depth_path = os.path.join(example_path, FRONT_DEPTH_FOLDER)
+    front_mask_path = os.path.join(example_path, FRONT_MASK_FOLDER)
 
     check_and_make(left_shoulder_rgb_path)
     check_and_make(left_shoulder_depth_path)
@@ -61,6 +72,9 @@ def save_demo(demo, example_path):
     check_and_make(wrist_rgb_path)
     check_and_make(wrist_depth_path)
     check_and_make(wrist_mask_path)
+    check_and_make(front_rgb_path)
+    check_and_make(front_depth_path)
+    check_and_make(front_mask_path)
 
     for i, obs in enumerate(demo):
         left_shoulder_rgb = Image.fromarray(
@@ -81,6 +95,11 @@ def save_demo(demo, example_path):
             obs.wrist_depth, scale_factor=DEPTH_SCALE)
         wrist_mask = Image.fromarray((obs.wrist_mask * 255).astype(np.uint8))
 
+        front_rgb = Image.fromarray((obs.front_rgb * 255).astype(np.uint8))
+        front_depth = utils.float_array_to_grayscale_image(
+            obs.front_depth, scale_factor=DEPTH_SCALE)
+        front_mask = Image.fromarray((obs.front_mask * 255).astype(np.uint8))
+
         left_shoulder_rgb.save(
             os.path.join(left_shoulder_rgb_path, IMAGE_FORMAT % i))
         left_shoulder_depth.save(
@@ -96,6 +115,9 @@ def save_demo(demo, example_path):
         wrist_rgb.save(os.path.join(wrist_rgb_path, IMAGE_FORMAT % i))
         wrist_depth.save(os.path.join(wrist_depth_path, IMAGE_FORMAT % i))
         wrist_mask.save(os.path.join(wrist_mask_path, IMAGE_FORMAT % i))
+        front_rgb.save(os.path.join(front_rgb_path, IMAGE_FORMAT % i))
+        front_depth.save(os.path.join(front_depth_path, IMAGE_FORMAT % i))
+        front_mask.save(os.path.join(front_mask_path, IMAGE_FORMAT % i))
 
         # We save the images separately, so set these to None for pickling.
         obs.left_shoulder_rgb = None
@@ -107,6 +129,9 @@ def save_demo(demo, example_path):
         obs.wrist_rgb = None
         obs.wrist_depth = None
         obs.wrist_mask = None
+        obs.front_rgb = None
+        obs.front_depth = None
+        obs.front_mask = None
 
     # Save the low-dimension data
     with open(os.path.join(example_path, LOW_DIM_PICKLE), 'wb') as f:
@@ -121,12 +146,25 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     np.random.seed(None)
     num_tasks = len(tasks)
 
+    img_size = list(map(int, FLAGS.image_size))
+
     obs_config = ObservationConfig()
     obs_config.set_all(True)
+    obs_config.right_shoulder_camera.image_size = img_size
+    obs_config.left_shoulder_camera.image_size = img_size
+    obs_config.wrist_camera.image_size = img_size
+    obs_config.front_camera.image_size = img_size
     # We want to save the masks as rgb encodings.
     obs_config.left_shoulder_camera.masks_as_one_channel = False
     obs_config.right_shoulder_camera.masks_as_one_channel = False
     obs_config.wrist_camera.masks_as_one_channel = False
+    obs_config.front_camera.masks_as_one_channel = False
+
+    if FLAGS.renderer == 'opengl':
+        obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.front_camera.render_mode = RenderMode.OPENGL
 
     rlbench_env = Environment(
         action_mode=ActionMode(),

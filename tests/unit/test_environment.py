@@ -14,11 +14,12 @@ class TestEnvironment(unittest.TestCase):
     def tearDown(self):
         self.env.shutdown()
 
-    def get_task(self, task_class, arm_action_mode):
-        obs_config = ObservationConfig()
-        obs_config.set_all(False)
-        obs_config.set_all_low_dim(True)
-        obs_config.right_shoulder_camera.rgb = True
+    def get_task(self, task_class, arm_action_mode, obs_config=None):
+        if obs_config is None:
+            obs_config = ObservationConfig()
+            obs_config.set_all(False)
+            obs_config.set_all_low_dim(True)
+            obs_config.right_shoulder_camera.rgb = True
         action_mode = ActionMode(arm_action_mode)
         self.env = environment.Environment(
             action_mode, ASSET_DIR, obs_config, headless=True)
@@ -38,6 +39,20 @@ class TestEnvironment(unittest.TestCase):
         self.assertIsNotNone(obs.right_shoulder_rgb)
         self.assertIsNone(obs.left_shoulder_rgb)
         self.assertIsInstance(desc, list)
+
+    def test_get_all_camera_observations(self):
+        obs_config = ObservationConfig()
+        obs_config.left_shoulder_camera.rgb = True
+        obs_config.right_shoulder_camera.rgb = True
+        obs_config.front_camera.rgb = True
+        obs_config.wrist_camera.rgb = True
+        task = self.get_task(
+            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY, obs_config)
+        desc, obs = task.reset()
+        self.assertIsNotNone(obs.left_shoulder_rgb)
+        self.assertIsNotNone(obs.right_shoulder_rgb)
+        self.assertIsNotNone(obs.front_rgb)
+        self.assertIsNotNone(obs.wrist_rgb)
 
     def test_step(self):
         task = self.get_task(

@@ -36,11 +36,13 @@ class Scene(object):
         self._cam_over_shoulder_left = VisionSensor('cam_over_shoulder_left')
         self._cam_over_shoulder_right = VisionSensor('cam_over_shoulder_right')
         self._cam_wrist = VisionSensor('cam_wrist')
+        self._cam_front = VisionSensor('cam_front')
         self._cam_over_shoulder_left_mask = VisionSensor(
             'cam_over_shoulder_left_mask')
         self._cam_over_shoulder_right_mask = VisionSensor(
             'cam_over_shoulder_right_mask')
         self._cam_wrist_mask = VisionSensor('cam_wrist_mask')
+        self._cam_front_mask = VisionSensor('cam_front_mask')
         self._has_init_task = self._has_init_episode = False
         self._variation_index = 0
 
@@ -156,6 +158,7 @@ class Scene(object):
         lsc_ob = self._obs_config.left_shoulder_camera
         rsc_ob = self._obs_config.right_shoulder_camera
         wc_ob = self._obs_config.wrist_camera
+        fc_ob = self._obs_config.front_camera
 
         lsc_mask_fn = (
             rgb_handles_to_mask if lsc_ob.masks_as_one_channel else lambda x: x)
@@ -163,6 +166,8 @@ class Scene(object):
             rgb_handles_to_mask if rsc_ob.masks_as_one_channel else lambda x: x)
         wc_mask_fn = (
             rgb_handles_to_mask if wc_ob.masks_as_one_channel else lambda x: x)
+        fc_mask_fn = (
+            rgb_handles_to_mask if fc_ob.masks_as_one_channel else lambda x: x)
 
         obs = Observation(
             left_shoulder_rgb=(
@@ -187,6 +192,12 @@ class Scene(object):
             wrist_depth=(
                 wc_ob.depth_noise.apply(self._cam_wrist.capture_depth())
                 if wc_ob.depth else None),
+            front_rgb=(
+                wc_ob.rgb_noise.apply(self._cam_front.capture_rgb())
+                if fc_ob.rgb else None),
+            front_depth=(
+                wc_ob.depth_noise.apply(self._cam_front.capture_depth())
+                if fc_ob.depth else None),
 
             left_shoulder_mask=(
                 lsc_mask_fn(
@@ -200,6 +211,10 @@ class Scene(object):
                 wc_mask_fn(
                     self._cam_wrist_mask.capture_rgb())
                 if wc_ob.mask else None),
+            front_mask=(
+                fc_mask_fn(
+                    self._cam_front_mask.capture_rgb())
+                if fc_ob.mask else None),
 
             joint_velocities=(
                 self._obs_config.joint_velocities_noise.apply(
@@ -389,6 +404,10 @@ class Scene(object):
             self._cam_wrist, self._obs_config.wrist_camera.rgb,
             self._obs_config.wrist_camera.depth,
             self._obs_config.wrist_camera)
+        _set_rgb_props(
+            self._cam_front, self._obs_config.front_camera.rgb,
+            self._obs_config.front_camera.depth,
+            self._obs_config.front_camera)
         _set_mask_props(
             self._cam_over_shoulder_left_mask,
             self._obs_config.left_shoulder_camera.mask,
@@ -400,6 +419,9 @@ class Scene(object):
         _set_mask_props(
             self._cam_wrist_mask, self._obs_config.wrist_camera.mask,
             self._obs_config.wrist_camera)
+        _set_mask_props(
+            self._cam_front_mask, self._obs_config.front_camera.mask,
+            self._obs_config.front_camera)
 
     def _place_task(self) -> None:
         self._workspace_boundary.clear()
