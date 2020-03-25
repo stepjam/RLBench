@@ -1,3 +1,5 @@
+from typing import Union
+
 import gym
 from gym import spaces
 from pyrep.const import RenderMode
@@ -12,10 +14,12 @@ import numpy as np
 class RLBenchEnv(gym.Env):
     """An gym wrapper for RLBench."""
 
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(self, task_class, observation_mode='state'):
+    def __init__(self, task_class, observation_mode='state',
+                 render_mode: Union[None, str] = None):
         self._observation_mode = observation_mode
+        self._render_mode = render_mode
         obs_config = ObservationConfig()
         if observation_mode == 'state':
             obs_config.set_all_high_dim(False)
@@ -50,9 +54,19 @@ class RLBenchEnv(gym.Env):
                     low=0, high=1, shape=obs.right_shoulder_rgb.shape),
                 "wrist_rgb": spaces.Box(
                     low=0, high=1, shape=obs.wrist_rgb.shape),
+                "front_rgb": spaces.Box(
+                    low=0, high=1, shape=obs.front_rgb.shape),
                 })
 
-        self._gym_cam = None
+        if render_mode is not None:
+            # Add the camera to the scene
+            cam_placeholder = Dummy('cam_cinematic_placeholder')
+            self._gym_cam = VisionSensor.create([640, 360])
+            self._gym_cam.set_pose(cam_placeholder.get_pose())
+            if render_mode == 'human':
+                self._gym_cam.set_render_mode(RenderMode.OPENGL3_WINDOWED)
+            else:
+                self._gym_cam.set_render_mode(RenderMode.OPENGL3)
 
     def _extract_obs(self, obs):
         if self._observation_mode == 'state':
@@ -63,15 +77,20 @@ class RLBenchEnv(gym.Env):
                 "left_shoulder_rgb": obs.left_shoulder_rgb,
                 "right_shoulder_rgb": obs.right_shoulder_rgb,
                 "wrist_rgb": obs.wrist_rgb,
+                "front_rgb": obs.front_rgb,
             }
 
     def render(self, mode='human'):
-        if self._gym_cam is None:
-            # Add the camera to the scene
-            cam_placeholder = Dummy('cam_cinematic_placeholder')
-            self._gym_cam = VisionSensor.create([640, 360])
-            self._gym_cam.set_pose(cam_placeholder.get_pose())
-            self._gym_cam.set_render_mode(RenderMode.OPENGL3_WINDOWED)
+        if mode != self._render_mode:
+            raise ValueError(
+                'The render mode must match the render mode selected in the '
+                'constructor. \nI.e. if you want "human" render mode, then '
+                'create the env by calling: '
+                'gym.make("reach_target-state-v0", render_mode="human").\n'
+                'You passed in mode %s, but expected %s.' % (
+                    mode, self._render_mode))
+        if mode == 'rgb_array':
+            return self._gym_cam.capture_rgb()
 
     def reset(self):
         descriptions, obs = self.task.reset()

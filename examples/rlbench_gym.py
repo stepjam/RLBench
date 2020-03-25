@@ -1,7 +1,7 @@
 import gym
 import rlbench.gym
 
-env = gym.make('reach_target-state-v0')
+env = gym.make('reach_target-state-v0', render_mode='human')
 
 training_steps = 120
 episode_length = 40
