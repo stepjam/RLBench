@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Dict, Tuple
 
 import gym
 from gym import spaces
@@ -68,7 +68,7 @@ class RLBenchEnv(gym.Env):
             else:
                 self._gym_cam.set_render_mode(RenderMode.OPENGL3)
 
-    def _extract_obs(self, obs):
+    def _extract_obs(self, obs) -> Dict[str, np.ndarray]:
         if self._observation_mode == 'state':
             return obs.get_low_dim_data()
         elif self._observation_mode == 'vision':
@@ -80,7 +80,7 @@ class RLBenchEnv(gym.Env):
                 "front_rgb": obs.front_rgb,
             }
 
-    def render(self, mode='human'):
+    def render(self, mode='human') -> Union[None, np.ndarray]:
         if mode != self._render_mode:
             raise ValueError(
                 'The render mode must match the render mode selected in the '
@@ -92,14 +92,14 @@ class RLBenchEnv(gym.Env):
         if mode == 'rgb_array':
             return self._gym_cam.capture_rgb()
 
-    def reset(self):
+    def reset(self) -> Dict[str, np.ndarray]:
         descriptions, obs = self.task.reset()
         del descriptions  # Not used.
         return self._extract_obs(obs)
 
-    def step(self, action):
+    def step(self, action) -> Tuple[Dict[str, np.ndarray], float, bool, dict]:
         obs, reward, terminate = self.task.step(action)
-        return self._extract_obs(obs), reward, terminate, None
+        return self._extract_obs(obs), reward, terminate, {}
 
-    def close(self):
+    def close(self) -> None:
         self.env.shutdown()
