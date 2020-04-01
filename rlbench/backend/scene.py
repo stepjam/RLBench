@@ -3,6 +3,8 @@ from pyrep import PyRep
 from pyrep.errors import ConfigurationPathError
 from pyrep.objects.shape import Shape
 from pyrep.objects.vision_sensor import VisionSensor
+from rlbench.noise_model import NoiseModel
+
 from rlbench.backend.spawn_boundary import SpawnBoundary
 from rlbench.backend.observation import Observation
 from rlbench.backend.exceptions import (
@@ -169,53 +171,63 @@ class Scene(object):
         fc_mask_fn = (
             rgb_handles_to_mask if fc_ob.masks_as_one_channel else lambda x: x)
 
+        def get_rgb_depth(sensor: VisionSensor, get_rgb: bool, get_depth: bool,
+                          rgb_noise: NoiseModel, depth_noise: NoiseModel):
+            rgb = depth = None
+            if sensor is not None and (get_rgb or get_depth):
+                sensor.handle_explicitly()
+                if get_rgb:
+                    rgb = sensor.capture_rgb()
+                    if rgb_noise is not None:
+                        rgb = rgb_noise.apply(rgb)
+                if get_depth:
+                    depth = sensor.capture_depth()
+                    if depth_noise is not None:
+                        depth = depth_noise.apply(depth)
+            return rgb, depth
+
+        def get_mask(sensor: VisionSensor, mask_fn):
+            mask = None
+            if sensor is not None:
+                sensor.handle_explicitly()
+                mask = mask_fn(sensor.capture_rgb())
+            return mask
+
+        left_shoulder_rgb, left_shoulder_depth = get_rgb_depth(
+            self._cam_over_shoulder_left, lsc_ob.rgb, lsc_ob.depth,
+            lsc_ob.rgb_noise, lsc_ob.depth_noise)
+        right_shoulder_rgb, right_shoulder_depth = get_rgb_depth(
+            self._cam_over_shoulder_right, rsc_ob.rgb, rsc_ob.depth,
+            rsc_ob.rgb_noise, rsc_ob.depth_noise)
+        wrist_rgb, wrist_depth = get_rgb_depth(
+            self._cam_wrist, wc_ob.rgb, wc_ob.depth,
+            wc_ob.rgb_noise, wc_ob.depth_noise)
+        front_rgb, front_depth = get_rgb_depth(
+            self._cam_front, fc_ob.rgb, fc_ob.depth,
+            fc_ob.rgb_noise, fc_ob.depth_noise)
+
+        left_shoulder_mask = get_mask(self._cam_over_shoulder_left_mask,
+                                      lsc_mask_fn) if lsc_ob.mask else None
+        right_shoulder_mask = get_mask(self._cam_over_shoulder_right_mask,
+                                      rsc_mask_fn) if rsc_ob.mask else None
+        wrist_mask = get_mask(self._cam_wrist_mask,
+                              wc_mask_fn) if wc_ob.mask else None
+        front_mask = get_mask(self._cam_front_mask,
+                              fc_mask_fn) if fc_ob.mask else None
+
         obs = Observation(
-            left_shoulder_rgb=(
-                lsc_ob.rgb_noise.apply(
-                    self._cam_over_shoulder_left.capture_rgb())
-                if lsc_ob.rgb else None),
-            left_shoulder_depth=(
-                lsc_ob.depth_noise.apply(
-                    self._cam_over_shoulder_left.capture_depth())
-                if lsc_ob.depth else None),
-            right_shoulder_rgb=(
-                rsc_ob.rgb_noise.apply(
-                    self._cam_over_shoulder_right.capture_rgb())
-                if rsc_ob.rgb else None),
-            right_shoulder_depth=(
-                rsc_ob.depth_noise.apply(
-                    self._cam_over_shoulder_right.capture_depth())
-                if rsc_ob.depth else None),
-            wrist_rgb=(
-                wc_ob.rgb_noise.apply(self._cam_wrist.capture_rgb())
-                if wc_ob.rgb else None),
-            wrist_depth=(
-                wc_ob.depth_noise.apply(self._cam_wrist.capture_depth())
-                if wc_ob.depth else None),
-            front_rgb=(
-                wc_ob.rgb_noise.apply(self._cam_front.capture_rgb())
-                if fc_ob.rgb else None),
-            front_depth=(
-                wc_ob.depth_noise.apply(self._cam_front.capture_depth())
-                if fc_ob.depth else None),
-
-            left_shoulder_mask=(
-                lsc_mask_fn(
-                    self._cam_over_shoulder_left_mask.capture_rgb())
-                if lsc_ob.mask else None),
-            right_shoulder_mask=(
-                rsc_mask_fn(
-                    self._cam_over_shoulder_right_mask.capture_rgb())
-                if rsc_ob.mask else None),
-            wrist_mask=(
-                wc_mask_fn(
-                    self._cam_wrist_mask.capture_rgb())
-                if wc_ob.mask else None),
-            front_mask=(
-                fc_mask_fn(
-                    self._cam_front_mask.capture_rgb())
-                if fc_ob.mask else None),
-
+            left_shoulder_rgb=left_shoulder_rgb,
+            left_shoulder_depth=left_shoulder_depth,
+            right_shoulder_rgb=right_shoulder_rgb,
+            right_shoulder_depth=right_shoulder_depth,
+            wrist_rgb=wrist_rgb,
+            wrist_depth=wrist_depth,
+            front_rgb=front_rgb,
+            front_depth=front_depth,
+            left_shoulder_mask=left_shoulder_mask,
+            right_shoulder_mask=right_shoulder_mask,
+            wrist_mask=wrist_mask,
+            front_mask=front_mask,
             joint_velocities=(
                 self._obs_config.joint_velocities_noise.apply(
                     np.array(self._robot.arm.get_joint_velocities()))
@@ -381,6 +393,7 @@ class Scene(object):
             if not (rgb or depth):
                 rgb_cam.remove()
             else:
+                rgb_cam.set_explicit_handling(1)
                 rgb_cam.set_resolution(conf.image_size)
                 rgb_cam.set_render_mode(conf.render_mode)
 
@@ -389,6 +402,7 @@ class Scene(object):
                 if not mask:
                     mask_cam.remove()
                 else:
+                    mask_cam.set_explicit_handling(1)
                     mask_cam.set_resolution(conf.image_size)
         _set_rgb_props(
             self._cam_over_shoulder_left,
