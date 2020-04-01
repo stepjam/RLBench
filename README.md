@@ -1,4 +1,5 @@
-# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=master)](https://travis-ci.com/stepjam/RLBench)
+# RLBench: Robot Learning Benchmark [![Build Status](https://travis-ci.com/stepjam/RLBench.svg?branch=master)](https://travis-ci.com/stepjam/RLBench) [![Discord](https://img.shields.io/discord/694945190867370155.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/DXPCjmd)
+
 
 ![task grid image missing](readme_files/task_grid.png)
 
@@ -26,6 +27,10 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 - [Citation](#citation)
 
 ## Announcements
+
+### 1 April, 2020
+
+- We added a Discord channel to allow the RLBench community to help one another. Click the Discord badge above.
 
 ### 28 January, 2020
 
