@@ -127,7 +127,7 @@ class TestEnvironment(unittest.TestCase):
         task = self.get_task(
             ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
         task.reset()
-        action = [0.1] * 8
+        action = [0.1] * 7 + [1]
         obs, reward, term = task.step(action)
         [self.assertAlmostEqual(0.1, a, delta=0.05)
          for a in obs.joint_velocities]
@@ -136,7 +136,7 @@ class TestEnvironment(unittest.TestCase):
         task = self.get_task(
             ReachTarget, ArmActionMode.DELTA_JOINT_VELOCITY)
         task.reset()
-        action = [-0.1] * 8
+        action = [-0.1] * 7 + [1]
         [task.step(action) for _ in range(2)]
         obs, reward, term = task.step(action)
         [self.assertAlmostEqual(-0.3, a, delta=0.1)
@@ -146,7 +146,7 @@ class TestEnvironment(unittest.TestCase):
         task = self.get_task(
             ReachTarget, ArmActionMode.ABS_JOINT_POSITION)
         _, obs = task.reset()
-        init_angles = np.append(obs.joint_positions, 0.)  # for gripper
+        init_angles = np.append(obs.joint_positions, 1.)  # for gripper
         target_angles = np.array(init_angles) + 0.05
         [task.step(target_angles) for _ in range(5)]
         obs, reward, term = task.step(target_angles)
@@ -159,7 +159,7 @@ class TestEnvironment(unittest.TestCase):
         _, obs = task.reset()
         init_angles = obs.joint_positions
         target_angles = np.array(init_angles) + 0.06
-        [task.step([0.01] * 8) for _ in range(5)]
+        [task.step([0.01] * 7 + [1]) for _ in range(5)]
         obs, reward, term = task.step([0.01] * 8)
         [self.assertAlmostEqual(a, actual, delta=0.05)
          for a, actual in zip(target_angles, obs.joint_positions)]
@@ -169,10 +169,10 @@ class TestEnvironment(unittest.TestCase):
             ReachTarget, ArmActionMode.ABS_EE_POSE)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
-        new_pose = np.append(init_pose, 0.0)  # for gripper
+        new_pose = np.append(init_pose, 1.0)  # for gripper
         new_pose[2] -= 0.1  # 10cm down
         obs, reward, term = task.step(new_pose)
-        [self.assertAlmostEqual(a, p, delta=0.001)
+        [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(new_pose, obs.gripper_pose)]
 
     def test_action_mode_delta_ee_position(self):
@@ -180,11 +180,11 @@ class TestEnvironment(unittest.TestCase):
             ReachTarget, ArmActionMode.DELTA_EE_POSE)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
-        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 0.0]  # 10cm down
+        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
         expected_pose = list(init_pose)
         expected_pose[2] -= 0.1
         obs, reward, term = task.step(new_pose)
-        [self.assertAlmostEqual(a, p, delta=0.001)
+        [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(expected_pose, obs.gripper_pose)]
 
     def test_action_mode_abs_ee_position_plan(self):
@@ -192,7 +192,7 @@ class TestEnvironment(unittest.TestCase):
             ReachTarget, ArmActionMode.ABS_EE_POSE_PLAN)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
-        new_pose = np.append(init_pose, 0.0)  # for gripper
+        new_pose = np.append(init_pose, 1.0)  # for gripper
         new_pose[2] -= 0.1  # 10cm down
         obs, reward, term = task.step(new_pose)
         [self.assertAlmostEqual(a, p, delta=0.001)
@@ -203,7 +203,7 @@ class TestEnvironment(unittest.TestCase):
             ReachTarget, ArmActionMode.DELTA_EE_POSE_PLAN)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
-        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 0.0]  # 10cm down
+        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
         expected_pose = list(init_pose)
         expected_pose[2] -= 0.1
         obs, reward, term = task.step(new_pose)
@@ -217,7 +217,7 @@ class TestEnvironment(unittest.TestCase):
         _, obs = task.reset()
         expected_pose = obs.gripper_pose
         expected_pose[2] += (VEL * 0.05)
-        vels = np.zeros((8,))
+        vels = [0.] * 7 + [1]
         vels[2] += VEL
         obs, reward, term = task.step(vels)
         [self.assertAlmostEqual(a, p, delta=0.001)
@@ -232,7 +232,7 @@ class TestEnvironment(unittest.TestCase):
         expected_pose[2] += (VEL * 0.05)
         expected_pose[2] += ((VEL * 2) * 0.05)
         expected_pose[2] += ((VEL * 3) * 0.05)
-        vels = np.zeros((8,))
+        vels = [0.] * 7 + [1]
         vels[2] += VEL
         [task.step(vels) for _ in range(2)]
         obs, reward, term = task.step(vels)
@@ -243,7 +243,7 @@ class TestEnvironment(unittest.TestCase):
         task = self.get_task(
             ReachTarget, ArmActionMode.ABS_JOINT_TORQUE)
         task.reset()
-        action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 0.0]
+        action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 1.0]
         obs, reward, term = task.step(action)
         # Difficult to test given gravity, so just check for exceptions.
 
@@ -252,7 +252,7 @@ class TestEnvironment(unittest.TestCase):
             ReachTarget, ArmActionMode.DELTA_JOINT_TORQUE)
         _, obs = task.reset()
         init_forces = np.array(obs.joint_forces)
-        action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 0]
+        action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 1]
         expected = np.array([0.3, -0.3, 0.3, -0.3, 0.3, -0.3, 0.3])
         expected += init_forces
         [task.step(action) for _ in range(2)]

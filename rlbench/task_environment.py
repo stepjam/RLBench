@@ -126,7 +126,11 @@ class TaskEnvironment(object):
             self._robot.arm.set_joint_target_positions(joint_positions)
         except IKError as e:
             raise InvalidActionError('Could not find a path.') from e
-        self._pyrep.step()
+        done = False
+        while not done:
+            self._pyrep.step()
+            done = np.allclose(self._robot.arm.get_joint_positions(),
+                               joint_positions, atol=0.01)
 
     def _path_action(self, action):
         self._assert_unit_quaternion(action[3:])
