@@ -11,7 +11,9 @@ class Agent(object):
         self.action_size = action_size
 
     def act(self, obs):
-        return (np.random.normal(0.0, 0.1, size=(self.action_size,))).tolist()
+        arm = np.random.normal(0.0, 0.1, size=(self.action_size - 1,))
+        gripper = [1.0]  # Always open
+        return np.concatenate([arm, gripper], axis=-1)
 
 
 obs_config = ObservationConfig()
@@ -22,7 +24,7 @@ env = Environment(
     action_mode, obs_config=obs_config, headless=False)
 env.launch()
 
-agent = Agent(action_mode.action_size)
+agent = Agent(env.action_size)
 
 train_tasks = MT30_V1['train']
 

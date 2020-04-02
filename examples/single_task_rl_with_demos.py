@@ -14,7 +14,9 @@ class Agent(object):
         pass
 
     def act(self, obs):
-        return (np.random.normal(0.0, 0.1, size=(self.action_size,))).tolist()
+        arm = np.random.normal(0.0, 0.1, size=(self.action_size - 1,))
+        gripper = [1.0]  # Always open
+        return np.concatenate([arm, gripper], axis=-1)
 
 
 # To use 'saved' demos, set the path below, and set live_demos=False
@@ -32,7 +34,7 @@ env.launch()
 task = env.get_task(ReachTarget)
 demos = task.get_demos(2, live_demos=live_demos)
 
-agent = Agent(action_mode.action_size)
+agent = Agent(env.action_size)
 agent.ingest(demos)
 
 training_steps = 120

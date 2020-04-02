@@ -29,10 +29,10 @@ DIR_PATH = dirname(abspath(__file__))
 # Arms from PyRep need to be modified to include a wrist camera.
 # Currently, only the arms/grippers below are supported.
 SUPPORTED_ROBOTS = {
-    'panda': (Panda, PandaGripper),
-    'jaco': (Jaco, JacoGripper),
-    'mico': (Mico, MicoGripper),
-    'sawyer': (Sawyer, BaxterGripper),
+    'panda': (Panda, PandaGripper, 7),
+    'jaco': (Jaco, JacoGripper, 6),
+    'mico': (Mico, MicoGripper, 6),
+    'sawyer': (Sawyer, BaxterGripper, 7),
 }
 
 
@@ -122,9 +122,9 @@ class Environment(object):
             raise RuntimeError('Already called launch!')
         self._pyrep = PyRep()
         self._pyrep.launch(join(DIR_PATH, TTT_FILE), headless=self._headless)
-        self._pyrep.set_simulation_timestep(0.005)
 
-        arm_class, gripper_class = SUPPORTED_ROBOTS[self._robot_configuration]
+        arm_class, gripper_class, _ = SUPPORTED_ROBOTS[
+            self._robot_configuration]
 
         # We assume the panda is already loaded in the scene.
         if self._robot_configuration is not 'panda':
@@ -170,3 +170,25 @@ class Environment(object):
             self._pyrep, self._robot, self._scene, task,
             self._action_mode, self._dataset_root, self._obs_config,
             self._static_positions)
+
+    @property
+    def action_size(self):
+        arm_action_size = 0
+        gripper_action_size = 1  # Only one gripper style atm
+        if (self._action_mode.arm == ArmActionMode.ABS_JOINT_VELOCITY or
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_VELOCITY or
+                self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION or
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
+                self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE or
+                self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
+                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY):
+            arm_action_size = SUPPORTED_ROBOTS[self._robot_configuration][2]
+        elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
+            arm_action_size = 7  # pose is always 7
+        return arm_action_size + gripper_action_size
+
+
