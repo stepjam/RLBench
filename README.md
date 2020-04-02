@@ -20,6 +20,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
     - [Multi-Task Learning](#multi-task-learning)
     - [RLBench Gym](#rlbench-gym)
     - [Swapping Arms](#swapping-arms)
+- [Tasks](#tasks)
 - [Task Building](#task-building)
 - [Gotchas!](#gotchas)
 - [Contributing](#contributing)
@@ -98,7 +99,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
 ```
 
 A full example can be seen in [examples/few_shot_rl.py](examples/few_shot_rl.py).
@@ -117,7 +118,7 @@ env.launch()
 
 task = env.get_task(ReachTarget)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(8))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
 ```
 
 A full example can be seen in [examples/single_task_rl.py](examples/single_task_rl.py).
@@ -147,7 +148,7 @@ env.launch()
 
 task = env.get_task(OpenDoor)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
 ```
 
 A full example can be seen in [examples/single_task_rl_domain_randomization.py](examples/single_task_rl_domain_randomization.py).
@@ -203,7 +204,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(action_mode.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
 ```
 
 A full example can be seen in [examples/multi_task_learning.py](examples/multi_task_learning.py).
@@ -269,6 +270,12 @@ _Don't see the arm that you want to use?_ Your first step is to make sure it is
 in PyRep, and if not, then you can follow the instructions for importing new
 arm on the PyRep GitHub page. After that, feel free to open an issue and 
 we can being it in to RLBench for you.
+
+## Tasks
+
+To see a full list of all tasks, [see here](rlbench/tasks).
+
+To see gifs of each of the tasks, [see here](https://drive.google.com/drive/folders/1TqbulbbCEqVBd6SBHatphFlUK2JQLkYu?usp=sharing).
 
 ## Task Building
 
