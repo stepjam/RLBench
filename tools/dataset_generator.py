@@ -163,7 +163,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     if FLAGS.renderer == 'opengl':
         obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
         obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
-        obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.wrist_camera.render_mode = RenderMode.OPENGL
         obs_config.front_camera.render_mode = RenderMode.OPENGL
 
     rlbench_env = Environment(
