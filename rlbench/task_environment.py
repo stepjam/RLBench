@@ -128,7 +128,7 @@ class TaskEnvironment(object):
             raise InvalidActionError('Could not find a path.') from e
         done = False
         while not done:
-            self._pyrep.step()
+            self._scene.step()
             done = np.allclose(self._robot.arm.get_joint_positions(),
                                joint_positions, atol=0.01)
 
@@ -141,7 +141,7 @@ class TaskEnvironment(object):
             observations = []
             while not done:
                 done = path.step()
-                self._pyrep.step()
+                self._scene.step()
                 observations.append(self._scene.get_observation())
             return observations
         except IKError as e:
@@ -169,26 +169,12 @@ class TaskEnvironment(object):
         elif ee_action < 0.5:
             ee_action = 0.0
 
-        # If there is a gripper action, then we dont do an arm action
-        if current_ee != ee_action:
-            done = False
-            while not done:
-                done = self._robot.gripper.actuate(ee_action, velocity=0.2)
-                self._pyrep.step()
-                self._task.step()
-            if ee_action == 0.0:
-                # If gripper close action, the check for grasp.
-                for g_obj in self._task.get_graspable_objects():
-                    self._robot.gripper.grasp(g_obj)
-            else:
-                # If gripper open action, the check for ungrasp.
-                self._robot.gripper.release()
-
-        elif self._action_mode.arm == ArmActionMode.ABS_JOINT_VELOCITY:
+        if self._action_mode.arm == ArmActionMode.ABS_JOINT_VELOCITY:
 
             self._assert_action_space(arm_action,
                                       (len(self._robot.arm.joints),))
             self._robot.arm.set_joint_target_velocities(arm_action)
+            self._scene.step()
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_VELOCITY:
 
@@ -196,12 +182,14 @@ class TaskEnvironment(object):
                                       (len(self._robot.arm.joints),))
             cur = np.array(self._robot.arm.get_joint_velocities())
             self._robot.arm.set_joint_target_velocities(cur + arm_action)
+            self._scene.step()
 
         elif self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION:
 
             self._assert_action_space(arm_action,
                                       (len(self._robot.arm.joints),))
             self._robot.arm.set_joint_target_positions(arm_action)
+            self._scene.step()
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION:
 
@@ -209,6 +197,7 @@ class TaskEnvironment(object):
                                       (len(self._robot.arm.joints),))
             cur = np.array(self._robot.arm.get_joint_positions())
             self._robot.arm.set_joint_target_positions(cur + arm_action)
+            self._scene.step()
 
         elif self._action_mode.arm == ArmActionMode.ABS_EE_POSE:
 
@@ -267,17 +256,32 @@ class TaskEnvironment(object):
             self._assert_action_space(
                 arm_action, (len(self._robot.arm.joints),))
             self._torque_action(arm_action)
+            self._scene.step()
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE:
 
             cur = np.array(self._robot.arm.get_joint_forces())
             new_action = cur + arm_action
             self._torque_action(new_action)
+            self._scene.step()
 
         else:
             raise RuntimeError('Unrecognised action mode.')
 
-        self._scene.step()
+        if current_ee != ee_action:
+            done = False
+            while not done:
+                done = self._robot.gripper.actuate(ee_action, velocity=0.2)
+                self._pyrep.step()
+                self._task.step()
+            if ee_action == 0.0:
+                # If gripper close action, the check for grasp.
+                for g_obj in self._task.get_graspable_objects():
+                    self._robot.gripper.grasp(g_obj)
+            else:
+                # If gripper open action, the check for ungrasp.
+                self._robot.gripper.release()
+
         success, terminate = self._task.success()
         return self._scene.get_observation(), int(success), terminate
 
