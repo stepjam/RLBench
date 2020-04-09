@@ -55,7 +55,6 @@ def ClipFloatValues(float_array, min_value, max_value):
 
   """
   if float_array.min() < min_value or float_array.max() > max_value:
-    # print('CLIPPING!')
     float_array = np.clip(float_array, min_value, max_value)
   return float_array
 

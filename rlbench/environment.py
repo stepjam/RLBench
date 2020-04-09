@@ -7,6 +7,10 @@ from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
 from pyrep.robots.end_effectors.mico_gripper import MicoGripper
 from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
+
+from rlbench import utils
+from rlbench.demo import Demo
+
 from rlbench.sim2real.domain_randomization import RandomizeEvery, \
     VisualRandomizationConfig, DynamicsRandomizationConfig
 
@@ -18,7 +22,7 @@ from rlbench.backend.const import *
 from rlbench.backend.robot import Robot
 from os.path import exists, dirname, abspath, join
 import importlib
-from typing import Type
+from typing import Type, List
 from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.action_modes import ActionMode, ArmActionMode
@@ -190,5 +194,16 @@ class Environment(object):
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
             arm_action_size = 7  # pose is always 7
         return arm_action_size + gripper_action_size
+
+    def get_demos(self, task_name: str, amount: int,
+                  variation_number=0,
+                  image_paths=False) -> List[Demo]:
+        if self._dataset_root is None or len(self._dataset_root) == 0:
+            raise RuntimeError(
+                "Can't ask for a stored demo when no dataset root provided.")
+        demos = utils.get_stored_demos(
+            amount, image_paths, self._dataset_root, variation_number,
+            task_name, self._obs_config)
+        return demos
 
 
