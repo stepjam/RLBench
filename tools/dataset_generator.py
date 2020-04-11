@@ -79,24 +79,24 @@ def save_demo(demo, example_path):
     for i, obs in enumerate(demo):
         left_shoulder_rgb = Image.fromarray(
             (obs.left_shoulder_rgb * 255).astype(np.uint8))
-        left_shoulder_depth = utils.float_array_to_grayscale_image(
+        left_shoulder_depth = utils.float_array_to_rgb_image(
             obs.left_shoulder_depth, scale_factor=DEPTH_SCALE)
         left_shoulder_mask = Image.fromarray(
             (obs.left_shoulder_mask * 255).astype(np.uint8))
         right_shoulder_rgb = Image.fromarray(
             (obs.right_shoulder_rgb * 255).astype(np.uint8))
-        right_shoulder_depth = utils.float_array_to_grayscale_image(
+        right_shoulder_depth = utils.float_array_to_rgb_image(
             obs.right_shoulder_depth, scale_factor=DEPTH_SCALE)
         right_shoulder_mask = Image.fromarray(
             (obs.right_shoulder_mask * 255).astype(np.uint8))
 
         wrist_rgb = Image.fromarray((obs.wrist_rgb * 255).astype(np.uint8))
-        wrist_depth = utils.float_array_to_grayscale_image(
+        wrist_depth = utils.float_array_to_rgb_image(
             obs.wrist_depth, scale_factor=DEPTH_SCALE)
         wrist_mask = Image.fromarray((obs.wrist_mask * 255).astype(np.uint8))
 
         front_rgb = Image.fromarray((obs.front_rgb * 255).astype(np.uint8))
-        front_depth = utils.float_array_to_grayscale_image(
+        front_depth = utils.float_array_to_rgb_image(
             obs.front_depth, scale_factor=DEPTH_SCALE)
         front_mask = Image.fromarray((obs.front_mask * 255).astype(np.uint8))
 
