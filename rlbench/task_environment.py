@@ -132,6 +132,13 @@ class TaskEnvironment(object):
     def _path_action(self, action):
         self._assert_unit_quaternion(action[3:])
         try:
+
+            # Check if the target is in the workspace; if not, then quick reject
+            # Only checks position, not rotation
+            valid = self._scene.check_target_in_workspace(action[:3])
+            if not valid:
+                raise InvalidActionError('Target is outside of workspace.')
+
             path = self._robot.arm.get_path(
                 action[:3], quaternion=action[3:], ignore_collisions=True)
             done = False

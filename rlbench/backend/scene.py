@@ -54,6 +54,11 @@ class Scene(object):
         # Set camera properties from observation config
         self._set_camera_properties()
 
+        (self._workspace_minx, self._workspace_maxx, self._workspace_miny,
+         self._workspace_maxy, _, _) = self._workspace.get_bounding_box()
+        self._workspace_minz = self._workspace.get_position()[2]
+        self._workspace_maxz = self._workspace_minz + 1.0  # 1M above workspace
+
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
 
@@ -380,6 +385,12 @@ class Scene(object):
 
     def get_observation_config(self) -> ObservationConfig:
         return self._obs_config
+
+    def check_target_in_workspace(self, target_pos: np.ndarray) -> bool:
+        x, y, z = target_pos
+        return (self._workspace_maxx > x > self._workspace_minx and
+                self._workspace_maxy > y > self._workspace_miny and
+                self._workspace_maxz > z > self._workspace_minz)
 
     def _demo_record_step(self, demo_list, record, func):
         if record:
