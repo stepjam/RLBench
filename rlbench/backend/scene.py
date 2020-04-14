@@ -54,10 +54,14 @@ class Scene(object):
         # Set camera properties from observation config
         self._set_camera_properties()
 
-        (self._workspace_minx, self._workspace_maxx, self._workspace_miny,
-         self._workspace_maxy, _, _) = self._workspace.get_bounding_box()
-        self._workspace_minz = self._workspace.get_position()[2]
-        self._workspace_maxz = self._workspace_minz + 1.0  # 1M above workspace
+        x, y, z = self._workspace.get_position()
+        minx, maxx, miny, maxy, _, _ = self._workspace.get_bounding_box()
+        self._workspace_minx = x - np.fabs(minx)
+        self._workspace_maxx = x + maxx
+        self._workspace_miny = y - np.fabs(miny)
+        self._workspace_maxy = y + maxy
+        self._workspace_minz = z
+        self._workspace_maxz = z + 1.0  # 1M above workspace
 
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
