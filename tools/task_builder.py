@@ -229,8 +229,6 @@ if __name__ == '__main__':
     ttt_file = join(CURRENT_DIR, '..', 'rlbench', TTT_FILE)
     pr.launch(ttt_file, responsive_ui=True)
     pr.step_ui()
-    pr.set_simulation_timestep(0.005)
-    pr.step_ui()
 
     robot = Robot(Panda(), PandaGripper())
     cam_config = CameraConfig(rgb=True, depth=False, mask=False,
@@ -240,6 +238,7 @@ if __name__ == '__main__':
     obs_config.right_shoulder_camera = cam_config
     obs_config.left_shoulder_camera = cam_config
     obs_config.wrist_camera = cam_config
+    obs_config.front_camera = cam_config
 
     scene = Scene(pr, robot, obs_config)
     loaded_task = LoadedTask(pr, scene, robot)
