@@ -121,8 +121,8 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                 obs[i].joint_positions = None
             if not obs_config.joint_forces:
                 obs[i].joint_forces = None
-            if not obs_config.gripper_open_amount:
-                obs[i].gripper_open_amount = None
+            if not obs_config.gripper_open:
+                obs[i].gripper_open = None
             if not obs_config.gripper_pose:
                 obs[i].gripper_pose = None
             if not obs_config.gripper_joint_positions:

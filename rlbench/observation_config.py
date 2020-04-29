@@ -39,7 +39,7 @@ class ObservationConfig(object):
                  joint_positions_noise: NoiseModel=Identity(),
                  joint_forces=True,
                  joint_forces_noise: NoiseModel=Identity(),
-                 gripper_open_amount=True,
+                 gripper_open=True,
                  gripper_pose=True,
                  gripper_joint_positions=False,
                  gripper_touch_forces=False,
@@ -64,7 +64,7 @@ class ObservationConfig(object):
         self.joint_positions_noise = joint_positions_noise
         self.joint_forces = joint_forces
         self.joint_forces_noise = joint_forces_noise
-        self.gripper_open_amount = gripper_open_amount
+        self.gripper_open = gripper_open
         self.gripper_pose = gripper_pose
         self.gripper_joint_positions = gripper_joint_positions
         self.gripper_touch_forces = gripper_touch_forces
@@ -85,7 +85,7 @@ class ObservationConfig(object):
         self.joint_velocities = value
         self.joint_positions = value
         self.joint_forces = value
-        self.gripper_open_amount = value
+        self.gripper_open = value
         self.gripper_pose = value
         self.gripper_joint_positions = value
         self.gripper_touch_forces = value
