@@ -1,3 +1,4 @@
+from pyrep import __version__ as pyrep_version
 from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.arms.jaco import Jaco
@@ -26,6 +27,10 @@ from typing import Type, List
 from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.action_modes import ActionMode, ArmActionMode
+
+major, minor = pyrep_version.split('.')
+if int(major) < 1 and int(minor) < 2:
+    raise ImportError('Must have PyRep version 1.2 or greater.')
 
 
 DIR_PATH = dirname(abspath(__file__))
@@ -90,13 +95,13 @@ class Environment(object):
             self._robot.arm.set_control_loop_enabled(False)
             self._robot.arm.set_motor_locked_at_zero_velocity(True)
         elif (self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION or
-                self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
-                self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
-                self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
-                self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
-                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY or
-                self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
-                self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
+              self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
+              self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
             self._robot.arm.set_control_loop_enabled(True)
         elif (self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
                 self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE):
@@ -184,14 +189,14 @@ class Environment(object):
                 self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION or
                 self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION or
                 self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE or
-                self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE or
-                self._action_mode.arm == ArmActionMode.ABS_EE_VELOCITY or
-                self._action_mode.arm == ArmActionMode.DELTA_EE_VELOCITY):
+                self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE):
             arm_action_size = SUPPORTED_ROBOTS[self._robot_configuration][2]
-        elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN or
-              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN):
+        elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
+              self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
             arm_action_size = 7  # pose is always 7
         return arm_action_size + gripper_action_size
 
