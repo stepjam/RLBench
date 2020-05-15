@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unittest Results</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <h2 class="text-capitalize">Unittest Results</h2>
+                <p class='attribute'><strong>Start Time: </strong>2020-05-15 15:49:36</p>
+                <p class='attribute'><strong>Duration: </strong>0 ms</p>
+                <p class='attribute'><strong>Summary: </strong>Total: 6, Pass: 0, Error: 6</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-md-10">
+                <table class='table table-hover table-responsive'>
+                    <thead>
+                        <tr>
+                            <th>unittest.loader._FailedTest</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_domain_randomization_environment</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_domain_randomization_environment
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_domain_randomization_environment.py", line 6, in <module>
+    from rlbench.sim2real.domain_randomization import RandomizeEvery, VisualRandomizationConfig
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_domain_randomization_environment
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_domain_randomization_environment.py", line 6, in <module>
+    from rlbench.sim2real.domain_randomization import RandomizeEvery, VisualRandomizationConfig
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_environment</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_environment
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_environment.py", line 6, in <module>
+    from rlbench import environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_environment
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_environment.py", line 6, in <module>
+    from rlbench import environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_gym</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_gym
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_gym.py", line 4, in <module>
+    import rlbench.gym
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_gym
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_gym.py", line 4, in <module>
+    import rlbench.gym
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_scene</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_scene
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_scene.py", line 7, in <module>
+    from rlbench import environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_scene
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_scene.py", line 7, in <module>
+    from rlbench import environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_task_sets</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_task_sets
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_task_sets.py", line 2, in <module>
+    from rlbench.tasks import (FS10_V1, FS25_V1, FS50_V1, FS95_V1, MT15_V1,
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_task_sets
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_task_sets.py", line 2, in <module>
+    from rlbench.tasks import (FS10_V1, FS25_V1, FS50_V1, FS95_V1, MT15_V1,
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr class='warning'>
+                            <td class="col-xs-10">test_tasks</td>
+                            <td class="col-xs-1">
+                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                            </td>
+                            <td class="col-xs-1">
+                                <button class="btn btn-default btn-xs">View</button>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">ImportError: Failed to import test module: test_tasks
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_tasks.py", line 2, in <module>
+    import rlbench.backend.task as task
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+</p><p style="color:maroon;">ImportError: Failed to import test module: test_tasks
+Traceback (most recent call last):
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 428, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/opt/python/3.6.7/lib/python3.6/unittest/loader.py", line 369, in _get_module_from_name
+    __import__(name)
+  File "/home/travis/build/stepjam/RLBench/tests/unit/test_tasks.py", line 2, in <module>
+    import rlbench.backend.task as task
+  File "/home/travis/build/stepjam/RLBench/rlbench/__init__.py", line 1, in <module>
+    from rlbench.environment import Environment
+  File "/home/travis/build/stepjam/RLBench/rlbench/environment.py", line 1, in <module>
+    from pyrep import __version__ as pyrep_version
+ImportError: cannot import name '__version__'
+
+</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                Total: 6, Pass: 0, Error: 6 -- Duration: 0 ms
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('td').on('click', '.btn', function(e){
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                var $this = $(this);
+                var $nextRow = $this.closest('tr').next('tr');
+                $nextRow.slideToggle("fast");
+                $this.text(function(i, text){
+                    if (text === 'View') {
+                        return 'Hide';
+                    } else {
+                        return 'View';
+                    };
+                });
+            });
+        });
+    </script>
+</body>
+</html
