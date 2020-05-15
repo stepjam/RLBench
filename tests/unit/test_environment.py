@@ -1,5 +1,8 @@
 import unittest
 from os import path
+
+from pyrep.objects import Dummy
+
 from rlbench import environment
 from rlbench.task_environment import TaskEnvironment
 from rlbench.tasks import TakeLidOffSaucepan, ReachTarget
@@ -180,7 +183,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_ee_position(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_EE_POSE)
+            ReachTarget, ArmActionMode.ABS_EE_POSE_WORLD_FRAME)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -191,7 +194,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_delta_ee_position(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_EE_POSE)
+            ReachTarget, ArmActionMode.DELTA_EE_POSE_WORLD_FRAME)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -203,7 +206,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_ee_position_plan(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_EE_POSE_PLAN)
+            ReachTarget, ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -214,7 +217,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_delta_ee_position_plan(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_EE_POSE_PLAN)
+            ReachTarget, ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -224,34 +227,27 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.001)
          for a, p in zip(expected_pose, obs.gripper_pose)]
 
-    def test_action_mode_abs_ee_velocity(self):
-        VEL = -0.2  # move down with velocity 0.1
+    def test_action_mode_ee_position_ee_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_EE_VELOCITY)
+            ReachTarget, ArmActionMode.EE_POSE_EE_FRAME)
         _, obs = task.reset()
-        expected_pose = obs.gripper_pose
-        expected_pose[2] += (VEL * 0.05)
-        vels = [0.] * 7 + [1]
-        vels[2] += VEL
-        obs, reward, term = task.step(vels)
-        [self.assertAlmostEqual(a, p, delta=0.001)
-         for a, p in zip(expected_pose, obs.gripper_pose)]
-
-    def test_action_mode_delta_velocity(self):
-        VEL = -0.2  # move down with velocity 0.2
-        task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_EE_VELOCITY)
-        _, obs = task.reset()
-        expected_pose = obs.gripper_pose
-        expected_pose[2] += (VEL * 0.05)
-        expected_pose[2] += ((VEL * 2) * 0.05)
-        expected_pose[2] += ((VEL * 3) * 0.05)
-        vels = [0.] * 7 + [1]
-        vels[2] += VEL
-        [task.step(vels) for _ in range(2)]
-        obs, reward, term = task.step(vels)
+        dummy = Dummy.create()
+        dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
+        action = [0, 0, 0.05, 0, 0, 0, 1, 1]
+        obs, reward, term = task.step(action)
         [self.assertAlmostEqual(a, p, delta=0.01)
-         for a, p in zip(expected_pose, obs.gripper_pose)]
+         for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
+
+    def test_action_mode_ee_position_plan_ee_frame(self):
+        task = self.get_task(
+            ReachTarget, ArmActionMode.EE_POSE_PLAN_EE_FRAME)
+        _, obs = task.reset()
+        dummy = Dummy.create()
+        dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
+        action = [0, 0, 0.05, 0, 0, 0, 1, 1]
+        obs, reward, term = task.step(action)
+        [self.assertAlmostEqual(a, p, delta=0.01)
+         for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
 
     def test_action_mode_abs_joint_torque(self):
         task = self.get_task(
