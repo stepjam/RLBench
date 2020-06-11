@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 # Version meaning (X.Y.Z)
 # X: Major version (e.g. vastly different scene, platform, etc)
