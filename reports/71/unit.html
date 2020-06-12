@@ -11,9 +11,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <h2 class="text-capitalize">Unittest Results</h2>
-                <p class='attribute'><strong>Start Time: </strong>2020-02-16 16:31:21</p>
-                <p class='attribute'><strong>Duration: </strong>164.18 s</p>
-                <p class='attribute'><strong>Summary: </strong>Total: 28, Pass: 26, Fail: 2</p>
+                <p class='attribute'><strong>Start Time: </strong>2020-06-12 10:49:19</p>
+                <p class='attribute'><strong>Duration: </strong>410.64 s</p>
+                <p class='attribute'><strong>Summary: </strong>Total: 34, Pass: 34</p>
             </div>
         </div>
         <div class="row">
@@ -29,6 +29,14 @@
                     <tbody>
                         <tr class='success'>
                             <td class="col-xs-10">test_action_mode_abs_ee_position</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_action_mode_abs_ee_position_plan</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
@@ -76,6 +84,14 @@
                             </td>
                         </tr>
                         <tr class='success'>
+                            <td class="col-xs-10">test_action_mode_delta_ee_position_plan</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
                             <td class="col-xs-10">test_action_mode_delta_joint_position</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
@@ -108,6 +124,14 @@
                             </td>
                         </tr>
                         <tr class='success'>
+                            <td class="col-xs-10">test_get_all_camera_observations</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
                             <td class="col-xs-10">test_get_invalid_number_of_demos</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
@@ -125,6 +149,14 @@
                         </tr>
                         <tr class='success'>
                             <td class="col-xs-10">test_get_stored_demos_images</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_get_stored_demos_images_without_init_sim</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
@@ -157,6 +189,14 @@
                         </tr>
                         <tr class='success'>
                             <td class="col-xs-10">test_reset</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_reset_to_demos</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
@@ -227,7 +267,7 @@
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 19, Pass: 19 -- Duration: 119.45 s
+                                Total: 24, Pass: 24 -- Duration: 261.20 s
                             </td>
                         </tr>
                     </tbody>
@@ -1305,12 +1345,56 @@
                 <table class='table table-hover table-responsive'>
                     <thead>
                         <tr>
+                            <th>test_domain_randomization_environment.TestDomainRandomizaionEnvironment</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_visual_randomize_every_2_episodes</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_visual_randomize_every_2_transitions</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                Total: 2, Pass: 2 -- Duration: 19.79 s
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-md-10">
+                <table class='table table-hover table-responsive'>
+                    <thead>
+                        <tr>
                             <th>test_gym.TestGym</th>
                             <th>Status</th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_env_render</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
                         <tr class='success'>
                             <td class="col-xs-10">test_state_env</td>
                             <td class="col-xs-1">
@@ -1329,7 +1413,7 @@
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 2, Pass: 2 -- Duration: 13.32 s
+                                Total: 3, Pass: 3 -- Duration: 91.26 s
                             </td>
                         </tr>
                     </tbody>
@@ -1365,61 +1449,7 @@
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 2, Pass: 2 -- Duration: 11.77 s
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12 col-sm-10 col-md-10">
-                <table class='table table-hover table-responsive'>
-                    <thead>
-                        <tr>
-                            <th>test_domain_randomization_environment.TestDomainRandomizaionEnvironment</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class='danger'>
-                            <td class="col-xs-10">test_visual_randomize_every_2_episodes</td>
-                            <td class="col-xs-1">
-                                <span class="label label-danger" style="display:block;width:40px;">Fail</span>
-                            </td>
-                            <td class="col-xs-1">
-                                <button class="btn btn-default btn-xs">View</button>
-                            </td>
-                        </tr>
-                        <tr style="display:none;">
-                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">AssertionError: 0.0 not greater than 0.05</p><p style="color:maroon;">Traceback (most recent call last):
-  File "/home/travis/build/stepjam/RLBench/tests/unit/test_domain_randomization_environment.py", line 48, in test_visual_randomize_every_2_episodes
-    0.05)
-AssertionError: 0.0 not greater than 0.05
-</p>
-                            </td>
-                        </tr>
-                        <tr class='danger'>
-                            <td class="col-xs-10">test_visual_randomize_every_2_transitions</td>
-                            <td class="col-xs-1">
-                                <span class="label label-danger" style="display:block;width:40px;">Fail</span>
-                            </td>
-                            <td class="col-xs-1">
-                                <button class="btn btn-default btn-xs">View</button>
-                            </td>
-                        </tr>
-                        <tr style="display:none;">
-                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">AssertionError: 0.0 not greater than 0.05</p><p style="color:maroon;">Traceback (most recent call last):
-  File "/home/travis/build/stepjam/RLBench/tests/unit/test_domain_randomization_environment.py", line 65, in test_visual_randomize_every_2_transitions
-    0.05)
-AssertionError: 0.0 not greater than 0.05
-</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                Total: 2, Pass: 0, Fail: 2 -- Duration: 19.65 s
+                                Total: 2, Pass: 2 -- Duration: 38.40 s
                             </td>
                         </tr>
                     </tbody>
