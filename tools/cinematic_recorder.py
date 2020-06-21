@@ -24,9 +24,9 @@ flags.DEFINE_string(
     'save_dir', '/tmp/rlbench_videos/',
     'Where to save the generated videos.')
 flags.DEFINE_list(
-    'tasks', ['reach_target', 'stack_blocks'], 'The tasks to record. If empty, all tasks are recorded.')
+    'tasks', [], 'The tasks to record. If empty, all tasks are recorded.')
 flags.DEFINE_boolean(
-    'individual', False, 'One long clip of all the tasks, or individual videos.')
+    'individual', True, 'One long clip of all the tasks, or individual videos.')
 flags.DEFINE_boolean(
     'domain_randomization', False, 'If domain randomization should be applied.')
 flags.DEFINE_string(
