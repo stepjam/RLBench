@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Callable
 
 import numpy as np
 from pyquaternion import Quaternion
@@ -296,8 +296,11 @@ class TaskEnvironment(object):
                                'ABS_EE_POSE_PLAN action mode.')
         return self._path_observations
 
-    def get_demos(self, amount: int, live_demos=False,
-                  image_paths=False) -> List[Demo]:
+    def get_demos(self, amount: int, live_demos: bool = False,
+                  image_paths: bool = False,
+                  callable_each_step: Callable[[Observation], None] = None,
+                  max_attempts: int = _MAX_DEMO_ATTEMPTS,
+                  ) -> List[Demo]:
         """Negative means all demos"""
 
         if not live_demos and (self._dataset_root is None
@@ -315,20 +318,25 @@ class TaskEnvironment(object):
         else:
             ctr_loop = self._robot.arm.joints[0].is_control_loop_enabled()
             self._robot.arm.joints[0].set_control_loop_enabled(True)
-            demos = self._get_live_demos(amount)
+            demos = self._get_live_demos(
+                amount, callable_each_step, max_attempts)
             self._robot.arm.joints[0].set_control_loop_enabled(ctr_loop)
         return demos
 
-    def _get_live_demos(self, amount) -> List[Demo]:
+    def _get_live_demos(self, amount: int,
+                        callable_each_step: Callable[
+                            [Observation], None] = None,
+                        max_attempts: int = _MAX_DEMO_ATTEMPTS) -> List[Demo]:
         demos = []
         for i in range(amount):
-            attempts = _MAX_DEMO_ATTEMPTS
+            attempts = max_attempts
             while attempts > 0:
                 random_seed = np.random.get_state()
                 self.reset()
                 logging.info('Collecting demo %d' % i)
                 try:
-                    demo = self._scene.get_demo()
+                    demo = self._scene.get_demo(
+                        callable_each_step=callable_each_step)
                     demo.random_seed = random_seed
                     demos.append(demo)
                     break

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 from pyrep import PyRep
 from pyrep.errors import ConfigurationPathError
 from pyrep.objects.shape import Shape
@@ -268,8 +268,9 @@ class Scene(object):
         self._pyrep.step()
         self._active_task.step()
 
-    def get_demo(self, record: bool=True, func=None,
-                 randomly_place: bool=True) -> Demo:
+    def get_demo(self, record: bool = True,
+                 callable_each_step: Callable[[Observation], None] = None,
+                 randomly_place: bool = True) -> Demo:
         """Returns a demo (list of observations)"""
 
         if not self._has_init_task:
@@ -307,7 +308,7 @@ class Scene(object):
                 while not done:
                     done = path.step()
                     self.step()
-                    self._demo_record_step(demo, record, func)
+                    self._demo_record_step(demo, record, callable_each_step)
                     success, term = self._active_task.success()
                     if success:
                         break
@@ -336,7 +337,8 @@ class Scene(object):
                                 self._pyrep.step()
                                 self._active_task.step()
                                 if self._obs_config.record_gripper_closing:
-                                    self._demo_record_step(demo, record, func)
+                                    self._demo_record_step(
+                                        demo, record, callable_each_step)
                     elif 'close_gripper(' in ext:
                         start_of_bracket = ext.index('close_gripper(') + 14
                         contains_param = ext[start_of_bracket] != ')'
@@ -347,7 +349,8 @@ class Scene(object):
                                 self._pyrep.step()
                                 self._active_task.step()
                                 if self._obs_config.record_gripper_closing:
-                                    self._demo_record_step(demo, record, func)
+                                    self._demo_record_step(
+                                        demo, record, callable_each_step)
 
                     if contains_param:
                         rest = ext[start_of_bracket:]
@@ -358,13 +361,14 @@ class Scene(object):
                             self._pyrep.step()
                             self._active_task.step()
                             if self._obs_config.record_gripper_closing:
-                                self._demo_record_step(demo, record, func)
+                                self._demo_record_step(
+                                    demo, record, callable_each_step)
 
                     if 'close_gripper(' in ext:
                         for g_obj in self._active_task.get_graspable_objects():
                             gripper.grasp(g_obj)
 
-                    self._demo_record_step(demo, record, func)
+                    self._demo_record_step(demo, record, callable_each_step)
 
             if not self._active_task.should_repeat_waypoints() or success:
                 break
@@ -375,7 +379,7 @@ class Scene(object):
             for _ in range(10):
                 self._pyrep.step()
                 self._active_task.step()
-                self._demo_record_step(demo, record, func)
+                self._demo_record_step(demo, record, callable_each_step)
                 success, term = self._active_task.success()
                 if success:
                     break
@@ -399,7 +403,7 @@ class Scene(object):
         if record:
             demo_list.append(self.get_observation())
         if func is not None:
-            func()
+            func(self.get_observation())
 
     def _set_camera_properties(self) -> None:
         def _set_rgb_props(rgb_cam: VisionSensor,
