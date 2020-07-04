@@ -112,6 +112,10 @@ class Task(object):
         """Called each time the simulation is stepped. Can usually be left."""
         pass
 
+    def reward(self) -> float:
+        """Allows the user to customise the task and add reward shaping."""
+        return 0.0
+
     def cleanup(self) -> None:
         """Called at the end of the episode. Can usually be left.
 

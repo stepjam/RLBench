@@ -47,6 +47,7 @@ class TaskEnvironment(object):
         self._static_positions = static_positions
         self._reset_called = False
         self._prev_ee_velocity = None
+        self._enable_path_observations = False
 
         self._scene.load(self._task)
         self._pyrep.start()
@@ -146,6 +147,12 @@ class TaskEnvironment(object):
             while not done:
                 done = path.step()
                 self._scene.step()
+                if self._enable_path_observations:
+                    observations.append(self._scene.get_observation())
+                success, terminate = self._task.success()
+                # If the task succeeds while traversing path, then break early
+                if success:
+                    break
                 observations.append(self._scene.get_observation())
             return observations
         except IKError as e:
@@ -287,7 +294,15 @@ class TaskEnvironment(object):
                 self._robot.gripper.release()
 
         success, terminate = self._task.success()
-        return self._scene.get_observation(), int(success), terminate
+        reward = self._task.reward()
+        return self._scene.get_observation(), float(success) + reward, terminate
+
+    def enable_path_observations(self, value: bool) -> None:
+        if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN):
+            raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
+                               'ABS_EE_POSE_PLAN action mode.')
+        self._enable_path_observations = value
 
     def get_path_observations(self):
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN and
