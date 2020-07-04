@@ -1,5 +1,6 @@
 from typing import List
 import numpy as np
+from pyrep.objects import Dummy
 from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
 from rlbench.const import colors
@@ -8,17 +9,17 @@ from rlbench.backend.conditions import DetectedCondition, ConditionSet
 from rlbench.backend.spawn_boundary import SpawnBoundary
 
 
-
 class HannoiSquare(Task):
 
     def init_task(self) -> None:
         self.square_ring = Shape('hannoi_square_ring')
-        self.success_detector = ProximitySensor(
-            'hannoi_square_success_detector')
+        self.success_centre = Dummy('success_centre')
+        success_detectors = [ProximitySensor(
+            'success_detector%d' % i) for i in range(4)]
         self.register_graspable_objects([self.square_ring])
-        success_condition1 = DetectedCondition(self.square_ring,
-                                               self.success_detector)
-        self.register_success_conditions([success_condition1])
+        success_condition = ConditionSet([DetectedCondition(
+            self.square_ring, sd) for sd in success_detectors])
+        self.register_success_conditions([success_condition])
 
     def init_episode(self, index: int) -> List[str]:
         pillar0 = Shape('hannoi_square_pillar0')
@@ -29,9 +30,9 @@ class HannoiSquare(Task):
         color_name, color_rgb = colors[index]
         chosen_pillar = np.random.choice(spokes)
         chosen_pillar.set_color(color_rgb)
-        _, _, z = self.success_detector.get_position()
+        _, _, z = self.success_centre.get_position()
         x, y, _ = chosen_pillar.get_position()
-        self.success_detector.set_position([x, y, z])
+        self.success_centre.set_position([x, y, z])
 
         color_choices = np.random.choice(
             list(range(index)) + list(range(index + 1, len(colors))),
