@@ -6,7 +6,7 @@ from setuptools import setup
 # Z: Patch version (e.g. small changes to tasks, bug fixes, etc)
 
 setup(name='rlbench',
-      version='1.0.7',
+      version='1.0.8',
       description='RLBench',
       author='Stephen James',
       author_email='slj12@ic.ac.uk',
