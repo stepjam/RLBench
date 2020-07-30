@@ -148,8 +148,7 @@ self.success_detector1 = ProximitySensor('success1')
 We will then call two functions, *register_waypoint_ability_start()* and *register_waypoints_should_repeat()* like so:
 
 ```python
-self.register_waypoint_ability_start('waypoint1',
-                                     self._move_above_object)
+self.register_waypoint_ability_start(1, self._move_above_object)
 self.register_waypoints_should_repeat(self._repeat)
 ```
 
