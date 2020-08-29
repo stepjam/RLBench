@@ -252,6 +252,9 @@ class Scene(object):
             gripper_pose=(
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
+            gripper_matrix=(
+                np.reshape(tip.get_matrix(), (3, 4))[:3, :3].reshape((-1,))
+                if self._obs_config.gripper_matrix else None),
             gripper_touch_forces=(
                 ee_forces_flat
                 if self._obs_config.gripper_touch_forces else None),
