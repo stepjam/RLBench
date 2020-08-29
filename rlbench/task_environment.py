@@ -127,10 +127,19 @@ class TaskEnvironment(object):
         except IKError as e:
             raise InvalidActionError('Could not find a path.') from e
         done = False
+        prev_values = None
+        # Move until reached target joint positions or until we stop moving
+        # (e.g. when we collide wth something)
         while not done:
             self._scene.step()
-            done = np.allclose(self._robot.arm.get_joint_positions(),
-                               joint_positions, atol=0.01)
+            cur_positions = self._robot.arm.get_joint_positions()
+            reached = np.allclose(cur_positions, joint_positions, atol=0.01)
+            not_moving = False
+            if prev_values is not None:
+                not_moving = np.allclose(
+                    cur_positions, prev_values, atol=0.001)
+            prev_values = cur_positions
+            done = reached or not_moving
 
     def _path_action(self, action, relative_to=None):
         self._assert_unit_quaternion(action[3:])
@@ -368,6 +377,6 @@ class TaskEnvironment(object):
                     'Could not collect demos. Maybe a problem with the task?')
         return demos
 
-    def reset_to_demo(self, demo: Demo) -> None:
+    def reset_to_demo(self, demo: Demo) -> (List[str], Observation):
         demo.restore_state()
-        self.reset()
+        return self.reset()
