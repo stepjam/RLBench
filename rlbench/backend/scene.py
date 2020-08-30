@@ -313,18 +313,11 @@ class Scene(object):
                     self.step()
                     self._demo_record_step(demo, record, callable_each_step)
                     success, term = self._active_task.success()
-                    if success:
-                        break
 
                 point.end_of_path()
 
                 path.clear_visualization()
 
-                if success:
-                    # We can quit early because we have finished the task
-                    break
-
-                # TODO: need to decide how I do the gripper actions
                 if len(ext) > 0:
                     contains_param = False
                     start_of_bracket = -1
