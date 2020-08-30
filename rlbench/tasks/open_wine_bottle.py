@@ -12,16 +12,12 @@ from rlbench.backend.conditions import JointCondition
 class OpenWineBottle(Task):
 
     def init_task(self) -> None:
-        bottle_detector = ProximitySensor("bottle_detector")
         cap_detector = ProximitySensor("cap_detector")
-        bottle = Shape('bottle')
         self.joint = Joint('joint')
         self.force_sensor = ForceSensor('Force_sensor')
         self.cap = Shape('cap')
         self.register_success_conditions(
-            [DetectedCondition(bottle, bottle_detector),
-             DetectedCondition(self.cap, cap_detector, negated=True),
-             NothingGrasped(self.robot.gripper)])
+            [DetectedCondition(self.cap, cap_detector, negated=True)])
         self.cap_turned_condition = JointCondition(
             self.joint, np.deg2rad(150))
 
