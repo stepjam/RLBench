@@ -11,9 +11,9 @@
         <div class="row">
             <div class="col-xs-12">
                 <h2 class="text-capitalize">Unittest Results</h2>
-                <p class='attribute'><strong>Start Time: </strong>2020-03-14 17:54:14</p>
-                <p class='attribute'><strong>Duration: </strong>593.38 s</p>
-                <p class='attribute'><strong>Summary: </strong>Total: 32, Pass: 30, Error: 2</p>
+                <p class='attribute'><strong>Start Time: </strong>2020-08-30 09:19:58</p>
+                <p class='attribute'><strong>Duration: </strong>457.56 s</p>
+                <p class='attribute'><strong>Summary: </strong>Total: 34, Pass: 34</p>
             </div>
         </div>
         <div class="row">
@@ -37,14 +37,6 @@
                         </tr>
                         <tr class='success'>
                             <td class="col-xs-10">test_action_mode_abs_ee_position_plan</td>
-                            <td class="col-xs-1">
-                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
-                            </td>
-                            <td class="col-xs-1">
-                            </td>
-                        </tr>
-                        <tr class='success'>
-                            <td class="col-xs-10">test_action_mode_abs_ee_velocity</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
@@ -116,7 +108,15 @@
                             </td>
                         </tr>
                         <tr class='success'>
-                            <td class="col-xs-10">test_action_mode_delta_velocity</td>
+                            <td class="col-xs-10">test_action_mode_ee_position_ee_frame</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_action_mode_ee_position_plan_ee_frame</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
@@ -147,46 +147,28 @@
                             <td class="col-xs-1">
                             </td>
                         </tr>
-                        <tr class='warning'>
+                        <tr class='success'>
                             <td class="col-xs-10">test_get_stored_demos_images</td>
                             <td class="col-xs-1">
-                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
                             <td class="col-xs-1">
-                                <button class="btn btn-default btn-xs">View</button>
                             </td>
                         </tr>
-                        <tr style="display:none;">
-                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/stepjam/RLBench/tests/unit/assets/tasks/reach_target/variation0/episodes/episode3/front_rgb'</p><p style="color:maroon;">Traceback (most recent call last):
-  File "/home/travis/build/stepjam/RLBench/tests/unit/test_environment.py", line 85, in test_get_stored_demos_images
-    demos = task.get_demos(2, live_demos=False, image_paths=False)
-  File "/home/travis/build/stepjam/RLBench/rlbench/task_environment.py", line 299, in get_demos
-    demos = self._get_stored_demos(amount, image_paths)
-  File "/home/travis/build/stepjam/RLBench/rlbench/task_environment.py", line 380, in _get_stored_demos
-    listdir(wrist_depth_f)) == len(listdir(front_rgb_f)) == len(
-FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/stepjam/RLBench/tests/unit/assets/tasks/reach_target/variation0/episodes/episode3/front_rgb'
-</p>
+                        <tr class='success'>
+                            <td class="col-xs-10">test_get_stored_demos_images_without_init_sim</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
                             </td>
                         </tr>
-                        <tr class='warning'>
+                        <tr class='success'>
                             <td class="col-xs-10">test_get_stored_demos_paths</td>
                             <td class="col-xs-1">
-                                <span class="label label-warning" style="display:block;width:40px;">Error</span>
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
                             </td>
                             <td class="col-xs-1">
-                                <button class="btn btn-default btn-xs">View</button>
-                            </td>
-                        </tr>
-                        <tr style="display:none;">
-                            <td class="col-xs-9" colspan="3"><p style="color:maroon;">FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/stepjam/RLBench/tests/unit/assets/tasks/reach_target/variation0/episodes/episode2/front_rgb'</p><p style="color:maroon;">Traceback (most recent call last):
-  File "/home/travis/build/stepjam/RLBench/tests/unit/test_environment.py", line 76, in test_get_stored_demos_paths
-    demos = task.get_demos(2, live_demos=False, image_paths=True)
-  File "/home/travis/build/stepjam/RLBench/rlbench/task_environment.py", line 299, in get_demos
-    demos = self._get_stored_demos(amount, image_paths)
-  File "/home/travis/build/stepjam/RLBench/rlbench/task_environment.py", line 380, in _get_stored_demos
-    listdir(wrist_depth_f)) == len(listdir(front_rgb_f)) == len(
-FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/stepjam/RLBench/tests/unit/assets/tasks/reach_target/variation0/episodes/episode2/front_rgb'
-</p>
                             </td>
                         </tr>
                         <tr class='success'>
@@ -285,7 +267,7 @@ FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/step
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 23, Pass: 21, Error: 2 -- Duration: 500.62 s
+                                Total: 24, Pass: 24 -- Duration: 311.62 s
                             </td>
                         </tr>
                     </tbody>
@@ -1387,7 +1369,7 @@ FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/step
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 2, Pass: 2 -- Duration: 20.36 s
+                                Total: 2, Pass: 2 -- Duration: 19.63 s
                             </td>
                         </tr>
                     </tbody>
@@ -1406,6 +1388,14 @@ FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/step
                     </thead>
                     <tbody>
                         <tr class='success'>
+                            <td class="col-xs-10">test_env_render</td>
+                            <td class="col-xs-1">
+                                <span class="label label-success" style="display:block;width:40px;">Pass</span>
+                            </td>
+                            <td class="col-xs-1">
+                            </td>
+                        </tr>
+                        <tr class='success'>
                             <td class="col-xs-10">test_state_env</td>
                             <td class="col-xs-1">
                                 <span class="label label-success" style="display:block;width:40px;">Pass</span>
@@ -1423,7 +1413,7 @@ FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/step
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 2, Pass: 2 -- Duration: 60.66 s
+                                Total: 3, Pass: 3 -- Duration: 89.01 s
                             </td>
                         </tr>
                     </tbody>
@@ -1459,7 +1449,7 @@ FileNotFoundError: [Errno 2] No such file or directory: '/home/travis/build/step
                         </tr>
                         <tr>
                             <td colspan="3">
-                                Total: 2, Pass: 2 -- Duration: 11.74 s
+                                Total: 2, Pass: 2 -- Duration: 37.30 s
                             </td>
                         </tr>
                     </tbody>
