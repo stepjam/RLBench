@@ -338,10 +338,10 @@ class TaskEnvironment(object):
                 self._task.get_name(), self._obs_config)
         else:
             ctr_loop = self._robot.arm.joints[0].is_control_loop_enabled()
-            self._robot.arm.joints[0].set_control_loop_enabled(True)
+            self._robot.arm.set_control_loop_enabled(True)
             demos = self._get_live_demos(
                 amount, callable_each_step, max_attempts)
-            self._robot.arm.joints[0].set_control_loop_enabled(ctr_loop)
+            self._robot.arm.set_control_loop_enabled(ctr_loop)
         return demos
 
     def _get_live_demos(self, amount: int,
