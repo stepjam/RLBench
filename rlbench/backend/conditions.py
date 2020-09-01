@@ -24,7 +24,7 @@ class ColorCondition(object):
     def condition_met(self):
         obj_rgb = self.shape.get_color()
         met = (obj_rgb == self.success_rgb)
-        return met, met
+        return met, False
 
 
 class JointCondition(Condition):
@@ -37,7 +37,7 @@ class JointCondition(Condition):
     def condition_met(self):
         met = math.fabs(
             self._joint.get_joint_position() - self._original_pos) > self._pos
-        return met, met
+        return met, False
 
 
 class DetectedCondition(Condition):
@@ -51,7 +51,7 @@ class DetectedCondition(Condition):
         met = self._detector.is_detected(self._obj)
         if self._negated:
             met = not met
-        return met, met
+        return met, False
 
 
 class NothingGrasped(Condition):
@@ -60,7 +60,7 @@ class NothingGrasped(Condition):
 
     def condition_met(self):
         met = len(self._gripper.get_grasped_objects()) == 0
-        return met, met
+        return met, False
 
 
 class GraspedCondition(Condition):
@@ -71,7 +71,7 @@ class GraspedCondition(Condition):
     def condition_met(self):
         met = len([ob for ob in self._gripper.get_grasped_objects()
                    if self._object_handle == ob.get_handle()]) > 0
-        return met, met
+        return met, False
 
 
 class DetectedSeveralCondition(Condition):
@@ -89,7 +89,7 @@ class DetectedSeveralCondition(Condition):
         met = False
         if count >= self._number_needed:
             met = True
-        return met, met
+        return met, False
 
 
 class EmptyCondition(Condition):
@@ -99,7 +99,7 @@ class EmptyCondition(Condition):
 
     def condition_met(self):
         met = len(self._container) == 0
-        return met, met
+        return met, False
 
 
 class FollowCondition(Condition):
@@ -170,7 +170,7 @@ class ConditionSet(Condition):
                 met &= ismet
                 # if term:
                 #     break
-        return met, met
+        return met, False
 
     def reset(self):
         self._current_condition_index = 0

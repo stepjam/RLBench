@@ -262,14 +262,25 @@ class Task(object):
     def get_graspable_objects(self):
         return self._graspable_objects
 
-    def success(self):
+    def success(self) -> Tuple[bool, bool]:
+        """If the task is currently successful.
+
+        :return: Tuple containing 2 bools: first specifies if the task is currently successful,
+            second specifies if the task should terminate (either from success or from broken constraints).
+        """
         all_met = True
-        one_terminate = False
+        should_terminate = False
         for cond in self._success_conditions:
             met, terminate = cond.condition_met()
+            if terminate:
+                # Broken constraint
+                should_terminate = True
+                break
             all_met &= met
-            one_terminate |= terminate
-        return all_met, all_met
+        if all_met:
+            # All conditions met, so we can terminate
+            should_terminate = True
+        return all_met, should_terminate
 
     def load(self) -> Object:
         if Object.exists(self.get_name()):

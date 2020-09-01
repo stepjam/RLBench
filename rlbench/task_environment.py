@@ -86,16 +86,7 @@ class TaskEnvironment(object):
                 'happen, please raise an issues on this task.'
                 % self._task.get_name()) from e
 
-        ctr_loop = self._robot.arm.joints[0].is_control_loop_enabled()
-        locked = self._robot.arm.joints[0].is_motor_locked_at_zero_velocity()
-        self._robot.arm.set_control_loop_enabled(False)
-        self._robot.arm.set_motor_locked_at_zero_velocity(True)
-
         self._reset_called = True
-
-        self._robot.arm.set_control_loop_enabled(ctr_loop)
-        self._robot.arm.set_motor_locked_at_zero_velocity(locked)
-
         # Returns a list of descriptions and the first observation
         return desc, self._scene.get_observation()
 
