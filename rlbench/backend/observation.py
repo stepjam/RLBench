@@ -60,4 +60,4 @@ class Observation(object):
                      self.gripper_touch_forces, self.task_low_dim_state]:
             if data is not None:
                 low_dim_data.append(data)
-        return np.concatenate(low_dim_data)
+        return np.concatenate(low_dim_data) if len(low_dim_data) > 0 else np.array([])
