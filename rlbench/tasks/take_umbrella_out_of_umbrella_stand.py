@@ -2,7 +2,7 @@ from typing import List
 from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
 from rlbench.backend.task import Task
-from rlbench.backend.conditions import DetectedCondition, NothingGrasped
+from rlbench.backend.conditions import DetectedCondition
 
 
 class TakeUmbrellaOutOfUmbrellaStand(Task):
