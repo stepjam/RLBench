@@ -306,8 +306,9 @@ class TaskEnvironment(object):
                 self._robot.gripper.release()
 
         success, terminate = self._task.success()
-        reward = self._task.reward()
-        return self._scene.get_observation(), float(success) + reward, terminate
+        task_reward = self._task.reward()
+        reward = float(success) if task_reward is None else task_reward
+        return self._scene.get_observation(), reward, terminate
 
     def enable_path_observations(self, value: bool) -> None:
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME and

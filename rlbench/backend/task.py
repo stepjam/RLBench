@@ -1,7 +1,7 @@
 import os
 import re
 from os.path import dirname, abspath, join
-from typing import List, Tuple, Callable
+from typing import List, Tuple, Callable, Union
 
 import numpy as np
 from pyrep import PyRep
@@ -112,9 +112,9 @@ class Task(object):
         """Called each time the simulation is stepped. Can usually be left."""
         pass
 
-    def reward(self) -> float:
+    def reward(self) -> Union[float, None]:
         """Allows the user to customise the task and add reward shaping."""
-        return 0.0
+        return None
 
     def cleanup(self) -> None:
         """Called at the end of the episode. Can usually be left.
