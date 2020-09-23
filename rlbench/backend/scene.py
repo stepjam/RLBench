@@ -91,6 +91,7 @@ class Scene(object):
 
     def init_task(self) -> None:
         self._active_task.init_task()
+        self._inital_task_state = self._active_task.get_state()
         self._has_init_task = True
         self._variation_index = 0
 
