@@ -11,7 +11,8 @@ class CameraConfig(object):
                  mask=True,
                  image_size=(128, 128),
                  render_mode=RenderMode.OPENGL3,
-                 masks_as_one_channel=True):
+                 masks_as_one_channel=True,
+                 depth_in_meters=False):
         self.rgb = rgb
         self.rgb_noise = rgb_noise
         self.depth = depth
@@ -20,6 +21,7 @@ class CameraConfig(object):
         self.image_size = image_size
         self.render_mode = render_mode
         self.masks_as_one_channel = masks_as_one_channel
+        self.depth_in_meters = depth_in_meters
 
     def set_all(self, value: bool):
         self.rgb = value
