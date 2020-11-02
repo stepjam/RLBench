@@ -23,12 +23,12 @@ obs_config.gripper_touch_forces = False
 action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
     action_mode, obs_config=obs_config, headless=False,
-    robot_configuration='jaco')
+    robot_configuration='sawyer')
 env.launch()
 
 task = env.get_task(ReachTarget)
 
-agent = Agent(action_size=env.action_size)  # Jaco is 6DoF + 1 for gripper
+agent = Agent(action_size=env.action_size)  # 6DoF + 1 for gripper
 
 training_steps = 120
 episode_length = 40
