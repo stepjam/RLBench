@@ -136,8 +136,6 @@ class TestEnvironment(unittest.TestCase):
         np.testing.assert_allclose(
             reset_obs.joint_positions, obs.joint_positions, atol=1e-1)
         np.testing.assert_allclose(
-            reset_obs.task_low_dim_state, obs.task_low_dim_state, atol=1e-1)
-        np.testing.assert_allclose(
             reset_obs.gripper_open, obs.gripper_open, atol=1e-1)
 
     def test_action_mode_abs_joint_velocity(self):

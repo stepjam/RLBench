@@ -36,7 +36,8 @@ class TaskEnvironment(object):
     def __init__(self, pyrep: PyRep, robot: Robot, scene: Scene, task: Task,
                  action_mode: ActionMode, dataset_root: str,
                  obs_config: ObservationConfig,
-                 static_positions: bool = False):
+                 static_positions: bool = False,
+                 attach_grasped_objects: bool = True):
         self._pyrep = pyrep
         self._robot = robot
         self._scene = scene
@@ -46,6 +47,7 @@ class TaskEnvironment(object):
         self._dataset_root = dataset_root
         self._obs_config = obs_config
         self._static_positions = static_positions
+        self._attach_grasped_objects = attach_grasped_objects
         self._reset_called = False
         self._prev_ee_velocity = None
         self._enable_path_observations = False
@@ -286,7 +288,7 @@ class TaskEnvironment(object):
                 done = self._robot.gripper.actuate(ee_action, velocity=0.2)
                 self._pyrep.step()
                 self._task.step()
-            if ee_action == 0.0:
+            if ee_action == 0.0 and self._attach_grasped_objects:
                 # If gripper close action, the check for grasp.
                 for g_obj in self._task.get_graspable_objects():
                     self._robot.gripper.grasp(g_obj)
