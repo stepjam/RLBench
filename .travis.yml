@@ -38,8 +38,8 @@ install:
   - pip3 install -r requirements.txt
 # command to run tests
 script:
-  # Runs unit tests and generates reports
-  - python3 travisci_run_tests.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER
+  # Runs unit tests and generates reports (110  min timeout)
+  - travis_wait 110 python3 travisci_run_tests.py $TEST_DIR $TRAVIS_BRANCH $TRAVIS_BUILD_NUMBER
 after_script:
   # Get previously generated index file
   - git clone --quiet --branch=gh-pages https://${GITHUB_TOKEN}@github.com/stepjam/RLBench.git gh-pages
