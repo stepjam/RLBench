@@ -17,9 +17,9 @@ install:
   - cd ../
   - cur=`pwd`
   # Pull V-REP
-  - wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_0_0_Ubuntu16_04.tar.xz
-  - tar -xf CoppeliaSim_Edu_V4_0_0_Ubuntu16_04.tar.xz
-  - export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_0_0_Ubuntu16_04"
+  - wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu16_04.tar.xz
+  - tar -xf CoppeliaSim_Edu_V4_1_0_Ubuntu16_04.tar.xz
+  - export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_1_0_Ubuntu16_04"
   - echo $COPPELIASIM_ROOT
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
   - export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
@@ -28,7 +28,7 @@ install:
   - git clone https://github.com/stepjam/PyRep.git
   - cd PyRep
   - pip3 install -r requirements.txt
-  - python3 setup.py install
+  - pip3 install .
 
   # Gym needed for some of unit tests
   - pip3 install gym

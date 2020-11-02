@@ -6,7 +6,6 @@ from pyrep import PyRep
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from rlbench.backend.const import TTT_FILE
-from rlbench.tasks import PutAllGroceriesInCupboard
 from tools.task_validator import task_smoke
 from rlbench.observation_config import ObservationConfig
 from rlbench.backend.scene import Scene
@@ -18,7 +17,7 @@ TASKS = [t for t in os.listdir(task.TASKS_PATH)
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # Task does work, but fails demos often. These should eventually be improved.
-FLAKY_TASKS = [PutAllGroceriesInCupboard]
+FLAKY_TASKS = ['put_all_groceries_in_cupboard', 'get_ice_from_fridge']
 
 
 class TestTasks(unittest.TestCase):
