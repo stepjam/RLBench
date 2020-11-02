@@ -73,8 +73,6 @@ class TaskEnvironment(object):
         return self._task.variation_count()
 
     def reset(self) -> (List[str], Observation):
-        logging.info('Resetting task: %s' % self._task.get_name())
-
         self._scene.reset()
         try:
             desc = self._scene.init_episode(

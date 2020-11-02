@@ -46,6 +46,7 @@ class ObservationConfig(object):
                  gripper_matrix=False,
                  gripper_joint_positions=False,
                  gripper_touch_forces=False,
+                 wrist_camera_matrix=False,
                  record_gripper_closing=False,
                  task_low_dim_state=False,
                  ):
@@ -72,6 +73,7 @@ class ObservationConfig(object):
         self.gripper_matrix = gripper_matrix
         self.gripper_joint_positions = gripper_joint_positions
         self.gripper_touch_forces = gripper_touch_forces
+        self.wrist_camera_matrix = wrist_camera_matrix
         self.record_gripper_closing = record_gripper_closing
         self.task_low_dim_state = task_low_dim_state
 
@@ -94,4 +96,5 @@ class ObservationConfig(object):
         self.gripper_matrix = value
         self.gripper_joint_positions = value
         self.gripper_touch_forces = value
+        self.wrist_camera_matrix = value
         self.task_low_dim_state = value
