@@ -69,8 +69,8 @@ Hopefully you have now installed PyRep and have run one of the PyRep examples.
 Now lets install RLBench:
 
 ```bash
-pip3 install -r requirements.txt
-python3 setup.py install --user
+pip install -r requirements.txt
+pip install .
 ```
 
 And that's it!
@@ -265,10 +265,10 @@ Currently supported arms:
 You can then swap out the arm using `robot_configuration`:
 
 ```python
-env = Environment(action_mode=action_mode, robot_configuration='jaco')
+env = Environment(action_mode=action_mode, robot_configuration='sawyer')
 ```
 
-A full example (using the Jaco) can be seen in [examples/swap_arm.py](examples/swap_arm.py).
+A full example (using the Sawyer) can be seen in [examples/swap_arm.py](examples/swap_arm.py).
 
 _Don't see the arm that you want to use?_ Your first step is to make sure it is
 in PyRep, and if not, then you can follow the instructions for importing new
