@@ -46,17 +46,6 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 - Gym is now supported!
 
-### 26 September, 2019
-- Given the scope of this project, we expect there to be a number of issues over
-the coming months. Please be patient during this time. 
-After the initial few weeks of release, we will tag a commit as _'V1'_, which 
-should then be used for benchmarking algorithms going forward. Once there are enough 
-significant changes in the future, we will tag a new _'V2'_ commit, 
-and so on. Versioning like this will ensure results remain consistent and 
-reproducible as the benchmark grows.
-- Currently, only **live demos** are available when requesting demos. Stored 
-demos will be made available soon!
-
 
 ## Install
 
