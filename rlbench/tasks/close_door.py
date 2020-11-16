@@ -18,7 +18,7 @@ class CloseDoor(Task):
     def init_episode(self, index: int) -> List[str]:
         return ['close the door',
                 'shut the door',
-                'grip the handle and slide the door shut',
+                'grip the handle and pull the door shut',
                 'use the handle to move the door closed']
 
     def variation_count(self) -> int:
