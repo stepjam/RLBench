@@ -58,6 +58,12 @@ def save_demo(demo, example_path):
         example_path, RIGHT_SHOULDER_DEPTH_FOLDER)
     right_shoulder_mask_path = os.path.join(
         example_path, RIGHT_SHOULDER_MASK_FOLDER)
+    overhead_rgb_path = os.path.join(
+        example_path, OVERHEAD_RGB_FOLDER)
+    overhead_depth_path = os.path.join(
+        example_path, OVERHEAD_DEPTH_FOLDER)
+    overhead_mask_path = os.path.join(
+        example_path, OVERHEAD_MASK_FOLDER)
     wrist_rgb_path = os.path.join(example_path, WRIST_RGB_FOLDER)
     wrist_depth_path = os.path.join(example_path, WRIST_DEPTH_FOLDER)
     wrist_mask_path = os.path.join(example_path, WRIST_MASK_FOLDER)
@@ -71,6 +77,9 @@ def save_demo(demo, example_path):
     check_and_make(right_shoulder_rgb_path)
     check_and_make(right_shoulder_depth_path)
     check_and_make(right_shoulder_mask_path)
+    check_and_make(overhead_rgb_path)
+    check_and_make(overhead_depth_path)
+    check_and_make(overhead_mask_path)
     check_and_make(wrist_rgb_path)
     check_and_make(wrist_depth_path)
     check_and_make(wrist_mask_path)
@@ -91,6 +100,12 @@ def save_demo(demo, example_path):
             obs.right_shoulder_depth, scale_factor=DEPTH_SCALE)
         right_shoulder_mask = Image.fromarray(
             (obs.right_shoulder_mask * 255).astype(np.uint8))
+        overhead_rgb = Image.fromarray(
+            (obs.overhead_rgb * 255).astype(np.uint8))
+        overhead_depth = utils.float_array_to_rgb_image(
+            obs.overhead_depth, scale_factor=DEPTH_SCALE)
+        overhead_mask = Image.fromarray(
+            (obs.overhead_mask * 255).astype(np.uint8))
 
         wrist_rgb = Image.fromarray((obs.wrist_rgb * 255).astype(np.uint8))
         wrist_depth = utils.float_array_to_rgb_image(
@@ -114,6 +129,12 @@ def save_demo(demo, example_path):
             os.path.join(right_shoulder_depth_path, IMAGE_FORMAT % i))
         right_shoulder_mask.save(
             os.path.join(right_shoulder_mask_path, IMAGE_FORMAT % i))
+        overhead_rgb.save(
+            os.path.join(overhead_rgb_path, IMAGE_FORMAT % i))
+        overhead_depth.save(
+            os.path.join(overhead_depth_path, IMAGE_FORMAT % i))
+        overhead_mask.save(
+            os.path.join(overhead_mask_path, IMAGE_FORMAT % i))
         wrist_rgb.save(os.path.join(wrist_rgb_path, IMAGE_FORMAT % i))
         wrist_depth.save(os.path.join(wrist_depth_path, IMAGE_FORMAT % i))
         wrist_mask.save(os.path.join(wrist_mask_path, IMAGE_FORMAT % i))
@@ -128,6 +149,9 @@ def save_demo(demo, example_path):
         obs.right_shoulder_rgb = None
         obs.right_shoulder_depth = None
         obs.right_shoulder_mask = None
+        obs.overhead_rgb = None
+        obs.overhead_depth = None
+        obs.overhead_mask = None
         obs.wrist_rgb = None
         obs.wrist_depth = None
         obs.wrist_mask = None
@@ -154,17 +178,20 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     obs_config.set_all(True)
     obs_config.right_shoulder_camera.image_size = img_size
     obs_config.left_shoulder_camera.image_size = img_size
+    obs_config.overhead_camera.image_size = img_size
     obs_config.wrist_camera.image_size = img_size
     obs_config.front_camera.image_size = img_size
     # We want to save the masks as rgb encodings.
     obs_config.left_shoulder_camera.masks_as_one_channel = False
     obs_config.right_shoulder_camera.masks_as_one_channel = False
+    obs_config.overhead_camera.masks_as_one_channel = False
     obs_config.wrist_camera.masks_as_one_channel = False
     obs_config.front_camera.masks_as_one_channel = False
 
     if FLAGS.renderer == 'opengl':
         obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
         obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.overhead_camera.render_mode = RenderMode.OPENGL
         obs_config.wrist_camera.render_mode = RenderMode.OPENGL
         obs_config.front_camera.render_mode = RenderMode.OPENGL
 

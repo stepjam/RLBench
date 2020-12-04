@@ -33,6 +33,7 @@ class ObservationConfig(object):
     def __init__(self,
                  left_shoulder_camera: CameraConfig = None,
                  right_shoulder_camera: CameraConfig = None,
+                 overhead_camera: CameraConfig = None,
                  wrist_camera: CameraConfig = None,
                  front_camera: CameraConfig = None,
                  joint_velocities=True,
@@ -56,6 +57,9 @@ class ObservationConfig(object):
         self.right_shoulder_camera = (
             CameraConfig() if right_shoulder_camera is None
             else right_shoulder_camera)
+        self.overhead_camera = (
+            CameraConfig() if overhead_camera is None
+            else overhead_camera)
         self.wrist_camera = (
             CameraConfig() if wrist_camera is None
             else wrist_camera)
@@ -84,6 +88,7 @@ class ObservationConfig(object):
     def set_all_high_dim(self, value: bool):
         self.left_shoulder_camera.set_all(value)
         self.right_shoulder_camera.set_all(value)
+        self.overhead_camera.set_all(value)
         self.wrist_camera.set_all(value)
         self.front_camera.set_all(value)
 

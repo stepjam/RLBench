@@ -237,6 +237,7 @@ if __name__ == '__main__':
     obs_config.set_all(False)
     obs_config.right_shoulder_camera = cam_config
     obs_config.left_shoulder_camera = cam_config
+    obs_config.overhead_camera = cam_config
     obs_config.wrist_camera = cam_config
     obs_config.front_camera = cam_config
 

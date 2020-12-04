@@ -11,6 +11,9 @@ class Observation(object):
                  right_shoulder_rgb: np.ndarray,
                  right_shoulder_depth: np.ndarray,
                  right_shoulder_mask: np.ndarray,
+                 overhead_rgb: np.ndarray,
+                 overhead_depth: np.ndarray,
+                 overhead_mask: np.ndarray,
                  wrist_rgb: np.ndarray,
                  wrist_depth: np.ndarray,
                  wrist_mask: np.ndarray,
@@ -33,6 +36,9 @@ class Observation(object):
         self.right_shoulder_rgb = right_shoulder_rgb
         self.right_shoulder_depth = right_shoulder_depth
         self.right_shoulder_mask = right_shoulder_mask
+        self.overhead_rgb = overhead_rgb
+        self.overhead_depth = overhead_depth
+        self.overhead_mask = overhead_mask
         self.wrist_rgb = wrist_rgb
         self.wrist_depth = wrist_depth
         self.wrist_mask = wrist_mask
