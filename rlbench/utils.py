@@ -71,6 +71,9 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
         r_sh_rgb_f = join(example_path, RIGHT_SHOULDER_RGB_FOLDER)
         r_sh_depth_f = join(example_path, RIGHT_SHOULDER_DEPTH_FOLDER)
         r_sh_mask_f = join(example_path, RIGHT_SHOULDER_MASK_FOLDER)
+        oh_rgb_f = join(example_path, OVERHEAD_RGB_FOLDER)
+        oh_depth_f = join(example_path, OVERHEAD_DEPTH_FOLDER)
+        oh_mask_f = join(example_path, OVERHEAD_MASK_FOLDER)
         wrist_rgb_f = join(example_path, WRIST_RGB_FOLDER)
         wrist_depth_f = join(example_path, WRIST_DEPTH_FOLDER)
         wrist_mask_f = join(example_path, WRIST_MASK_FOLDER)
@@ -82,7 +85,8 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
 
         if not (num_steps == len(listdir(l_sh_rgb_f)) == len(
                 listdir(l_sh_depth_f)) == len(listdir(r_sh_rgb_f)) == len(
-                listdir(r_sh_depth_f)) == len(listdir(wrist_rgb_f)) == len(
+                listdir(r_sh_depth_f)) == len(listdir(oh_rgb_f)) == len(
+                listdir(oh_depth_f)) == len(listdir(wrist_rgb_f)) == len(
                 listdir(wrist_depth_f)) == len(listdir(front_rgb_f)) == len(
                 listdir(front_depth_f))):
             raise RuntimeError('Broken dataset assumption')
@@ -101,6 +105,12 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                 obs[i].right_shoulder_depth = join(r_sh_depth_f, si)
             if obs_config.right_shoulder_camera.mask:
                 obs[i].right_shoulder_mask = join(r_sh_mask_f, si)
+            if obs_config.overhead_camera.rgb:
+                obs[i].overhead_rgb = join(oh_rgb_f, si)
+            if obs_config.overhead_camera.depth:
+                obs[i].overhead_depth = join(oh_depth_f, si)
+            if obs_config.overhead_camera.mask:
+                obs[i].overhead_mask = join(oh_mask_f, si)
             if obs_config.wrist_camera.rgb:
                 obs[i].wrist_rgb = join(wrist_rgb_f, si)
             if obs_config.wrist_camera.depth:
@@ -144,6 +154,11 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                         _resize_if_needed(Image.open(
                         obs[i].right_shoulder_rgb),
                             obs_config.right_shoulder_camera.image_size))
+                if obs_config.overhead_camera.rgb:
+                    obs[i].overhead_rgb = np.array(
+                        _resize_if_needed(Image.open(
+                        obs[i].overhead_rgb),
+                            obs_config.overhead_camera.image_size))
                 if obs_config.wrist_camera.rgb:
                     obs[i].wrist_rgb = np.array(
                         _resize_if_needed(
@@ -166,6 +181,12 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                         _resize_if_needed(
                             Image.open(obs[i].right_shoulder_depth),
                             obs_config.right_shoulder_camera.image_size),
+                        DEPTH_SCALE)
+                if obs_config.overhead_camera.depth:
+                    obs[i].overhead_depth = image_to_float_array(
+                        _resize_if_needed(
+                            Image.open(obs[i].overhead_depth),
+                            obs_config.overhead_camera.image_size),
                         DEPTH_SCALE)
                 if obs_config.wrist_camera.depth:
                     obs[i].wrist_depth = image_to_float_array(
@@ -192,6 +213,11 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                         np.array(_resize_if_needed(Image.open(
                             obs[i].right_shoulder_mask),
                             obs_config.right_shoulder_camera.image_size)))
+                if obs_config.overhead_camera.mask:
+                    obs[i].overhead_mask = rgb_handles_to_mask(
+                        np.array(_resize_if_needed(Image.open(
+                            obs[i].overhead_mask),
+                            obs_config.overhead_camera.image_size)))
                 if obs_config.wrist_camera.mask:
                     obs[i].wrist_mask = rgb_handles_to_mask(np.array(
                         _resize_if_needed(Image.open(

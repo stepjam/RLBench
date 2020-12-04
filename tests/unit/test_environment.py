@@ -47,6 +47,7 @@ class TestEnvironment(unittest.TestCase):
         obs_config = ObservationConfig()
         obs_config.left_shoulder_camera.rgb = True
         obs_config.right_shoulder_camera.rgb = True
+        obs_config.overhead_camera.rgb = True
         obs_config.front_camera.rgb = True
         obs_config.wrist_camera.rgb = True
         task = self.get_task(
@@ -54,6 +55,7 @@ class TestEnvironment(unittest.TestCase):
         desc, obs = task.reset()
         self.assertIsNotNone(obs.left_shoulder_rgb)
         self.assertIsNotNone(obs.right_shoulder_rgb)
+        self.assertIsNotNone(obs.overhead_rgb)
         self.assertIsNotNone(obs.front_rgb)
         self.assertIsNotNone(obs.wrist_rgb)
 

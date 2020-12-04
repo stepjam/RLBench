@@ -37,12 +37,14 @@ class Scene(object):
         self._workspace_boundary = SpawnBoundary([self._workspace])
         self._cam_over_shoulder_left = VisionSensor('cam_over_shoulder_left')
         self._cam_over_shoulder_right = VisionSensor('cam_over_shoulder_right')
+        self._cam_overhead = VisionSensor('cam_overhead')
         self._cam_wrist = VisionSensor('cam_wrist')
         self._cam_front = VisionSensor('cam_front')
         self._cam_over_shoulder_left_mask = VisionSensor(
             'cam_over_shoulder_left_mask')
         self._cam_over_shoulder_right_mask = VisionSensor(
             'cam_over_shoulder_right_mask')
+        self._cam_overhead_mask = VisionSensor('cam_overhead_mask')
         self._cam_wrist_mask = VisionSensor('cam_wrist_mask')
         self._cam_front_mask = VisionSensor('cam_front_mask')
         self._has_init_task = self._has_init_episode = False
@@ -168,17 +170,14 @@ class Scene(object):
 
         lsc_ob = self._obs_config.left_shoulder_camera
         rsc_ob = self._obs_config.right_shoulder_camera
+        oc_ob = self._obs_config.overhead_camera
         wc_ob = self._obs_config.wrist_camera
         fc_ob = self._obs_config.front_camera
 
-        lsc_mask_fn = (
-            rgb_handles_to_mask if lsc_ob.masks_as_one_channel else lambda x: x)
-        rsc_mask_fn = (
-            rgb_handles_to_mask if rsc_ob.masks_as_one_channel else lambda x: x)
-        wc_mask_fn = (
-            rgb_handles_to_mask if wc_ob.masks_as_one_channel else lambda x: x)
-        fc_mask_fn = (
-            rgb_handles_to_mask if fc_ob.masks_as_one_channel else lambda x: x)
+        lsc_mask_fn, rsc_mask_fn, oc_mask_fn, wc_mask_fn, fc_mask_fn = [
+            (rgb_handles_to_mask if c.masks_as_one_channel else lambda x: x
+             ) for c in [lsc_ob, rsc_ob, oc_ob, wc_ob, fc_ob]]
+
 
         def get_rgb_depth(sensor: VisionSensor, get_rgb: bool, get_depth: bool,
                           rgb_noise: NoiseModel, depth_noise: NoiseModel,
@@ -209,6 +208,9 @@ class Scene(object):
         right_shoulder_rgb, right_shoulder_depth = get_rgb_depth(
             self._cam_over_shoulder_right, rsc_ob.rgb, rsc_ob.depth,
             rsc_ob.rgb_noise, rsc_ob.depth_noise, rsc_ob.depth_in_meters)
+        overhead_rgb, overhead_depth = get_rgb_depth(
+            self._cam_overhead, oc_ob.rgb, oc_ob.depth,
+            oc_ob.rgb_noise, oc_ob.depth_noise, oc_ob.depth_in_meters)
         wrist_rgb, wrist_depth = get_rgb_depth(
             self._cam_wrist, wc_ob.rgb, wc_ob.depth,
             wc_ob.rgb_noise, wc_ob.depth_noise, wc_ob.depth_in_meters)
@@ -220,6 +222,8 @@ class Scene(object):
                                       lsc_mask_fn) if lsc_ob.mask else None
         right_shoulder_mask = get_mask(self._cam_over_shoulder_right_mask,
                                       rsc_mask_fn) if rsc_ob.mask else None
+        overhead_mask = get_mask(self._cam_overhead_mask,
+                                 oc_mask_fn) if oc_ob.mask else None
         wrist_mask = get_mask(self._cam_wrist_mask,
                               wc_mask_fn) if wc_ob.mask else None
         front_mask = get_mask(self._cam_front_mask,
@@ -230,12 +234,15 @@ class Scene(object):
             left_shoulder_depth=left_shoulder_depth,
             right_shoulder_rgb=right_shoulder_rgb,
             right_shoulder_depth=right_shoulder_depth,
+            overhead_rgb=overhead_rgb,
+            overhead_depth=overhead_depth,
             wrist_rgb=wrist_rgb,
             wrist_depth=wrist_depth,
             front_rgb=front_rgb,
             front_depth=front_depth,
             left_shoulder_mask=left_shoulder_mask,
             right_shoulder_mask=right_shoulder_mask,
+            overhead_mask=overhead_mask,
             wrist_mask=wrist_mask,
             front_mask=front_mask,
             joint_velocities=(
@@ -434,6 +441,11 @@ class Scene(object):
             self._obs_config.right_shoulder_camera.depth,
             self._obs_config.right_shoulder_camera)
         _set_rgb_props(
+            self._cam_overhead,
+            self._obs_config.overhead_camera.rgb,
+            self._obs_config.overhead_camera.depth,
+            self._obs_config.overhead_camera)
+        _set_rgb_props(
             self._cam_wrist, self._obs_config.wrist_camera.rgb,
             self._obs_config.wrist_camera.depth,
             self._obs_config.wrist_camera)
@@ -449,6 +461,10 @@ class Scene(object):
             self._cam_over_shoulder_right_mask,
             self._obs_config.right_shoulder_camera.mask,
             self._obs_config.right_shoulder_camera)
+        _set_mask_props(
+            self._cam_overhead_mask,
+            self._obs_config.overhead_camera.mask,
+            self._obs_config.overhead_camera)
         _set_mask_props(
             self._cam_wrist_mask, self._obs_config.wrist_camera.mask,
             self._obs_config.wrist_camera)
