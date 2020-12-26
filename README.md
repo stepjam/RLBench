@@ -249,6 +249,7 @@ Currently supported arms:
 - Mico arm with Mico gripper `(mico)`
 - Jaco arm with 3-finger Jaco gripper `(jaco)`
 - Sawyer arm with Baxter gripper `(sawyer)`
+- UR5 arm with Robotiq 85 gripper `(ur5)`
 
 You can then swap out the arm using `robot_configuration`:
 
