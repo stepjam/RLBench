@@ -4,10 +4,12 @@ from pyrep.robots.arms.panda import Panda
 from pyrep.robots.arms.jaco import Jaco
 from pyrep.robots.arms.mico import Mico
 from pyrep.robots.arms.sawyer import Sawyer
+from pyrep.robots.arms.ur5 import UR5
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
 from pyrep.robots.end_effectors.mico_gripper import MicoGripper
 from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
+from pyrep.robots.end_effectors.robotiq85_gripper import Robotiq85Gripper
 
 from rlbench import utils
 from rlbench.demo import Demo
@@ -42,6 +44,7 @@ SUPPORTED_ROBOTS = {
     'jaco': (Jaco, JacoGripper, 6),
     'mico': (Mico, MicoGripper, 6),
     'sawyer': (Sawyer, BaxterGripper, 7),
+    'ur5': (UR5, Robotiq85Gripper, 6),
 }
 
 
@@ -64,7 +67,7 @@ class Environment(object):
         self._obs_config = obs_config
         self._headless = headless
         self._static_positions = static_positions
-        self._robot_configuration = robot_configuration
+        self._robot_configuration = robot_configuration.lower()
 
         self._randomize_every = randomize_every
         self._frequency = frequency
