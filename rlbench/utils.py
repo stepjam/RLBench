@@ -6,11 +6,12 @@ from typing import List
 
 import numpy as np
 from PIL import Image
+from natsort import natsorted
 
-from rlbench.observation_config import ObservationConfig
 from rlbench.backend.const import *
 from rlbench.backend.utils import image_to_float_array, rgb_handles_to_mask
 from rlbench.demo import Demo
+from rlbench.observation_config import ObservationConfig
 
 
 class InvalidTaskName(Exception):
@@ -38,7 +39,9 @@ def name_to_task_class(task_file: str):
 
 def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                      variation_number: int, task_name: str,
-                     obs_config: ObservationConfig) -> List[Demo]:
+                     obs_config: ObservationConfig,
+                     random_selection: bool = True,
+                     from_episode_number: int = 0) -> List[Demo]:
 
     task_root = join(dataset_root, task_name)
     if not exists(task_root):
@@ -56,7 +59,11 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
         raise RuntimeError(
             'You asked for %d examples, but only %d were available.' % (
                 amount, len(examples)))
-    selected_examples = np.random.choice(examples, amount, replace=False)
+    if random_selection:
+        selected_examples = np.random.choice(examples, amount, replace=False)
+    else:
+        selected_examples = natsorted(
+            examples)[from_episode_number:from_episode_number+amount]
 
     # Process these examples (e.g. loading observations)
     demos = []

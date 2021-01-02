@@ -207,13 +207,15 @@ class Environment(object):
 
     def get_demos(self, task_name: str, amount: int,
                   variation_number=0,
-                  image_paths=False) -> List[Demo]:
+                  image_paths=False,
+                  random_selection: bool = True,
+                  from_episode_number: int = 0) -> List[Demo]:
         if self._dataset_root is None or len(self._dataset_root) == 0:
             raise RuntimeError(
                 "Can't ask for a stored demo when no dataset root provided.")
         demos = utils.get_stored_demos(
             amount, image_paths, self._dataset_root, variation_number,
-            task_name, self._obs_config)
+            task_name, self._obs_config, random_selection, from_episode_number)
         return demos
 
 
