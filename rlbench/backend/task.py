@@ -342,9 +342,8 @@ class Task(object):
             except ConfigurationPathError as err:
                 arm.set_joint_positions(start_vals)
                 return False, i
-            path.set_to_end(allow_force_mode=False)
+            path.set_to_end()
         # Needed twice otherwise can glitch out.
-        arm.set_joint_positions(start_vals, allow_force_mode=False)
         arm.set_joint_positions(start_vals)
         return True, -1
 
