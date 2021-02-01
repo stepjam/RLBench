@@ -112,11 +112,15 @@ class TaskEnvironment(object):
     def _ee_action(self, action, relative_to=None):
         self._assert_unit_quaternion(action[3:])
         try:
-            joint_positions = self._robot.arm.solve_ik(
+            joint_positions = self._robot.arm.solve_ik_via_jacobian(
                 action[:3], quaternion=action[3:], relative_to=relative_to)
             self._robot.arm.set_joint_target_positions(joint_positions)
         except IKError as e:
-            raise InvalidActionError('Could not find a path.') from e
+            raise InvalidActionError(
+                'Could not perform IK via Jacobian. This is because the current'
+                ' end-effector pose is too far from the given target pose. '
+                'Try limiting your action space, or sapping to an alternative '
+                'action mode, e.g. ABS_EE_POSE_PLAN_WORLD_FRAME') from e
         done = False
         prev_values = None
         # Move until reached target joint positions or until we stop moving
