@@ -30,7 +30,8 @@ from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.action_modes import ActionMode, ArmActionMode
 
-major, minor = pyrep_version.split('.')
+version = pyrep_version.split('.')
+major, minor = version[0], version[1]
 if int(major) < 1 and int(minor) < 2:
     raise ImportError('Must have PyRep version 1.2 or greater.')
 
