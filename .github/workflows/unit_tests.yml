@@ -1,0 +1,54 @@
+name: Unit Tests
+
+# Controls when the action will run.
+# Run this workflow every time a new commit pushed to your repository
+on:
+  # Triggers the workflow on push or pull request events.
+  push:
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
+    env:
+      DISPLAY: :0
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install
+        run: |
+          sudo apt-get install -y xvfb qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev qt5-default qttools5-dev-tools
+          # start xvfb in the background
+          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+          cur=`pwd`
+          wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz
+          tar -xf CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz
+          export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04"
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
+          export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
+
+          # Install PyRep
+          git clone https://github.com/stepjam/PyRep.git
+          cd PyRep
+          pip3 install -r requirements.txt
+          pip3 install setuptools
+          pip3 install .
+
+          # Gym needed for some of unit tests
+          pip3 install gym
+
+          cd ../
+          pip3 install -r requirements.txt
+
+      - name: Test
+        run: |
+          python3 -m unittest discover tests/unit
