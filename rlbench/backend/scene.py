@@ -135,11 +135,11 @@ class Scene(object):
         arm, gripper = self._initial_robot_state
         self._pyrep.set_configuration_tree(arm)
         self._pyrep.set_configuration_tree(gripper)
-        self._robot.arm.set_joint_positions(self._start_arm_joint_pos)
+        self._robot.arm.set_joint_positions(self._start_arm_joint_pos, disable_dynamics=True)
         self._robot.arm.set_joint_target_velocities(
             [0] * len(self._robot.arm.joints))
         self._robot.gripper.set_joint_positions(
-            self._starting_gripper_joint_pos)
+            self._starting_gripper_joint_pos, disable_dynamics=True)
         self._robot.gripper.set_joint_target_velocities(
             [0] * len(self._robot.gripper.joints))
 
