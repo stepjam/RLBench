@@ -133,7 +133,7 @@ class Environment(object):
             self._robot_configuration]
 
         # We assume the panda is already loaded in the scene.
-        if self._robot_configuration is not 'panda':
+        if self._robot_configuration != 'panda':
             # Remove the panda from the scene
             panda_arm = Panda()
             panda_pos = panda_arm.get_position()
