@@ -262,7 +262,7 @@ class Scene(object):
                 np.array(tip.get_pose())
                 if self._obs_config.gripper_pose else None),
             gripper_matrix=(
-                np.reshape(tip.get_matrix(), (3, 4))
+                tip.get_matrix()
                 if self._obs_config.gripper_matrix else None),
             gripper_touch_forces=(
                 ee_forces_flat
@@ -271,7 +271,7 @@ class Scene(object):
                 np.array(self._robot.gripper.get_joint_positions())
                 if self._obs_config.gripper_joint_positions else None),
             wrist_camera_matrix=(
-                np.reshape(self._cam_wrist.get_matrix(), (3, 4))
+                self._cam_wrist.get_matrix()
                 if self._cam_wrist.still_exists() else None),
             task_low_dim_state=(
                 self._active_task.get_low_dim_state() if
