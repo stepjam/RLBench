@@ -54,7 +54,6 @@ class TaskEnvironment(object):
 
         self._scene.load(self._task)
         self._pyrep.start()
-        self._target_workspace_check = Dummy.create()
 
     def get_name(self) -> str:
         return self._task.get_name()
@@ -144,9 +143,9 @@ class TaskEnvironment(object):
             # Only checks position, not rotation
             pos_to_check = action[:3]
             if relative_to is not None:
-                self._target_workspace_check.set_position(
+                self._scene.target_workspace_check.set_position(
                     pos_to_check, relative_to)
-                pos_to_check = self._target_workspace_check.get_position()
+                pos_to_check = self._scene.target_workspace_check.get_position()
             valid = self._scene.check_target_in_workspace(pos_to_check)
             if not valid:
                 raise InvalidActionError('Target is outside of workspace.')

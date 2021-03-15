@@ -1,6 +1,7 @@
 from typing import List, Callable
 from pyrep import PyRep
 from pyrep.errors import ConfigurationPathError
+from pyrep.objects import Dummy
 from pyrep.objects.shape import Shape
 from pyrep.objects.vision_sensor import VisionSensor
 from rlbench.noise_model import NoiseModel
@@ -64,6 +65,8 @@ class Scene(object):
         self._workspace_maxy = y + maxy
         self._workspace_minz = z
         self._workspace_maxz = z + 1.0  # 1M above workspace
+
+        self.target_workspace_check = Dummy.create()
 
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
