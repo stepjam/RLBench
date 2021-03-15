@@ -38,7 +38,8 @@ jobs:
           export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
           # Install PyRep
-          git clone -branch dev https://github.com/stepjam/PyRep.git
+          git clone https://github.com/stepjam/PyRep.git
+          git checkout dev
           cd PyRep
           pip3 install -r requirements.txt
           pip3 install setuptools

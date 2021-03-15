@@ -39,6 +39,7 @@ jobs:
 
           # Install PyRep
           git clone -branch dev https://github.com/stepjam/PyRep.git
+          git checkout dev
           cd PyRep
           pip3 install -r requirements.txt
           pip3 install setuptools
