@@ -31,7 +31,7 @@ class Scene(object):
         self._robot = robot
         self._obs_config = obs_config
         self._active_task = None
-        self._inital_task_state = None
+        self._initial_task_state = None
         self._start_arm_joint_pos = robot.arm.get_joint_positions()
         self._starting_gripper_joint_pos = robot.gripper.get_joint_positions()
         self._workspace = Shape('workspace')
@@ -78,7 +78,7 @@ class Scene(object):
         # Set at the centre of the workspace
         task.get_base().set_position(self._workspace.get_position())
 
-        self._inital_task_state = task.get_state()
+        self._initial_task_state = task.get_state()
         self._active_task = task
         self._initial_task_pose = task.boundary_root().get_orientation()
         self._has_init_task = self._has_init_episode = False
@@ -96,7 +96,7 @@ class Scene(object):
 
     def init_task(self) -> None:
         self._active_task.init_task()
-        self._inital_task_state = self._active_task.get_state()
+        self._initial_task_state = self._active_task.get_state()
         self._has_init_task = True
         self._variation_index = 0
 
@@ -123,7 +123,7 @@ class Scene(object):
                 break
             except (BoundaryError, WaypointError) as e:
                 self._active_task.cleanup_()
-                self._active_task.restore_state(self._inital_task_state)
+                self._active_task.restore_state(self._initial_task_state)
                 attempts += 1
                 if attempts >= max_attempts:
                     raise e
@@ -150,7 +150,7 @@ class Scene(object):
 
         if self._active_task is not None and self._has_init_task:
             self._active_task.cleanup_()
-            self._active_task.restore_state(self._inital_task_state)
+            self._active_task.restore_state(self._initial_task_state)
         self._active_task.set_initial_objects_in_scene()
 
     def get_observation(self) -> Observation:
