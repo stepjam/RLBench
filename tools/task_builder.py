@@ -262,7 +262,7 @@ if __name__ == '__main__':
             print('(v) for task variation.')
             print('(e) for episode of same variation.')
             print('(d) for demo.')
-            print('(p) for running the sim for 100 steps.')
+            print('(p) for running the sim for 100 steps (with rendering).')
         else:
             print('(!) to run task validator.')
             print('(+) run the simulator')
@@ -280,7 +280,7 @@ if __name__ == '__main__':
                 pr.stop()
                 pr.step_ui()
             elif inp == 'p':
-                [pr.step() for _ in range(100)]
+                [(pr.step(), scene.get_observation()) for _ in range(100)]
             elif inp == 'd':
                 loaded_task.new_demo()
             elif inp == 'v':
