@@ -13,7 +13,7 @@ class OpenFridge(Task):
     def init_task(self):
         top_joint = Joint('top_joint')
         self.register_success_conditions(
-            [JointCondition(top_joint, np.deg2rad(40))])
+            [JointCondition(top_joint, np.deg2rad(30))])
 
     def init_episode(self, index: int) -> List[str]:
         return ['open fridge',
@@ -28,4 +28,4 @@ class OpenFridge(Task):
 
     def base_rotation_bounds(self) -> Tuple[Tuple[float, float, float],
                                             Tuple[float, float, float]]:
-        return (0.0, 0.0, -3.14/2), (0.0, 0.0, 3.14/2)
+        return (0.0, 0.0, -np.pi/4), (0.0, 0.0, np.pi/4)
