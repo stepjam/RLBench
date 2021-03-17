@@ -42,6 +42,7 @@ class Task(object):
         self._waypoint_abilities_end = {}
         self._waypoints_should_repeat = lambda: False
         self._initial_objs_in_scene = None
+        self._stop_at_waypoint_index = -1
 
     ########################
     # Overriding functions #
@@ -236,6 +237,13 @@ class Task(object):
         """
         self._waypoints_should_repeat = func
 
+    def register_stop_at_waypoint(self, waypoint_index: int):
+        """Register at what index the demo should be stopped.
+
+        :param waypoint_index: The waypoint index.
+        """
+        self._stop_at_waypoint_index = waypoint_index
+
     ##########################
     # Other public functions #
     ##########################
@@ -354,7 +362,7 @@ class Task(object):
         i = 0
         while True:
             name = waypoint_name % i
-            if not Object.exists(name):
+            if not Object.exists(name) or i == self._stop_at_waypoint_index:
                 # There are no more waypoints...
                 break
             ob_type = Object.get_object_type(name)
