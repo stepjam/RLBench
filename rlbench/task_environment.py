@@ -149,17 +149,18 @@ class TaskEnvironment(object):
         if not valid:
             raise InvalidActionError('Target is outside of workspace.')
 
-        shapes = self._task.get_base().get_objects_in_tree(
-            object_type=ObjectType.SHAPE)
-        colliding_shapes = [s for s in shapes if self._robot.arm.check_arm_collision(s)]
-        orig_values = [s.is_collidable() for s in colliding_shapes]
+        grasped_objects = self._robot.gripper.get_grasped_objects()
+        colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
+            object_type=ObjectType.SHAPE) if s not in grasped_objects
+                  and 'Panda' not in s.get_name() and s.is_collidable()
+                  and self._robot.arm.check_arm_collision(s)]
         [s.set_collidable(False) for s in colliding_shapes]
         try:
             path = self._robot.arm.get_path(
                 action[:3], quaternion=action[3:], ignore_collisions=False,
                 relative_to=relative_to, trials=300, max_configs=50,
                 max_time_ms=20)
-            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            [s.set_collidable(True) for s in colliding_shapes]
             done = False
             observations = []
             while not done:
@@ -173,7 +174,7 @@ class TaskEnvironment(object):
                     break
             return observations
         except IKError as e:
-            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            [s.set_collidable(True) for s in colliding_shapes]
             raise InvalidActionError('Could not find a path.') from e
 
     def _path_action_v2(self, action, relative_to=None):
@@ -197,13 +198,12 @@ class TaskEnvironment(object):
         calculated_joint_positions = []
         initial_joint_positions = self._robot.arm.get_joint_positions()
 
-        shapes = self._task.get_base().get_objects_in_tree(
-            object_type=ObjectType.SHAPE)
-        colliding_shapes = [s for s in shapes if
-                            self._robot.arm.check_arm_collision(s)]
-        orig_values = [s.is_collidable() for s in colliding_shapes]
+        grasped_objects = self._robot.gripper.get_grasped_objects()
+        colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
+            object_type=ObjectType.SHAPE) if s not in grasped_objects
+                  and 'Panda' not in s.get_name() and s.is_collidable()
+                  and self._robot.arm.check_arm_collision(s)]
         [s.set_collidable(False) for s in colliding_shapes]
-
         try:
             for p in path_poses[1:]:
                 joint_positions = self._robot.arm.solve_ik_via_jacobian(
@@ -212,7 +212,10 @@ class TaskEnvironment(object):
                 self._robot.arm.set_joint_positions(joint_positions, disable_dynamics=False)
                 colliding = self._robot.arm.check_arm_collision()
                 if colliding:
+                    calculated_joint_positions = []
                     break
+
+            self._robot.arm.set_joint_positions(initial_joint_positions)
 
             # Move until reached target joint positions or until we stop moving
             # (e.g. when we collide wth something)
@@ -236,7 +239,7 @@ class TaskEnvironment(object):
                         prev_values = cur_positions
                         done = reached or not_moving
 
-                [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+                [s.set_collidable(True) for s in colliding_shapes]
                 return observations
         except IKError as e:
             self._robot.arm.set_joint_positions(initial_joint_positions)
@@ -247,7 +250,7 @@ class TaskEnvironment(object):
                 action[:3], quaternion=action[3:], ignore_collisions=False,
                 relative_to=relative_to, trials=300, max_configs=50,
                 max_time_ms=20)
-            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            [s.set_collidable(True) for s in colliding_shapes]
             done = False
             while not done:
                 done = path.step()
@@ -260,7 +263,7 @@ class TaskEnvironment(object):
                     break
             return observations
         except IKError as e:
-            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            [s.set_collidable(True) for s in colliding_shapes]
             raise InvalidActionError('Could not find a path.') from e
 
     def step(self, action) -> (Observation, int, bool):

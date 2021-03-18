@@ -318,19 +318,17 @@ class Scene(object):
             success = False
             for i, point in enumerate(waypoints):
                 point.start_of_path()
-                shapes = self._active_task.get_base().get_objects_in_tree(
-                    object_type=ObjectType.SHAPE)
-                colliding_shapes = [s for s in shapes if
-                                    self._robot.arm.check_arm_collision(s)]
-                orig_values = [s.is_collidable() for s in colliding_shapes]
+                grasped_objects = self._robot.gripper.get_grasped_objects()
+                colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
+                    object_type=ObjectType.SHAPE) if s not in grasped_objects
+                                    and 'Panda' not in s.get_name() and s.is_collidable()
+                                    and self._robot.arm.check_arm_collision(s)]
                 [s.set_collidable(False) for s in colliding_shapes]
                 try:
                     path = point.get_path()
-                    [s.set_collidable(c) for s, c in
-                     zip(colliding_shapes, orig_values)]
+                    [s.set_collidable(True) for s in colliding_shapes]
                 except ConfigurationPathError as e:
-                    [s.set_collidable(c) for s, c in
-                     zip(colliding_shapes, orig_values)]
+                    [s.set_collidable(True) for s in colliding_shapes]
                     raise DemoError(
                         'Could not get a path for waypoint %d.' % i,
                         self._active_task) from e
