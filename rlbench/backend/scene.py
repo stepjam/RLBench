@@ -4,6 +4,7 @@ from pyrep.errors import ConfigurationPathError
 from pyrep.objects import Dummy
 from pyrep.objects.shape import Shape
 from pyrep.objects.vision_sensor import VisionSensor
+from pyrep.const import ObjectType
 from rlbench.noise_model import NoiseModel
 
 from rlbench.backend.spawn_boundary import SpawnBoundary
@@ -316,11 +317,20 @@ class Scene(object):
         while True:
             success = False
             for i, point in enumerate(waypoints):
-
                 point.start_of_path()
+                shapes = self._active_task.get_base().get_objects_in_tree(
+                    object_type=ObjectType.SHAPE)
+                colliding_shapes = [s for s in shapes if
+                                    self._robot.arm.check_arm_collision(s)]
+                orig_values = [s.is_collidable() for s in colliding_shapes]
+                [s.set_collidable(False) for s in colliding_shapes]
                 try:
                     path = point.get_path()
+                    [s.set_collidable(c) for s, c in
+                     zip(colliding_shapes, orig_values)]
                 except ConfigurationPathError as e:
+                    [s.set_collidable(c) for s, c in
+                     zip(colliding_shapes, orig_values)]
                     raise DemoError(
                         'Could not get a path for waypoint %d.' % i,
                         self._active_task) from e
