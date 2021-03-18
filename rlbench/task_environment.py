@@ -4,6 +4,7 @@ from typing import List, Callable
 import numpy as np
 from pyquaternion import Quaternion
 from pyrep import PyRep
+from pyrep.const import ObjectType
 from pyrep.errors import IKError
 from pyrep.objects import Dummy
 
@@ -137,22 +138,28 @@ class TaskEnvironment(object):
 
     def _path_action(self, action, relative_to=None):
         self._assert_unit_quaternion(action[3:])
+        # Check if the target is in the workspace; if not, then quick reject
+        # Only checks position, not rotation
+        pos_to_check = action[:3]
+        if relative_to is not None:
+            self._scene.target_workspace_check.set_position(
+                pos_to_check, relative_to)
+            pos_to_check = self._scene.target_workspace_check.get_position()
+        valid = self._scene.check_target_in_workspace(pos_to_check)
+        if not valid:
+            raise InvalidActionError('Target is outside of workspace.')
+
+        shapes = self._task.get_base().get_objects_in_tree(
+            object_type=ObjectType.SHAPE)
+        colliding_shapes = [s for s in shapes if self._robot.arm.check_arm_collision(s)]
+        orig_values = [s.is_collidable() for s in colliding_shapes]
+        [s.set_collidable(False) for s in colliding_shapes]
         try:
-
-            # Check if the target is in the workspace; if not, then quick reject
-            # Only checks position, not rotation
-            pos_to_check = action[:3]
-            if relative_to is not None:
-                self._scene.target_workspace_check.set_position(
-                    pos_to_check, relative_to)
-                pos_to_check = self._scene.target_workspace_check.get_position()
-            valid = self._scene.check_target_in_workspace(pos_to_check)
-            if not valid:
-                raise InvalidActionError('Target is outside of workspace.')
-
             path = self._robot.arm.get_path(
-                action[:3], quaternion=action[3:], ignore_collisions=True,
-                relative_to=relative_to)
+                action[:3], quaternion=action[3:], ignore_collisions=False,
+                relative_to=relative_to, trials=300, max_configs=50,
+                max_time_ms=20)
+            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
             done = False
             observations = []
             while not done:
@@ -164,9 +171,96 @@ class TaskEnvironment(object):
                 # If the task succeeds while traversing path, then break early
                 if success:
                     break
-                observations.append(self._scene.get_observation())
             return observations
         except IKError as e:
+            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            raise InvalidActionError('Could not find a path.') from e
+
+    def _path_action_v2(self, action, relative_to=None):
+        self._assert_unit_quaternion(action[3:])
+
+        # Check if the target is in the workspace; if not, then quick reject
+        # Only checks position, not rotation
+        pos_to_check = action[:3]
+        if relative_to is not None:
+            self._scene.target_workspace_check.set_position(
+                pos_to_check, relative_to)
+            pos_to_check = self._scene.target_workspace_check.get_position()
+        valid = self._scene.check_target_in_workspace(pos_to_check)
+        if not valid:
+            raise InvalidActionError('Target is outside of workspace.')
+
+        observations = []
+        MAX_DELTA = 0.01
+        steps = np.ceil(np.linalg.norm(self._robot.arm.get_tip().get_pose()[:3] - action[:3]) / MAX_DELTA).astype(int)
+        path_poses = np.linspace(self._robot.arm.get_tip().get_pose(), action, steps)
+        calculated_joint_positions = []
+        initial_joint_positions = self._robot.arm.get_joint_positions()
+
+        shapes = self._task.get_base().get_objects_in_tree(
+            object_type=ObjectType.SHAPE)
+        colliding_shapes = [s for s in shapes if
+                            self._robot.arm.check_arm_collision(s)]
+        orig_values = [s.is_collidable() for s in colliding_shapes]
+        [s.set_collidable(False) for s in colliding_shapes]
+
+        try:
+            for p in path_poses[1:]:
+                joint_positions = self._robot.arm.solve_ik_via_jacobian(
+                    p[:3], quaternion=p[3:], relative_to=relative_to)
+                calculated_joint_positions.append(joint_positions)
+                self._robot.arm.set_joint_positions(joint_positions, disable_dynamics=False)
+                colliding = self._robot.arm.check_arm_collision()
+                if colliding:
+                    break
+
+            # Move until reached target joint positions or until we stop moving
+            # (e.g. when we collide wth something)
+            if len(calculated_joint_positions) > 0:
+                for ii, jp in enumerate(calculated_joint_positions):
+                    self._robot.arm.set_joint_target_positions(jp)
+                    done = False
+                    prev_values = None
+                    while not done:
+                        self._scene.step()
+                        if self._enable_path_observations:
+                            observations.append(self._scene.get_observation())
+                        cur_positions = self._robot.arm.get_joint_positions()
+                        # reached = np.allclose(cur_positions, jp, atol=0.01)
+                        atol = 1.0 if ii == len(jp) - 1 else 0.01
+                        reached = np.allclose(cur_positions, jp, atol=atol)
+                        not_moving = False
+                        if prev_values is not None:
+                            not_moving = np.allclose(
+                                cur_positions, prev_values, atol=0.001)
+                        prev_values = cur_positions
+                        done = reached or not_moving
+
+                [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+                return observations
+        except IKError as e:
+            self._robot.arm.set_joint_positions(initial_joint_positions)
+
+        observations = []
+        try:
+            path = self._robot.arm.get_path(
+                action[:3], quaternion=action[3:], ignore_collisions=False,
+                relative_to=relative_to, trials=300, max_configs=50,
+                max_time_ms=20)
+            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
+            done = False
+            while not done:
+                done = path.step()
+                self._scene.step()
+                if self._enable_path_observations:
+                    observations.append(self._scene.get_observation())
+                success, terminate = self._task.success()
+                # If the task succeeds while traversing path, then break early
+                if success:
+                    break
+            return observations
+        except IKError as e:
+            [s.set_collidable(c) for s, c in zip(colliding_shapes, orig_values)]
             raise InvalidActionError('Could not find a path.') from e
 
     def step(self, action) -> (Observation, int, bool):
@@ -246,6 +340,12 @@ class TaskEnvironment(object):
             self._path_observations = []
             self._path_observations = self._path_action(list(arm_action))
 
+        elif self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2:
+
+            self._assert_action_space(arm_action, (7,))
+            self._path_observations = []
+            self._path_observations = self._path_action_v2(list(arm_action))
+
         elif self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME:
 
             self._assert_action_space(arm_action, (7,))
@@ -307,6 +407,7 @@ class TaskEnvironment(object):
     def enable_path_observations(self, value: bool) -> None:
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME and
                 self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 and
                 self._action_mode.arm != ArmActionMode.EE_POSE_PLAN_EE_FRAME):
             raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
                                'ABS_EE_POSE_PLAN action mode.')
@@ -315,6 +416,7 @@ class TaskEnvironment(object):
     def get_path_observations(self):
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME and
                 self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 and
                 self._action_mode.arm != ArmActionMode.EE_POSE_PLAN_EE_FRAME):
             raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
                                'ABS_EE_POSE_PLAN action mode.')

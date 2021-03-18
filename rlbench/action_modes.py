@@ -46,6 +46,11 @@ class ArmActionMode(Enum):
 
     # NOTE: There is no ABS/DELTA mode for the EE_FRAME because ABS == DELTA
 
+    # Absolute end-effector pose (position (3) and quaternion (4))
+    # But does path planning between these points
+    # TODO: Experimental
+    ABS_EE_POSE_PLAN_WORLD_FRAME_V2 = 12
+
 
 class GripperActionMode(Enum):
 
