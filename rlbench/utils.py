@@ -178,35 +178,40 @@ def get_stored_demos(amount: int, image_paths: bool, dataset_root: str,
                             obs_config.front_camera.image_size))
 
                 if obs_config.left_shoulder_camera.depth:
-                    obs[i].left_shoulder_depth = image_to_float_array(
+                    depth = image_to_float_array(
                         _resize_if_needed(
                             Image.open(obs[i].left_shoulder_depth),
                             obs_config.left_shoulder_camera.image_size),
                         DEPTH_SCALE)
+                    obs[i].left_shoulder_depth = obs_config.left_shoulder_camera.depth_noise.apply(depth)
                 if obs_config.right_shoulder_camera.depth:
-                    obs[i].right_shoulder_depth = image_to_float_array(
+                    depth = image_to_float_array(
                         _resize_if_needed(
                             Image.open(obs[i].right_shoulder_depth),
                             obs_config.right_shoulder_camera.image_size),
                         DEPTH_SCALE)
+                    obs[i].right_shoulder_depth = obs_config.right_shoulder_camera.depth_noise.apply(depth)
                 if obs_config.overhead_camera.depth:
-                    obs[i].overhead_depth = image_to_float_array(
+                    depth = image_to_float_array(
                         _resize_if_needed(
                             Image.open(obs[i].overhead_depth),
                             obs_config.overhead_camera.image_size),
                         DEPTH_SCALE)
+                    obs[i].overhead_depth = obs_config.overhead_camera.depth_noise.apply(depth)
                 if obs_config.wrist_camera.depth:
-                    obs[i].wrist_depth = image_to_float_array(
+                    depth = image_to_float_array(
                         _resize_if_needed(
                             Image.open(obs[i].wrist_depth),
                             obs_config.wrist_camera.image_size),
                         DEPTH_SCALE)
+                    obs[i].wrist_depth = obs_config.wrist_camera.depth_noise.apply(depth)
                 if obs_config.front_camera.depth:
-                    obs[i].front_depth = image_to_float_array(
+                    depth = image_to_float_array(
                         _resize_if_needed(
                             Image.open(obs[i].front_depth),
                             obs_config.front_camera.image_size),
                         DEPTH_SCALE)
+                    obs[i].front_depth = obs_config.front_camera.depth_noise.apply(depth)
 
                 # Masks are stored as coded RGB images.
                 # Here we transform them into 1 channel handles.
