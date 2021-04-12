@@ -23,6 +23,7 @@ class TestEnvironment(unittest.TestCase):
             obs_config.set_all(False)
             obs_config.set_all_low_dim(True)
             obs_config.right_shoulder_camera.rgb = True
+            obs_config.left_shoulder_camera.point_cloud = True
         action_mode = ActionMode(arm_action_mode)
         self.env = environment.Environment(
             action_mode, ASSET_DIR, obs_config, headless=True)
@@ -92,6 +93,7 @@ class TestEnvironment(unittest.TestCase):
         self.assertGreater(len(demos[0]), 0)
         self.assertIsInstance(demos[0][0].right_shoulder_rgb, np.ndarray)
         self.assertIsNone(demos[0][0].left_shoulder_rgb)
+        self.assertIsInstance(demos[0][0].left_shoulder_point_cloud, np.ndarray)
 
     def test_get_stored_demos_images_without_init_sim(self):
         obs_config = ObservationConfig()

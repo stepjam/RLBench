@@ -1,22 +1,23 @@
 from typing import List, Callable
+
+import numpy as np
 from pyrep import PyRep
+from pyrep.const import ObjectType
 from pyrep.errors import ConfigurationPathError
 from pyrep.objects import Dummy
 from pyrep.objects.shape import Shape
 from pyrep.objects.vision_sensor import VisionSensor
-from pyrep.const import ObjectType
-from rlbench.noise_model import NoiseModel
 
-from rlbench.backend.spawn_boundary import SpawnBoundary
-from rlbench.backend.observation import Observation
 from rlbench.backend.exceptions import (
     WaypointError, BoundaryError, NoWaypointsError, DemoError)
+from rlbench.backend.observation import Observation
+from rlbench.backend.robot import Robot
+from rlbench.backend.spawn_boundary import SpawnBoundary
+from rlbench.backend.task import Task
 from rlbench.backend.utils import rgb_handles_to_mask
 from rlbench.demo import Demo
+from rlbench.noise_model import NoiseModel
 from rlbench.observation_config import ObservationConfig, CameraConfig
-from rlbench.backend.task import Task
-from rlbench.backend.robot import Robot
-import numpy as np
 
 STEPS_BEFORE_EPISODE_START = 10
 
@@ -183,22 +184,31 @@ class Scene(object):
             (rgb_handles_to_mask if c.masks_as_one_channel else lambda x: x
              ) for c in [lsc_ob, rsc_ob, oc_ob, wc_ob, fc_ob]]
 
-
         def get_rgb_depth(sensor: VisionSensor, get_rgb: bool, get_depth: bool,
-                          rgb_noise: NoiseModel, depth_noise: NoiseModel,
-                          depth_in_meters: bool):
-            rgb = depth = None
+                          get_pcd: bool, rgb_noise: NoiseModel,
+                          depth_noise: NoiseModel, depth_in_meters: bool):
+            rgb = depth = pcd = None
             if sensor is not None and (get_rgb or get_depth):
                 sensor.handle_explicitly()
                 if get_rgb:
                     rgb = sensor.capture_rgb()
+                    rgb = np.clip((rgb * 255.).astype(np.uint8), 0, 255)
                     if rgb_noise is not None:
                         rgb = rgb_noise.apply(rgb)
-                if get_depth:
+                if get_depth or get_pcd:
                     depth = sensor.capture_depth(depth_in_meters)
                     if depth_noise is not None:
                         depth = depth_noise.apply(depth)
-            return rgb, depth
+                if get_pcd:
+                    depth_m = depth
+                    if not depth_in_meters:
+                        near = sensor.get_near_clipping_plane()
+                        far = sensor.get_far_clipping_plane()
+                        depth_m = near + depth * (far - near)
+                    pcd = sensor.pointcloud_from_depth(depth_m)
+                    if not get_depth:
+                        depth = None
+            return rgb, depth, pcd
 
         def get_mask(sensor: VisionSensor, mask_fn):
             mask = None
@@ -207,20 +217,20 @@ class Scene(object):
                 mask = mask_fn(sensor.capture_rgb())
             return mask
 
-        left_shoulder_rgb, left_shoulder_depth = get_rgb_depth(
-            self._cam_over_shoulder_left, lsc_ob.rgb, lsc_ob.depth,
+        left_shoulder_rgb, left_shoulder_depth, left_shoulder_pcd = get_rgb_depth(
+            self._cam_over_shoulder_left, lsc_ob.rgb, lsc_ob.depth, lsc_ob.point_cloud,
             lsc_ob.rgb_noise, lsc_ob.depth_noise, lsc_ob.depth_in_meters)
-        right_shoulder_rgb, right_shoulder_depth = get_rgb_depth(
-            self._cam_over_shoulder_right, rsc_ob.rgb, rsc_ob.depth,
+        right_shoulder_rgb, right_shoulder_depth, right_shoulder_pcd = get_rgb_depth(
+            self._cam_over_shoulder_right, rsc_ob.rgb, rsc_ob.depth, rsc_ob.point_cloud,
             rsc_ob.rgb_noise, rsc_ob.depth_noise, rsc_ob.depth_in_meters)
-        overhead_rgb, overhead_depth = get_rgb_depth(
-            self._cam_overhead, oc_ob.rgb, oc_ob.depth,
+        overhead_rgb, overhead_depth, overhead_pcd = get_rgb_depth(
+            self._cam_overhead, oc_ob.rgb, oc_ob.depth, oc_ob.point_cloud,
             oc_ob.rgb_noise, oc_ob.depth_noise, oc_ob.depth_in_meters)
-        wrist_rgb, wrist_depth = get_rgb_depth(
-            self._cam_wrist, wc_ob.rgb, wc_ob.depth,
+        wrist_rgb, wrist_depth, wrist_pcd = get_rgb_depth(
+            self._cam_wrist, wc_ob.rgb, wc_ob.depth, wc_ob.point_cloud,
             wc_ob.rgb_noise, wc_ob.depth_noise, wc_ob.depth_in_meters)
-        front_rgb, front_depth = get_rgb_depth(
-            self._cam_front, fc_ob.rgb, fc_ob.depth,
+        front_rgb, front_depth, front_pcd = get_rgb_depth(
+            self._cam_front, fc_ob.rgb, fc_ob.depth, fc_ob.point_cloud,
             fc_ob.rgb_noise, fc_ob.depth_noise, fc_ob.depth_in_meters)
 
         left_shoulder_mask = get_mask(self._cam_over_shoulder_left_mask,
@@ -237,14 +247,19 @@ class Scene(object):
         obs = Observation(
             left_shoulder_rgb=left_shoulder_rgb,
             left_shoulder_depth=left_shoulder_depth,
+            left_shoulder_point_cloud=left_shoulder_pcd,
             right_shoulder_rgb=right_shoulder_rgb,
             right_shoulder_depth=right_shoulder_depth,
+            right_shoulder_point_cloud=right_shoulder_pcd,
             overhead_rgb=overhead_rgb,
             overhead_depth=overhead_depth,
+            overhead_point_cloud=overhead_pcd,
             wrist_rgb=wrist_rgb,
             wrist_depth=wrist_depth,
+            wrist_point_cloud=wrist_pcd,
             front_rgb=front_rgb,
             front_depth=front_depth,
+            front_point_cloud=front_pcd,
             left_shoulder_mask=left_shoulder_mask,
             right_shoulder_mask=right_shoulder_mask,
             overhead_mask=overhead_mask,
@@ -275,12 +290,10 @@ class Scene(object):
             gripper_joint_positions=(
                 np.array(self._robot.gripper.get_joint_positions())
                 if self._obs_config.gripper_joint_positions else None),
-            wrist_camera_matrix=(
-                self._cam_wrist.get_matrix()
-                if self._cam_wrist.still_exists() else None),
             task_low_dim_state=(
                 self._active_task.get_low_dim_state() if
-                self._obs_config.task_low_dim_state else None))
+                self._obs_config.task_low_dim_state else None),
+            misc=self._get_misc())
         obs = self._active_task.decorate_observation(obs)
         return obs
 
@@ -433,7 +446,7 @@ class Scene(object):
     def _set_camera_properties(self) -> None:
         def _set_rgb_props(rgb_cam: VisionSensor,
                            rgb: bool, depth: bool, conf: CameraConfig):
-            if not (rgb or depth):
+            if not (rgb or depth or conf.point_cloud):
                 rgb_cam.remove()
             else:
                 rgb_cam.set_explicit_handling(1)
@@ -498,3 +511,21 @@ class Scene(object):
         self._workspace_boundary.sample(
             self._active_task.boundary_root(),
             min_rotation=min_rot, max_rotation=max_rot)
+
+    def _get_misc(self):
+        def _get_cam_data(cam: VisionSensor, name: str):
+            d = {}
+            if cam.still_exists():
+                d = {
+                    '%s_extrinsics' % name: cam.get_matrix(),
+                    '%s_intrinsics' % name: cam.get_intrinsic_matrix(),
+                    '%s_near' % name: cam.get_near_clipping_plane(),
+                    '%s_far' % name: cam.get_far_clipping_plane(),
+                }
+            return d
+        misc = _get_cam_data(self._cam_over_shoulder_left, 'left_shoulder_camera')
+        misc.update(_get_cam_data(self._cam_over_shoulder_right, 'right_shoulder_camera'))
+        misc.update(_get_cam_data(self._cam_overhead, 'overhead_camera'))
+        misc.update(_get_cam_data(self._cam_front, 'front_camera'))
+        misc.update(_get_cam_data(self._cam_wrist, 'wrist_camera'))
+        return misc

@@ -465,7 +465,6 @@ class TaskEnvironment(object):
             while attempts > 0:
                 random_seed = np.random.get_state()
                 self.reset()
-                logging.info('Collecting demo %d' % i)
                 try:
                     demo = self._scene.get_demo(
                         callable_each_step=callable_each_step)

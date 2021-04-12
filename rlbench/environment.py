@@ -1,4 +1,7 @@
+import pickle
+
 from pyrep import PyRep
+from pyrep.objects import VisionSensor
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.arms.jaco import Jaco
 from pyrep.robots.arms.mico import Mico
@@ -215,4 +218,34 @@ class Environment(object):
             task_name, self._obs_config, random_selection, from_episode_number)
         return demos
 
+    def get_scene_data(self) -> dict:
+        """Get the data of various scene/camera information.
 
+        This temporarily starts the simulator in headless mode.
+
+        :return: A dictionary containing scene data.
+        """
+        def _get_cam_info(cam: VisionSensor):
+            if not cam.still_exists():
+                return None
+            intrinsics = cam.get_intrinsic_matrix()
+            return dict(
+                intrinsics=intrinsics,
+                near_plane=cam.get_near_clipping_plane(),
+                far_plane=cam.get_far_clipping_plane(),
+                extrinsics=cam.get_matrix())
+        headless = self._headless
+        self._headless = True
+        self.launch()
+        d = dict(
+            left_shoulder_camera=_get_cam_info(
+                self._scene._cam_over_shoulder_left),
+            right_shoulder_camera=_get_cam_info(
+                self._scene._cam_over_shoulder_right),
+            front_camera=_get_cam_info(self._scene._cam_front),
+            wrist_camera=_get_cam_info(self._scene._cam_wrist),
+            overhead_camera=_get_cam_info(self._scene._cam_overhead)
+        )
+        self.shutdown()
+        self._headless = headless
+        return d

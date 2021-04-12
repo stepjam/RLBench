@@ -8,6 +8,7 @@ class CameraConfig(object):
                  rgb_noise: NoiseModel=Identity(),
                  depth=True,
                  depth_noise: NoiseModel=Identity(),
+                 point_cloud=True,
                  mask=True,
                  image_size=(128, 128),
                  render_mode=RenderMode.OPENGL3,
@@ -17,6 +18,7 @@ class CameraConfig(object):
         self.rgb_noise = rgb_noise
         self.depth = depth
         self.depth_noise = depth_noise
+        self.point_cloud = point_cloud
         self.mask = mask
         self.image_size = image_size
         self.render_mode = render_mode
@@ -26,6 +28,7 @@ class CameraConfig(object):
     def set_all(self, value: bool):
         self.rgb = value
         self.depth = value
+        self.point_cloud = value
         self.mask = value
 
 
