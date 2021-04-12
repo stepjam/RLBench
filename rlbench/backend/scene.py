@@ -192,9 +192,9 @@ class Scene(object):
                 sensor.handle_explicitly()
                 if get_rgb:
                     rgb = sensor.capture_rgb()
-                    rgb = np.clip((rgb * 255.).astype(np.uint8), 0, 255)
                     if rgb_noise is not None:
                         rgb = rgb_noise.apply(rgb)
+                    rgb = np.clip((rgb * 255.).astype(np.uint8), 0, 255)
                 if get_depth or get_pcd:
                     depth = sensor.capture_depth(depth_in_meters)
                     if depth_noise is not None:
