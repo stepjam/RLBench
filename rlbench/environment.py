@@ -102,7 +102,7 @@ class Environment(object):
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
@@ -198,7 +198,7 @@ class Environment(object):
         elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
-              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):

@@ -4,7 +4,7 @@ from typing import List, Callable
 import numpy as np
 from pyquaternion import Quaternion
 from pyrep import PyRep
-from pyrep.const import ObjectType
+from pyrep.const import ObjectType, ConfigurationPathAlgorithms
 from pyrep.errors import IKError
 from pyrep.objects import Dummy
 
@@ -164,7 +164,7 @@ class TaskEnvironment(object):
                 action[:3], quaternion=action[3:],
                 ignore_collisions=not collision_checking,
                 relative_to=relative_to, trials=300, max_configs=50,
-                max_time_ms=20)
+                max_time_ms=20, algorithm=ConfigurationPathAlgorithms.RRTConnect)
             [s.set_collidable(True) for s in colliding_shapes]
             done = False
             observations = []
@@ -328,7 +328,7 @@ class TaskEnvironment(object):
     def enable_path_observations(self, value: bool) -> None:
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME and
                 self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME and
-                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK and
                 self._action_mode.arm != ArmActionMode.EE_POSE_PLAN_EE_FRAME):
             raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
                                'ABS_EE_POSE_PLAN action mode.')
@@ -337,7 +337,7 @@ class TaskEnvironment(object):
     def get_path_observations(self):
         if (self._action_mode.arm != ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME and
                 self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME and
-                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_V2 and
+                self._action_mode.arm != ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK and
                 self._action_mode.arm != ArmActionMode.EE_POSE_PLAN_EE_FRAME):
             raise RuntimeError('Only available in DELTA_EE_POSE_PLAN or '
                                'ABS_EE_POSE_PLAN action mode.')
