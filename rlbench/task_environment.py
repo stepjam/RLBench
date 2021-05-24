@@ -163,8 +163,11 @@ class TaskEnvironment(object):
             path = self._robot.arm.get_path(
                 action[:3], quaternion=action[3:],
                 ignore_collisions=not collision_checking,
-                relative_to=relative_to, trials=300, max_configs=50,
-                max_time_ms=20, algorithm=ConfigurationPathAlgorithms.RRTConnect)
+                relative_to=relative_to,
+                trials=300,
+                max_configs=10,
+                trials_per_goal=5,
+                algorithm=ConfigurationPathAlgorithms.RRTConnect)
             [s.set_collidable(True) for s in colliding_shapes]
             done = False
             observations = []
@@ -173,10 +176,6 @@ class TaskEnvironment(object):
                 self._scene.step()
                 if self._enable_path_observations:
                     observations.append(self._scene.get_observation())
-                success, terminate = self._task.success()
-                # If the task succeeds while traversing path, then break early
-                if success:
-                    break
             return observations
         except IKError as e:
             [s.set_collidable(True) for s in colliding_shapes]
@@ -210,6 +209,8 @@ class TaskEnvironment(object):
                                       (len(self._robot.arm.joints),))
             self._robot.arm.set_joint_target_velocities(arm_action)
             self._scene.step()
+            self._robot.arm.set_joint_target_velocities(
+                np.zeros_like(arm_action))
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_VELOCITY:
 
@@ -218,6 +219,8 @@ class TaskEnvironment(object):
             cur = np.array(self._robot.arm.get_joint_velocities())
             self._robot.arm.set_joint_target_velocities(cur + arm_action)
             self._scene.step()
+            self._robot.arm.set_joint_target_velocities(
+                np.zeros_like(arm_action))
 
         elif self._action_mode.arm == ArmActionMode.ABS_JOINT_POSITION:
 
@@ -225,6 +228,8 @@ class TaskEnvironment(object):
                                       (len(self._robot.arm.joints),))
             self._robot.arm.set_joint_target_positions(arm_action)
             self._scene.step()
+            self._robot.arm.set_joint_target_positions(
+                self._robot.arm.get_joint_positions())
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_POSITION:
 
@@ -233,6 +238,8 @@ class TaskEnvironment(object):
             cur = np.array(self._robot.arm.get_joint_positions())
             self._robot.arm.set_joint_target_positions(cur + arm_action)
             self._scene.step()
+            self._robot.arm.set_joint_target_positions(
+                self._robot.arm.get_joint_positions())
 
         elif self._action_mode.arm == ArmActionMode.ABS_JOINT_TORQUE:
 
@@ -240,6 +247,9 @@ class TaskEnvironment(object):
                 arm_action, (len(self._robot.arm.joints),))
             self._torque_action(arm_action)
             self._scene.step()
+            self._torque_action(self._robot.arm.get_joint_forces())
+            self._robot.arm.set_joint_target_velocities(
+                np.zeros_like(arm_action))
 
         elif self._action_mode.arm == ArmActionMode.DELTA_JOINT_TORQUE:
 
@@ -247,6 +257,9 @@ class TaskEnvironment(object):
             new_action = cur + arm_action
             self._torque_action(new_action)
             self._scene.step()
+            self._torque_action(self._robot.arm.get_joint_forces())
+            self._robot.arm.set_joint_target_velocities(
+                np.zeros_like(arm_action))
 
         elif self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME:
 
@@ -308,10 +321,6 @@ class TaskEnvironment(object):
 
         if current_ee != ee_action:
             done = False
-            while not done:
-                done = self._robot.gripper.actuate(ee_action, velocity=0.2)
-                self._pyrep.step()
-                self._task.step()
             if ee_action == 0.0 and self._attach_grasped_objects:
                 # If gripper close action, the check for grasp.
                 for g_obj in self._task.get_graspable_objects():
@@ -319,6 +328,15 @@ class TaskEnvironment(object):
             else:
                 # If gripper open action, the check for ungrasp.
                 self._robot.gripper.release()
+            while not done:
+                done = self._robot.gripper.actuate(ee_action, velocity=0.2)
+                self._pyrep.step()
+                self._task.step()
+            if ee_action == 1.0:
+                # Step a few more times to allow objects to drop
+                for _ in range(10):
+                    self._pyrep.step()
+                    self._task.step()
 
         success, terminate = self._task.success()
         task_reward = self._task.reward()
