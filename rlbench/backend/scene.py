@@ -71,6 +71,9 @@ class Scene(object):
         self.target_workspace_check = Dummy.create()
         self._step_callback = None
 
+        self._robot_shapes = self._robot.arm.get_objects_in_tree(
+            object_type=ObjectType.SHAPE)
+
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
 
@@ -334,7 +337,7 @@ class Scene(object):
                 grasped_objects = self._robot.gripper.get_grasped_objects()
                 colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
                     object_type=ObjectType.SHAPE) if s not in grasped_objects
-                                    and 'Panda' not in s.get_name() and s.is_collidable()
+                                    and s not in self._robot_shapes and s.is_collidable()
                                     and self._robot.arm.check_arm_collision(s)]
                 [s.set_collidable(False) for s in colliding_shapes]
                 try:

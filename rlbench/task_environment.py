@@ -55,6 +55,8 @@ class TaskEnvironment(object):
 
         self._scene.load(self._task)
         self._pyrep.start()
+        self._robot_shapes = self._robot.arm.get_objects_in_tree(
+            object_type=ObjectType.SHAPE)
 
     def get_name(self) -> str:
         return self._task.get_name()
@@ -136,6 +138,17 @@ class TaskEnvironment(object):
             prev_values = cur_positions
             done = reached or not_moving
 
+    def _path_action_get_path(self, action, collision_checking, relative_to):
+        try:
+            path = self._robot.arm.get_path(
+                action[:3], quaternion=action[3:],
+                ignore_collisions=not collision_checking,
+                relative_to=relative_to,
+              )
+            return path
+        except IKError as e:
+            raise InvalidActionError('Could not find a path.') from e
+
     def _path_action(self, action, collision_checking=False, relative_to=None):
         self._assert_unit_quaternion(action[3:])
         # Check if the target is in the workspace; if not, then quick reject
@@ -149,37 +162,42 @@ class TaskEnvironment(object):
         if not valid:
             raise InvalidActionError('Target is outside of workspace.')
 
-        colliding_shapes = []
+        observations = []
+        done = False
         if collision_checking:
-            # Disable collision checking for objs we are already colliding with,
-            # otherwise planning will always fail.
-            grasped_objects = self._robot.gripper.get_grasped_objects()
-            colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
-                object_type=ObjectType.SHAPE) if s not in grasped_objects
-                      and 'Panda' not in s.get_name() and s.is_collidable()
-                      and self._robot.arm.check_arm_collision(s)]
-            [s.set_collidable(False) for s in colliding_shapes]
-        try:
-            path = self._robot.arm.get_path(
-                action[:3], quaternion=action[3:],
-                ignore_collisions=not collision_checking,
-                relative_to=relative_to,
-                trials=300,
-                max_configs=10,
-                trials_per_goal=5,
-                algorithm=ConfigurationPathAlgorithms.RRTConnect)
-            [s.set_collidable(True) for s in colliding_shapes]
-            done = False
-            observations = []
+            # First check if we are colliding with anything
+            colliding = self._robot.arm.check_arm_collision()
+            if colliding:
+                # Disable collisions with the objects that we are colliding with
+                grasped_objects = self._robot.gripper.get_grasped_objects()
+                colliding_shapes = [s for s in self._pyrep.get_objects_in_tree(
+                    object_type=ObjectType.SHAPE) if (
+                        s.is_collidable() and
+                        s not in self._robot_shapes and
+                        s not in grasped_objects and
+                        self._robot.arm.check_arm_collision(s))]
+                [s.set_collidable(False) for s in colliding_shapes]
+                path = self._path_action_get_path(
+                    action, collision_checking, relative_to)
+                [s.set_collidable(True) for s in colliding_shapes]
+                # Only run this path until we are no longer colliding
+                while not done:
+                    done = path.step()
+                    self._scene.step()
+                    if self._enable_path_observations:
+                        observations.append(self._scene.get_observation())
+                    colliding = self._robot.arm.check_arm_collision()
+                    if not colliding:
+                        break
+        if not done:
+            path = self._path_action_get_path(
+                action, collision_checking, relative_to)
             while not done:
                 done = path.step()
                 self._scene.step()
                 if self._enable_path_observations:
                     observations.append(self._scene.get_observation())
             return observations
-        except IKError as e:
-            [s.set_collidable(True) for s in colliding_shapes]
-            raise InvalidActionError('Could not find a path.') from e
 
     def step(self, action) -> (Observation, int, bool):
         # returns observation, reward, done, info
