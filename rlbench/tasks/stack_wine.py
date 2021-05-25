@@ -11,7 +11,8 @@ class StackWine(Task):
         wine_bottle = Shape('wine_bottle')
         self.register_graspable_objects([wine_bottle])
         self.register_success_conditions(
-            [DetectedCondition(wine_bottle, ProximitySensor('success'))])
+            [DetectedCondition(wine_bottle, ProximitySensor('success')),
+             NothingGrasped(self.robot.gripper)])
 
     def init_episode(self, index: int) -> List[str]:
         return ['stack wine bottle',
