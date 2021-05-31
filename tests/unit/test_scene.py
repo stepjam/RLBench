@@ -46,8 +46,8 @@ class TestScene(unittest.TestCase):
             np.array_equal(obs1.right_shoulder_rgb, obs2.right_shoulder_rgb))
         self.assertFalse(
             np.array_equal(obs1.left_shoulder_rgb, obs2.left_shoulder_rgb))
-        self.assertTrue(obs1.left_shoulder_rgb.max() <= 1.0)
-        self.assertTrue(obs1.left_shoulder_rgb.min() >= 0.0)
+        self.assertTrue(obs1.left_shoulder_rgb.max() <= 255)
+        self.assertTrue(obs1.left_shoulder_rgb.min() >= 0)
 
     def test_sensor_noise_robot(self):
         obs_config = ObservationConfig(

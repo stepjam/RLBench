@@ -30,4 +30,4 @@ class CloseFridge(Task):
 
     def base_rotation_bounds(self) -> Tuple[Tuple[float, float, float],
                                             Tuple[float, float, float]]:
-        return (0.0, 0.0, -3.14/2), (0.0, 0.0, 3.14/2)
+        return (0.0, 0.0, -np.pi/4), (0.0, 0.0, np.pi/4)

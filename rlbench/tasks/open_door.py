@@ -10,29 +10,27 @@ from rlbench.backend.conditions import JointCondition
 class OpenDoor(Task):
 
     def init_task(self) -> None:
-        self.door_main = Shape('door_main')
-        self.door_main.set_dynamic(False)
-        door_joint = Joint('door_frame_joint')
-        handle_joint = Joint('door_handle_joint')
+        self._door_joint = Joint('door_frame_joint')
         self.register_success_conditions(
-            [JointCondition(door_joint, np.deg2rad(25))])
+            [JointCondition(self._door_joint, np.deg2rad(25))])
         self.door_unlock_cond = JointCondition(
-            handle_joint, np.deg2rad(25))
+            Joint('door_handle_joint'), np.deg2rad(25))
 
     def init_episode(self, index: int) -> List[str]:
-        self.door_unlocked = False
+        self._door_unlocked = False
+        self._door_joint.set_motor_locked_at_zero_velocity(True)
         return ['open the door',
-                'grip the handle and slide the door open',
-                'use the handle to move the door open']
+                'grip the handle and push the door open',
+                'use the handle to open the door']
 
     def variation_count(self) -> int:
         return 1
 
     def step(self) -> None:
-        if not self.door_unlocked:
-            self.door_unlocked = self.door_unlock_cond.condition_met()[0]
-            if self.door_unlocked:
-                self.door_main.set_dynamic(True)
+        if not self._door_unlocked:
+            self._door_unlocked = self.door_unlock_cond.condition_met()[0]
+            if self._door_unlocked:
+                self._door_joint.set_motor_locked_at_zero_velocity(False)
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
         return [0, 0, -3.14 / 4.], [0, 0, 3.14 / 4.]

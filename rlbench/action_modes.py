@@ -31,18 +31,22 @@ class ArmActionMode(Enum):
     # But does path planning between these points
     ABS_EE_POSE_PLAN_WORLD_FRAME = 8
 
+    # Absolute end-effector pose (position (3) and quaternion (4))
+    # But does path planning between these points (with collision checking)
+    ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK = 9
+
     # Change in end-effector pose (position (3) and quaternion (4))
     # But does path planning between these points
-    DELTA_EE_POSE_PLAN_WORLD_FRAME = 9
+    DELTA_EE_POSE_PLAN_WORLD_FRAME = 10
 
     # Change in end-effector pose (position (3) and quaternion (4))
     # In the end-effector frame
-    EE_POSE_EE_FRAME = 10
+    EE_POSE_EE_FRAME = 11
 
     # Change in end-effector pose (position (3) and quaternion (4))
     # But does path planning between these points.
     # In the end-effector frame
-    EE_POSE_PLAN_EE_FRAME = 11
+    EE_POSE_PLAN_EE_FRAME = 12
 
     # NOTE: There is no ABS/DELTA mode for the EE_FRAME because ABS == DELTA
 
