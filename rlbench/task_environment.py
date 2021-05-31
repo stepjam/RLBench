@@ -189,6 +189,11 @@ class TaskEnvironment(object):
                     colliding = self._robot.arm.check_arm_collision()
                     if not colliding:
                         break
+                    success, terminate = self._task.success()
+                    # If the task succeeds while traversing path, then break early
+                    if success:
+                        done = True
+                        break
         if not done:
             path = self._path_action_get_path(
                 action, collision_checking, relative_to)
@@ -197,7 +202,12 @@ class TaskEnvironment(object):
                 self._scene.step()
                 if self._enable_path_observations:
                     observations.append(self._scene.get_observation())
-            return observations
+                success, terminate = self._task.success()
+                # If the task succeeds while traversing path, then break early
+                if success:
+                    break
+
+        return observations
 
     def step(self, action) -> (Observation, int, bool):
         # returns observation, reward, done, info
