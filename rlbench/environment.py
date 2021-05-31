@@ -1,12 +1,17 @@
+import pickle
+
 from pyrep import PyRep
+from pyrep.objects import VisionSensor
 from pyrep.robots.arms.panda import Panda
 from pyrep.robots.arms.jaco import Jaco
 from pyrep.robots.arms.mico import Mico
 from pyrep.robots.arms.sawyer import Sawyer
+from pyrep.robots.arms.ur5 import UR5
 from pyrep.robots.end_effectors.panda_gripper import PandaGripper
 from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
 from pyrep.robots.end_effectors.mico_gripper import MicoGripper
 from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
+from pyrep.robots.end_effectors.robotiq85_gripper import Robotiq85Gripper
 
 from rlbench import utils
 from rlbench.demo import Demo
@@ -37,6 +42,7 @@ SUPPORTED_ROBOTS = {
     'jaco': (Jaco, JacoGripper, 6),
     'mico': (Mico, MicoGripper, 6),
     'sawyer': (Sawyer, BaxterGripper, 7),
+    'ur5': (UR5, Robotiq85Gripper, 6),
 }
 
 
@@ -59,7 +65,7 @@ class Environment(object):
         self._obs_config = obs_config
         self._headless = headless
         self._static_positions = static_positions
-        self._robot_configuration = robot_configuration
+        self._robot_configuration = robot_configuration.lower()
 
         self._randomize_every = randomize_every
         self._frequency = frequency
@@ -96,6 +102,7 @@ class Environment(object):
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
@@ -191,6 +198,7 @@ class Environment(object):
         elif (self._action_mode.arm == ArmActionMode.ABS_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME or
+              self._action_mode.arm == ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME_WITH_COLLISION_CHECK or
               self._action_mode.arm == ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_PLAN_EE_FRAME or
               self._action_mode.arm == ArmActionMode.EE_POSE_EE_FRAME):
@@ -199,13 +207,45 @@ class Environment(object):
 
     def get_demos(self, task_name: str, amount: int,
                   variation_number=0,
-                  image_paths=False) -> List[Demo]:
+                  image_paths=False,
+                  random_selection: bool = True,
+                  from_episode_number: int = 0) -> List[Demo]:
         if self._dataset_root is None or len(self._dataset_root) == 0:
             raise RuntimeError(
                 "Can't ask for a stored demo when no dataset root provided.")
         demos = utils.get_stored_demos(
             amount, image_paths, self._dataset_root, variation_number,
-            task_name, self._obs_config)
+            task_name, self._obs_config, random_selection, from_episode_number)
         return demos
 
+    def get_scene_data(self) -> dict:
+        """Get the data of various scene/camera information.
 
+        This temporarily starts the simulator in headless mode.
+
+        :return: A dictionary containing scene data.
+        """
+        def _get_cam_info(cam: VisionSensor):
+            if not cam.still_exists():
+                return None
+            intrinsics = cam.get_intrinsic_matrix()
+            return dict(
+                intrinsics=intrinsics,
+                near_plane=cam.get_near_clipping_plane(),
+                far_plane=cam.get_far_clipping_plane(),
+                extrinsics=cam.get_matrix())
+        headless = self._headless
+        self._headless = True
+        self.launch()
+        d = dict(
+            left_shoulder_camera=_get_cam_info(
+                self._scene._cam_over_shoulder_left),
+            right_shoulder_camera=_get_cam_info(
+                self._scene._cam_over_shoulder_right),
+            front_camera=_get_cam_info(self._scene._cam_front),
+            wrist_camera=_get_cam_info(self._scene._cam_wrist),
+            overhead_camera=_get_cam_info(self._scene._cam_overhead)
+        )
+        self.shutdown()
+        self._headless = headless
+        return d

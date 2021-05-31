@@ -41,11 +41,11 @@ class TestDomainRandomizaionEnvironment(unittest.TestCase):
         # obs1 and obs2 should be almost identical
         self.assertLess(
             np.mean(np.abs(obs1.right_shoulder_rgb - obs2.right_shoulder_rgb)),
-            0.05)
+            5)
         # obs2 and obs3 should be very different
         self.assertGreater(
             np.mean(np.abs(obs2.right_shoulder_rgb - obs3.right_shoulder_rgb)),
-            0.05)
+            5)
 
     def test_visual_randomize_every_2_transitions(self):
         visual_config = VisualRandomizationConfig(ASSET_DIR)
@@ -58,8 +58,8 @@ class TestDomainRandomizaionEnvironment(unittest.TestCase):
         # obs1 and obs2 should be almost identical
         self.assertLess(
             np.mean(np.abs(obs1.right_shoulder_rgb - obs2.right_shoulder_rgb)),
-            0.05)
+            5)
         # obs2 and obs3 should be very different
         self.assertGreater(
             np.mean(np.abs(obs2.right_shoulder_rgb - obs3.right_shoulder_rgb)),
-            0.05)
+            5)

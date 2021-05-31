@@ -58,6 +58,12 @@ def save_demo(demo, example_path):
         example_path, RIGHT_SHOULDER_DEPTH_FOLDER)
     right_shoulder_mask_path = os.path.join(
         example_path, RIGHT_SHOULDER_MASK_FOLDER)
+    overhead_rgb_path = os.path.join(
+        example_path, OVERHEAD_RGB_FOLDER)
+    overhead_depth_path = os.path.join(
+        example_path, OVERHEAD_DEPTH_FOLDER)
+    overhead_mask_path = os.path.join(
+        example_path, OVERHEAD_MASK_FOLDER)
     wrist_rgb_path = os.path.join(example_path, WRIST_RGB_FOLDER)
     wrist_depth_path = os.path.join(example_path, WRIST_DEPTH_FOLDER)
     wrist_mask_path = os.path.join(example_path, WRIST_MASK_FOLDER)
@@ -71,6 +77,9 @@ def save_demo(demo, example_path):
     check_and_make(right_shoulder_rgb_path)
     check_and_make(right_shoulder_depth_path)
     check_and_make(right_shoulder_mask_path)
+    check_and_make(overhead_rgb_path)
+    check_and_make(overhead_depth_path)
+    check_and_make(overhead_mask_path)
     check_and_make(wrist_rgb_path)
     check_and_make(wrist_depth_path)
     check_and_make(wrist_mask_path)
@@ -79,25 +88,26 @@ def save_demo(demo, example_path):
     check_and_make(front_mask_path)
 
     for i, obs in enumerate(demo):
-        left_shoulder_rgb = Image.fromarray(
-            (obs.left_shoulder_rgb * 255).astype(np.uint8))
+        left_shoulder_rgb = Image.fromarray(obs.left_shoulder_rgb)
         left_shoulder_depth = utils.float_array_to_rgb_image(
             obs.left_shoulder_depth, scale_factor=DEPTH_SCALE)
         left_shoulder_mask = Image.fromarray(
             (obs.left_shoulder_mask * 255).astype(np.uint8))
-        right_shoulder_rgb = Image.fromarray(
-            (obs.right_shoulder_rgb * 255).astype(np.uint8))
+        right_shoulder_rgb = Image.fromarray(obs.right_shoulder_rgb)
         right_shoulder_depth = utils.float_array_to_rgb_image(
             obs.right_shoulder_depth, scale_factor=DEPTH_SCALE)
         right_shoulder_mask = Image.fromarray(
             (obs.right_shoulder_mask * 255).astype(np.uint8))
-
-        wrist_rgb = Image.fromarray((obs.wrist_rgb * 255).astype(np.uint8))
+        overhead_rgb = Image.fromarray(obs.overhead_rgb)
+        overhead_depth = utils.float_array_to_rgb_image(
+            obs.overhead_depth, scale_factor=DEPTH_SCALE)
+        overhead_mask = Image.fromarray(
+            (obs.overhead_mask * 255).astype(np.uint8))
+        wrist_rgb = Image.fromarray(obs.wrist_rgb)
         wrist_depth = utils.float_array_to_rgb_image(
             obs.wrist_depth, scale_factor=DEPTH_SCALE)
         wrist_mask = Image.fromarray((obs.wrist_mask * 255).astype(np.uint8))
-
-        front_rgb = Image.fromarray((obs.front_rgb * 255).astype(np.uint8))
+        front_rgb = Image.fromarray(obs.front_rgb)
         front_depth = utils.float_array_to_rgb_image(
             obs.front_depth, scale_factor=DEPTH_SCALE)
         front_mask = Image.fromarray((obs.front_mask * 255).astype(np.uint8))
@@ -114,6 +124,12 @@ def save_demo(demo, example_path):
             os.path.join(right_shoulder_depth_path, IMAGE_FORMAT % i))
         right_shoulder_mask.save(
             os.path.join(right_shoulder_mask_path, IMAGE_FORMAT % i))
+        overhead_rgb.save(
+            os.path.join(overhead_rgb_path, IMAGE_FORMAT % i))
+        overhead_depth.save(
+            os.path.join(overhead_depth_path, IMAGE_FORMAT % i))
+        overhead_mask.save(
+            os.path.join(overhead_mask_path, IMAGE_FORMAT % i))
         wrist_rgb.save(os.path.join(wrist_rgb_path, IMAGE_FORMAT % i))
         wrist_depth.save(os.path.join(wrist_depth_path, IMAGE_FORMAT % i))
         wrist_mask.save(os.path.join(wrist_mask_path, IMAGE_FORMAT % i))
@@ -124,15 +140,23 @@ def save_demo(demo, example_path):
         # We save the images separately, so set these to None for pickling.
         obs.left_shoulder_rgb = None
         obs.left_shoulder_depth = None
+        obs.left_shoulder_point_cloud = None
         obs.left_shoulder_mask = None
         obs.right_shoulder_rgb = None
         obs.right_shoulder_depth = None
+        obs.right_shoulder_point_cloud = None
         obs.right_shoulder_mask = None
+        obs.overhead_rgb = None
+        obs.overhead_depth = None
+        obs.overhead_point_cloud = None
+        obs.overhead_mask = None
         obs.wrist_rgb = None
         obs.wrist_depth = None
+        obs.wrist_point_cloud = None
         obs.wrist_mask = None
         obs.front_rgb = None
         obs.front_depth = None
+        obs.front_point_cloud = None
         obs.front_mask = None
 
     # Save the low-dimension data
@@ -154,17 +178,28 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     obs_config.set_all(True)
     obs_config.right_shoulder_camera.image_size = img_size
     obs_config.left_shoulder_camera.image_size = img_size
+    obs_config.overhead_camera.image_size = img_size
     obs_config.wrist_camera.image_size = img_size
     obs_config.front_camera.image_size = img_size
+
+    # Store depth as 0 - 1
+    obs_config.right_shoulder_camera.depth_in_meters = False
+    obs_config.left_shoulder_camera.depth_in_meters = False
+    obs_config.overhead_camera.depth_in_meters = False
+    obs_config.wrist_camera.depth_in_meters = False
+    obs_config.front_camera.depth_in_meters = False
+
     # We want to save the masks as rgb encodings.
     obs_config.left_shoulder_camera.masks_as_one_channel = False
     obs_config.right_shoulder_camera.masks_as_one_channel = False
+    obs_config.overhead_camera.masks_as_one_channel = False
     obs_config.wrist_camera.masks_as_one_channel = False
     obs_config.front_camera.masks_as_one_channel = False
 
     if FLAGS.renderer == 'opengl':
         obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
         obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
+        obs_config.overhead_camera.render_mode = RenderMode.OPENGL
         obs_config.wrist_camera.render_mode = RenderMode.OPENGL
         obs_config.front_camera.render_mode = RenderMode.OPENGL
 
@@ -204,9 +239,6 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
                 break
             t = tasks[task_index.value]
 
-            print('Process', i, 'collecting task:', task_env.get_name(),
-                  '// variation:', my_variation_count)
-
         task_env = rlbench_env.get_task(t)
         task_env.set_variation(my_variation_count)
         obs, descriptions = task_env.reset()
@@ -226,6 +258,8 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
 
         abort_variation = False
         for ex_idx in range(FLAGS.episodes_per_task):
+            print('Process', i, '// Task:', task_env.get_name(),
+                  '// Variation:', my_variation_count, '// Demo:', ex_idx)
             attempts = 10
             while attempts > 0:
                 try:
