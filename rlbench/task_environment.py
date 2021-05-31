@@ -213,8 +213,8 @@ class TaskEnvironment(object):
             raise ValueError('Gripper action expected to be within 0 and 1.')
 
         # Discretize the gripper action
-        current_ee = (1.0 if self._robot.gripper.get_open_amount()[0] > 0.9
-                      else 0.0)
+        open_condition = all(x > 0.9 for x in self._robot.gripper.get_open_amount())
+        current_ee = 1.0 if open_condition else 0.0
 
         if ee_action > 0.5:
             ee_action = 1.0
