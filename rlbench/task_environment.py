@@ -219,7 +219,7 @@ class TaskEnvironment(object):
         arm_action = np.array(action[:-1])
         ee_action = action[-1]
 
-        if 0.0 > ee_action > 1.0:
+        if not 0.0 < ee_action < 1.0:
             raise ValueError('Gripper action expected to be within 0 and 1.')
 
         # Discretize the gripper action
