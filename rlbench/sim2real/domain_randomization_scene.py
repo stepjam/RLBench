@@ -20,13 +20,16 @@ TEX_KWARGS = {
 
 class DomainRandomizationScene(Scene):
 
-    def __init__(self, pyrep: PyRep, robot: Robot,
-                 obs_config: ObservationConfig=ObservationConfig(),
+    def __init__(self,
+                 pyrep: PyRep,
+                 robot: Robot,
+                 obs_config: ObservationConfig = ObservationConfig(),
+                 robot_setup: str = 'Panda',
                  randomize_every: RandomizeEvery=RandomizeEvery.EPISODE,
                  frequency: int=1,
                  visual_randomization_config=None,
                  dynamics_randomization_config=None):
-        super().__init__(pyrep, robot, obs_config)
+        super().__init__(pyrep, robot, obs_config, robot_setup)
         self._randomize_every = randomize_every
         self._frequency = frequency
         self._visual_rand_config = visual_randomization_config
@@ -40,8 +43,8 @@ class DomainRandomizationScene(Scene):
                 'Only visual randomization available.')
 
         self._scene_objects = [Shape(name) for name in SCENE_OBJECTS]
-        self._scene_objects += self._robot.arm.get_visuals()
-        self._scene_objects += self._robot.gripper.get_visuals()
+        self._scene_objects += self.robot.arm.get_visuals()
+        self._scene_objects += self.robot.gripper.get_visuals()
         if self._visual_rand_config is not None:
             # Make the floor plane renderable (to cover old floor)
             self._scene_objects[0].set_renderable(True)
@@ -57,21 +60,21 @@ class DomainRandomizationScene(Scene):
         return rand
 
     def _randomize(self):
-        tree = self._active_task.get_base().get_objects_in_tree(
+        tree = self.task.get_base().get_objects_in_tree(
             ObjectType.SHAPE)
         tree = [Shape(obj.get_handle()) for obj in tree + self._scene_objects]
         if self._visual_rand_config is not None:
             files = self._visual_rand_config.sample(len(tree))
             for file, obj in zip(files, tree):
                 if self._visual_rand_config.should_randomize(obj.get_name()):
-                    text_ob, texture = self._pyrep.create_texture(file)
+                    text_ob, texture = self.pyrep.create_texture(file)
                     try:
                         obj.set_texture(texture, **TEX_KWARGS)
                     except RuntimeError:
                         ungrouped = obj.ungroup()
                         for o in ungrouped:
                             o.set_texture(texture, **TEX_KWARGS)
-                        self._pyrep.group_objects(ungrouped)
+                        self.pyrep.group_objects(ungrouped)
                     text_ob.remove()
 
     def init_task(self) -> None:
@@ -82,7 +85,7 @@ class DomainRandomizationScene(Scene):
         if (self._randomize_every != RandomizeEvery.TRANSITION and
                 self._should_randomize_episode(index)):
             self._randomize()
-            self._pyrep.step()  # Need to step to apply textures
+            self.pyrep.step()  # Need to step to apply textures
         return ret
 
     def step(self):

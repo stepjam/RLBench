@@ -1,17 +1,20 @@
+import numpy as np
+
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 from rlbench.tasks import ReachTarget
-import numpy as np
 
 
 class Agent(object):
 
-    def __init__(self, action_size):
-        self.action_size = action_size
+    def __init__(self, action_shape):
+        self.action_shape = action_shape
 
     def act(self, obs):
-        arm = np.random.normal(0.0, 0.1, size=(self.action_size - 1,))
+        arm = np.random.normal(0.0, 0.1, size=(self.action_shape[0] - 1,))
         gripper = [1.0]  # Always open
         return np.concatenate([arm, gripper], axis=-1)
 
@@ -20,15 +23,16 @@ obs_config = ObservationConfig()
 obs_config.set_all(True)
 obs_config.gripper_touch_forces = False
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+    arm_action_mode=JointVelocity(), gripper_action_mode=Discrete())
 env = Environment(
     action_mode, obs_config=obs_config, headless=False,
-    robot_configuration='sawyer')
+    robot_setup='sawyer')
 env.launch()
 
 task = env.get_task(ReachTarget)
 
-agent = Agent(action_size=env.action_size)  # 6DoF + 1 for gripper
+agent = Agent(env.action_shape)  # 6DoF + 1 for gripper
 
 training_steps = 120
 episode_length = 40

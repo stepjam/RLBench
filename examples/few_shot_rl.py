@@ -1,17 +1,20 @@
+import numpy as np
+
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 from rlbench.tasks import FS10_V1
-import numpy as np
 
 
 class Agent(object):
 
-    def __init__(self, action_size):
-        self.action_size = action_size
+    def __init__(self, action_shape):
+        self.action_shape = action_shape
 
     def act(self, obs):
-        arm = np.random.normal(0.0, 0.1, size=(self.action_size - 1,))
+        arm = np.random.normal(0.0, 0.1, size=(self.action_shape[0] - 1,))
         gripper = [1.0]  # Always open
         return np.concatenate([arm, gripper], axis=-1)
 
@@ -19,12 +22,14 @@ class Agent(object):
 obs_config = ObservationConfig()
 obs_config.set_all(True)
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
-    action_mode, obs_config=obs_config, headless=False)
+    action_mode=MoveArmThenGripper(
+        arm_action_mode=JointVelocity(), gripper_action_mode=Discrete()),
+    obs_config=ObservationConfig(),
+    headless=False)
 env.launch()
 
-agent = Agent(env.action_size)
+agent = Agent(env.action_shape)
 
 train_tasks = FS10_V1['train']
 test_tasks = FS10_V1['test']

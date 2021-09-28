@@ -1,14 +1,18 @@
 import unittest
 from os import path
 
+import numpy as np
 from pyrep.objects import Dummy
 
 from rlbench import environment
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity, JointPosition, \
+    EndEffectorPoseViaPlanning, JointTorque, EndEffectorPoseViaIK
+from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
 from rlbench.tasks import TakeLidOffSaucepan, ReachTarget
-from rlbench.action_modes import ArmActionMode, ActionMode
-from rlbench.observation_config import ObservationConfig
-import numpy as np
+
 ASSET_DIR = path.join(path.dirname(path.abspath(__file__)), 'assets', 'tasks')
 
 
@@ -24,21 +28,21 @@ class TestEnvironment(unittest.TestCase):
             obs_config.set_all_low_dim(True)
             obs_config.right_shoulder_camera.rgb = True
             obs_config.left_shoulder_camera.point_cloud = True
-        action_mode = ActionMode(arm_action_mode)
+        mode = MoveArmThenGripper(arm_action_mode, Discrete())
         self.env = environment.Environment(
-            action_mode, ASSET_DIR, obs_config, headless=True)
+            mode, ASSET_DIR, obs_config, headless=True)
         self.env.launch()
         return self.env.get_task(task_class)
 
     def test_get_task(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         self.assertIsInstance(task, TaskEnvironment)
         self.assertEqual(task.get_name(), 'reach_target')
 
     def test_reset(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         desc, obs = task.reset()
         self.assertIsNotNone(obs.right_shoulder_rgb)
         self.assertIsNone(obs.left_shoulder_rgb)
@@ -52,7 +56,7 @@ class TestEnvironment(unittest.TestCase):
         obs_config.front_camera.rgb = True
         obs_config.wrist_camera.rgb = True
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY, obs_config)
+            ReachTarget, JointVelocity(), obs_config)
         desc, obs = task.reset()
         self.assertIsNotNone(obs.left_shoulder_rgb)
         self.assertIsNotNone(obs.right_shoulder_rgb)
@@ -62,7 +66,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_step(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         task.reset()
         obs, reward, term = task.step(np.random.uniform(size=8))
         self.assertIsNotNone(obs.right_shoulder_rgb)
@@ -72,13 +76,13 @@ class TestEnvironment(unittest.TestCase):
 
     def test_get_invalid_number_of_demos(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         with self.assertRaises(RuntimeError):
             task.get_demos(10, live_demos=False, image_paths=True)
 
     def test_get_stored_demos_paths(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         demos = task.get_demos(2, live_demos=False, image_paths=True)
         self.assertEqual(len(demos), 2)
         self.assertGreater(len(demos[0]), 0)
@@ -87,7 +91,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_get_stored_demos_images(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         demos = task.get_demos(2, live_demos=False, image_paths=False)
         self.assertEqual(len(demos), 2)
         self.assertGreater(len(demos[0]), 0)
@@ -100,7 +104,7 @@ class TestEnvironment(unittest.TestCase):
         obs_config.set_all(False)
         obs_config.set_all_low_dim(True)
         obs_config.right_shoulder_camera.rgb = True
-        action_mode = ActionMode()
+        action_mode = MoveArmThenGripper(JointVelocity(), Discrete())
         self.env = environment.Environment(
             action_mode, ASSET_DIR, obs_config, headless=True)
         demos = self.env.get_demos('reach_target', 2)
@@ -111,7 +115,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_get_live_demos(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         demos = task.get_demos(2, live_demos=True)
         self.assertEqual(len(demos), 2)
         self.assertGreater(len(demos[0]), 0)
@@ -119,7 +123,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_observation_shape_constant_across_demo(self):
         task = self.get_task(
-            TakeLidOffSaucepan, ArmActionMode.ABS_JOINT_VELOCITY)
+            TakeLidOffSaucepan, JointVelocity())
         demos = task.get_demos(1, live_demos=True)
         self.assertEqual(len(demos), 1)
         self.assertGreater(len(demos[0]), 0)
@@ -130,7 +134,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_reset_to_demos(self):
         task = self.get_task(
-            TakeLidOffSaucepan, ArmActionMode.ABS_JOINT_VELOCITY)
+            TakeLidOffSaucepan, JointVelocity())
         demo = task.get_demos(1, live_demos=True)[0]
         obs = demo[0]
         task.reset_to_demo(demo)
@@ -144,26 +148,16 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_joint_velocity(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_VELOCITY)
+            ReachTarget, JointVelocity())
         task.reset()
         action = [0.1] * 7 + [1]
         obs, reward, term = task.step(action)
         [self.assertAlmostEqual(0.1, a, delta=0.05)
          for a in obs.joint_velocities]
 
-    def test_action_mode_delta_joint_velocity(self):
-        task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_JOINT_VELOCITY)
-        task.reset()
-        action = [-0.1] * 7 + [1]
-        [task.step(action) for _ in range(2)]
-        obs, reward, term = task.step(action)
-        [self.assertAlmostEqual(-0.3, a, delta=0.1)
-         for a in obs.joint_velocities]
-
     def test_action_mode_abs_joint_position(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_POSITION)
+            ReachTarget, JointPosition(True))
         _, obs = task.reset()
         init_angles = np.append(obs.joint_positions, 1.)  # for gripper
         target_angles = np.array(init_angles) + 0.05
@@ -174,7 +168,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_delta_joint_position(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_JOINT_POSITION)
+            ReachTarget, JointPosition(False))
         _, obs = task.reset()
         init_angles = obs.joint_positions
         target_angles = np.array(init_angles) + 0.06
@@ -183,9 +177,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, actual, delta=0.05)
          for a, actual in zip(target_angles, obs.joint_positions)]
 
-    def test_action_mode_abs_ee_position(self):
+    def test_action_mode_abs_ee_pose_ik_world_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_EE_POSE_WORLD_FRAME)
+            ReachTarget, EndEffectorPoseViaIK(True, 'world'))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -194,9 +188,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(new_pose, obs.gripper_pose)]
 
-    def test_action_mode_delta_ee_position(self):
+    def test_action_mode_delta_ee_pose_ik_world_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_EE_POSE_WORLD_FRAME)
+            ReachTarget, EndEffectorPoseViaIK(False, 'world'))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -206,9 +200,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(expected_pose, obs.gripper_pose)]
 
-    def test_action_mode_abs_ee_position_plan(self):
+    def test_action_mode_abs_ee_pose_plan_world_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_EE_POSE_PLAN_WORLD_FRAME)
+            ReachTarget, EndEffectorPoseViaPlanning(True, 'world'))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -217,9 +211,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.001)
          for a, p in zip(new_pose, obs.gripper_pose)]
 
-    def test_action_mode_delta_ee_position_plan(self):
+    def test_action_mode_delta_ee_pose_plan_world_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_EE_POSE_PLAN_WORLD_FRAME)
+            ReachTarget, EndEffectorPoseViaPlanning(False, 'world'))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -229,9 +223,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.001)
          for a, p in zip(expected_pose, obs.gripper_pose)]
 
-    def test_action_mode_ee_position_ee_frame(self):
+    def test_action_mode_ee_pose_ik_ee_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.EE_POSE_EE_FRAME)
+            ReachTarget, EndEffectorPoseViaIK(True, 'end effector'))
         _, obs = task.reset()
         dummy = Dummy.create()
         dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
@@ -240,9 +234,9 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
 
-    def test_action_mode_ee_position_plan_ee_frame(self):
+    def test_action_mode_ee_pose_plan_ee_frame(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.EE_POSE_PLAN_EE_FRAME)
+            ReachTarget, EndEffectorPoseViaPlanning(True, 'end effector'))
         _, obs = task.reset()
         dummy = Dummy.create()
         dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
@@ -253,31 +247,19 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_joint_torque(self):
         task = self.get_task(
-            ReachTarget, ArmActionMode.ABS_JOINT_TORQUE)
+            ReachTarget, JointTorque())
         task.reset()
         action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 1.0]
         obs, reward, term = task.step(action)
         # Difficult to test given gravity, so just check for exceptions.
 
-    def test_action_mode_delta_joint_torque(self):
-        task = self.get_task(
-            ReachTarget, ArmActionMode.DELTA_JOINT_TORQUE)
-        _, obs = task.reset()
-        init_forces = np.array(obs.joint_forces)
-        action = [0.1, -0.1, 0.1, -0.1, 0.1, -0.1, 0.1, 1]
-        expected = np.array([0.3, -0.3, 0.3, -0.3, 0.3, -0.3, 0.3])
-        expected += init_forces
-        [task.step(action) for _ in range(2)]
-        obs, reward, term = task.step(action)
-        # Difficult to test given gravity, so just check for exceptions.
-
     def test_swap_arm(self):
         # Checks if the environment can be setup with each arm
-        action_mode = ActionMode(ArmActionMode.DELTA_JOINT_VELOCITY)
+        action_mode = MoveArmThenGripper(JointVelocity(), Discrete())
         for robot_config in environment.SUPPORTED_ROBOTS.keys():
             with self.subTest(robot_config=robot_config):
                 self.env = environment.Environment(
                     action_mode, headless=True,
-                    robot_configuration=robot_config)
+                    robot_setup=robot_config)
                 self.env.launch()
                 self.env.shutdown()

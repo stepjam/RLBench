@@ -1,3 +1,14 @@
+from pyrep.robots.arms.jaco import Jaco
+from pyrep.robots.arms.mico import Mico
+from pyrep.robots.arms.panda import Panda
+from pyrep.robots.arms.sawyer import Sawyer
+from pyrep.robots.arms.ur5 import UR5
+from pyrep.robots.end_effectors.baxter_gripper import BaxterGripper
+from pyrep.robots.end_effectors.jaco_gripper import JacoGripper
+from pyrep.robots.end_effectors.mico_gripper import MicoGripper
+from pyrep.robots.end_effectors.panda_gripper import PandaGripper
+from pyrep.robots.end_effectors.robotiq85_gripper import Robotiq85Gripper
+
 
 colors = [
     ('red', (1.0, 0.0, 0.0)),
@@ -21,3 +32,13 @@ colors = [
     ('black', (0.0, 0.0, 0.0)),
     ('white', (1.0, 1.0, 1.0)),
 ]
+
+# Arms from PyRep need to be modified to include a wrist camera.
+# Currently, only the arms/grippers below are supported.
+SUPPORTED_ROBOTS = {
+    'panda': (Panda, PandaGripper, 7),
+    'jaco': (Jaco, JacoGripper, 6),
+    'mico': (Mico, MicoGripper, 6),
+    'sawyer': (Sawyer, BaxterGripper, 7),
+    'ur5': (UR5, Robotiq85Gripper, 6),
+}

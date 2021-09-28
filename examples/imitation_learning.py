@@ -1,8 +1,11 @@
+import numpy as np
+
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 from rlbench.tasks import ReachTarget
-import numpy as np
 
 
 class ImitationLearning(object):
@@ -21,9 +24,11 @@ DATASET = '' if live_demos else 'PATH/TO/YOUR/DATASET'
 obs_config = ObservationConfig()
 obs_config.set_all(True)
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
 env = Environment(
-    action_mode, DATASET, obs_config, False)
+    action_mode=MoveArmThenGripper(
+        arm_action_mode=JointVelocity(), gripper_action_mode=Discrete()),
+    obs_config=ObservationConfig(),
+    headless=False)
 env.launch()
 
 task = env.get_task(ReachTarget)

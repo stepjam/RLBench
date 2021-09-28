@@ -1,20 +1,23 @@
+import numpy as np
+
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
 from rlbench.tasks import ReachTarget
-import numpy as np
 
 
 class Agent(object):
 
-    def __init__(self, action_size):
-        self.action_size = action_size
+    def __init__(self, action_shape):
+        self.action_shape = action_shape
 
     def ingest(self, demos):
         pass
 
     def act(self, obs):
-        arm = np.random.normal(0.0, 0.1, size=(self.action_size - 1,))
+        arm = np.random.normal(0.0, 0.1, size=(self.action_shape[0] - 1,))
         gripper = [1.0]  # Always open
         return np.concatenate([arm, gripper], axis=-1)
 
@@ -26,7 +29,8 @@ DATASET = '' if live_demos else 'PATH/TO/YOUR/DATASET'
 obs_config = ObservationConfig()
 obs_config.set_all(True)
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+    arm_action_mode=JointVelocity(), gripper_action_mode=Discrete())
 env = Environment(
     action_mode, DATASET, obs_config, False)
 env.launch()
@@ -34,7 +38,7 @@ env.launch()
 task = env.get_task(ReachTarget)
 demos = task.get_demos(2, live_demos=live_demos)
 
-agent = Agent(env.action_size)
+agent = Agent(env.action_shape)
 agent.ingest(demos)
 
 training_steps = 120
