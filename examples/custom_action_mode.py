@@ -1,13 +1,23 @@
 import numpy as np
 
-from rlbench import Environment
-from rlbench import ObservationConfig
-from rlbench import RandomizeEvery
-from rlbench import VisualRandomizationConfig
 from rlbench.action_modes.action_mode import MoveArmThenGripper
 from rlbench.action_modes.arm_action_modes import JointVelocity
 from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.backend.scene import Scene
+from rlbench.environment import Environment
+from rlbench.observation_config import ObservationConfig
 from rlbench.tasks import ReachTarget
+
+
+class CustomAbsoluteJointVelocity(JointVelocity):
+
+    def action(self, scene: Scene, action: np.ndarray):
+        if np.random.random() > 0.5:
+            # Example of custom behaviour.
+            # Here we randomly ignore 50% of actions
+            print('Skip action!')
+            return
+        super(CustomAbsoluteJointVelocity, self).action(scene, action)
 
 
 class Agent(object):
@@ -21,20 +31,14 @@ class Agent(object):
         return np.concatenate([arm, gripper], axis=-1)
 
 
-obs_config = ObservationConfig()
-obs_config.set_all(True)
-
-# We will borrow some from the tests dir
-rand_config = VisualRandomizationConfig(
-    image_directory='../tests/unit/assets/textures')
-
 action_mode = MoveArmThenGripper(
-        arm_action_mode=JointVelocity(), gripper_action_mode=Discrete())
+    arm_action_mode=CustomAbsoluteJointVelocity(),
+    gripper_action_mode=Discrete())
+
 env = Environment(
-    action_mode, obs_config=obs_config, headless=False,
-    randomize_every=RandomizeEvery.EPISODE, frequency=1,
-    visual_randomization_config=rand_config
-)
+    action_mode,
+    obs_config=ObservationConfig(),
+    headless=False)
 env.launch()
 
 task = env.get_task(ReachTarget)
@@ -42,7 +46,7 @@ task = env.get_task(ReachTarget)
 agent = Agent(env.action_shape)
 
 training_steps = 120
-episode_length = 20
+episode_length = 40
 obs = None
 for i in range(training_steps):
     if i % episode_length == 0:
@@ -50,6 +54,7 @@ for i in range(training_steps):
         descriptions, obs = task.reset()
         print(descriptions)
     action = agent.act(obs)
+    print(action)
     obs, reward, terminate = task.step(action)
 
 print('Done')

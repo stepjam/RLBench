@@ -1,14 +1,17 @@
 import unittest
 from os import path
 
+import numpy as np
 from pyrep.const import RenderMode
 
-from rlbench.sim2real.domain_randomization import RandomizeEvery, VisualRandomizationConfig
-from rlbench.sim2real.domain_randomization_environment import DomainRandomizationEnvironment
-from rlbench.tasks.open_microwave import OpenMicrowave
-from rlbench.action_modes import ArmActionMode, ActionMode
+from rlbench import Environment
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.observation_config import ObservationConfig, CameraConfig
-import numpy as np
+from rlbench.sim2real.domain_randomization import RandomizeEvery, \
+    VisualRandomizationConfig
+from rlbench.tasks.open_microwave import OpenMicrowave
 
 ASSET_DIR = path.join(path.dirname(path.abspath(__file__)), 'assets', 'textures')
 
@@ -25,9 +28,9 @@ class TestDomainRandomizaionEnvironment(unittest.TestCase):
         obs_config.set_all(False)
         obs_config.set_all_low_dim(True)
         obs_config.right_shoulder_camera.rgb = True
-        mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
-        self.env = DomainRandomizationEnvironment(
-            mode, ASSET_DIR, obs_config, True, True,
+        mode = MoveArmThenGripper(JointVelocity(), Discrete())
+        self.env = Environment(
+            mode, ASSET_DIR, obs_config, True, True, 'panda',
             randomize_every, frequency, visual_config, dynamics_config)
         self.env.launch()
         return self.env.get_task(OpenMicrowave)

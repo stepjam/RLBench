@@ -1,14 +1,17 @@
 from typing import Union, Dict, Tuple
 
 import gym
+import numpy as np
 from gym import spaces
 from pyrep.const import RenderMode
 from pyrep.objects.dummy import Dummy
 from pyrep.objects.vision_sensor import VisionSensor
+
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
 from rlbench.observation_config import ObservationConfig
-import numpy as np
 
 
 class RLBenchEnv(gym.Env):
@@ -29,7 +32,8 @@ class RLBenchEnv(gym.Env):
         else:
             raise ValueError(
                 'Unrecognised observation_mode: %s.' % observation_mode)
-        action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+
+        action_mode = MoveArmThenGripper(JointVelocity(), Discrete())
         self.env = Environment(
             action_mode, obs_config=obs_config, headless=True)
         self.env.launch()
@@ -38,7 +42,7 @@ class RLBenchEnv(gym.Env):
         _, obs = self.task.reset()
 
         self.action_space = spaces.Box(
-            low=-1.0, high=1.0, shape=(self.env.action_size,))
+            low=-1.0, high=1.0, shape=self.env.action_shape)
 
         if observation_mode == 'state':
             self.observation_space = spaces.Box(

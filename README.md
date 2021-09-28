@@ -29,6 +29,11 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Announcements
 
+### 28 September, 2021
+
+- **Version 1.2.0 is live!** Note: This release will cause code-breaking API changes. Changes include:
+  - Improved API for action modes; custom action modes now much easier.
+
 ### 1 July, 2021
 
 - New instructions on headless GPU rendering [here](#running-headless)!
@@ -107,12 +112,17 @@ collection of X training tasks and 5 tests tasks. Here X can be 10, 25, 50, or 9
 For example, to work on the task set with 10 training tasks, we import `FS10_V1`:
 
 ```python
-from rlbench.environment import Environment
-from rlbench.action_modes import ActionMode, ArmActionMode
-from rlbench.tasks import FS10_V1
 import numpy as np
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.environment import Environment
+from rlbench.tasks import FS10_V1
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+  arm_action_mode=JointVelocity(),
+  gripper_action_mode=Discrete()
+)
 env = Environment(action_mode)
 env.launch()
 
@@ -122,7 +132,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_shape))
 ```
 
 A full example can be seen in [examples/few_shot_rl.py](examples/few_shot_rl.py).
@@ -130,18 +140,23 @@ A full example can be seen in [examples/few_shot_rl.py](examples/few_shot_rl.py)
 ### Reinforcement Learning
 
 ```python
-from rlbench.environment import Environment
-from rlbench.action_modes import ActionMode, ArmActionMode
-from rlbench.tasks import ReachTarget
 import numpy as np
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.environment import Environment
+from rlbench.tasks import ReachTarget
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+  arm_action_mode=JointVelocity(),
+  gripper_action_mode=Discrete()
+)
 env = Environment(action_mode)
 env.launch()
 
 task = env.get_task(ReachTarget)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_shape))
 ```
 
 A full example can be seen in [examples/single_task_rl.py](examples/single_task_rl.py).
@@ -151,19 +166,24 @@ If you would like to bootstrap from demonstrations, then take a look at [example
 ### Sim-to-Real
 
 ```python
-from rlbench import DomainRandomizationEnvironment
+import numpy as np
+from rlbench import Environment
 from rlbench import RandomizeEvery
 from rlbench import VisualRandomizationConfig
-from rlbench.action_modes import ActionMode, ArmActionMode
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.tasks import OpenDoor
-import numpy as np
 
 # We will borrow some from the tests dir
 rand_config = VisualRandomizationConfig(
     image_directory='../tests/unit/assets/textures')
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
-env = DomainRandomizationEnvironment(
+action_mode = MoveArmThenGripper(
+  arm_action_mode=JointVelocity(),
+  gripper_action_mode=Discrete()
+)
+env = Environment(
     action_mode, randomize_every=RandomizeEvery.EPISODE, 
     frequency=1, visual_randomization_config=rand_config)
 
@@ -171,7 +191,7 @@ env.launch()
 
 task = env.get_task(OpenDoor)
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_shape))
 ```
 
 A full example can be seen in [examples/single_task_rl_domain_randomization.py](examples/single_task_rl_domain_randomization.py).
@@ -179,15 +199,20 @@ A full example can be seen in [examples/single_task_rl_domain_randomization.py](
 ### Imitation Learning
 
 ```python
-from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode, ActionMode
-from rlbench.tasks import ReachTarget
 import numpy as np
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.environment import Environment
+from rlbench.tasks import ReachTarget
 
 # To use 'saved' demos, set the path below
 DATASET = 'PATH/TO/YOUR/DATASET'
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+  arm_action_mode=JointVelocity(),
+  gripper_action_mode=Discrete()
+)
 env = Environment(action_mode, DATASET)
 env.launch()
 
@@ -213,12 +238,17 @@ collection of X training tasks. Here X can be 15, 30, 55, or 100.
 For example, to work on the task set with 15 training tasks, we import `MT15_V1`:
 
 ```python
-from rlbench.environment import Environment
-from rlbench.action_modes import ActionMode, ArmActionMode
-from rlbench.tasks import MT15_V1
 import numpy as np
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
+from rlbench.environment import Environment
+from rlbench.tasks import MT15_V1
 
-action_mode = ActionMode(ArmActionMode.ABS_JOINT_VELOCITY)
+action_mode = MoveArmThenGripper(
+  arm_action_mode=JointVelocity(),
+  gripper_action_mode=Discrete()
+)
 env = Environment(action_mode)
 env.launch()
 
@@ -227,7 +257,7 @@ task_to_train = np.random.choice(train_tasks, 1)[0]
 task = env.get_task(task_to_train)
 task.sample_variation()  # random variation
 descriptions, obs = task.reset()
-obs, reward, terminate = task.step(np.random.normal(size=env.action_size))
+obs, reward, terminate = task.step(np.random.normal(size=env.action_shape))
 ```
 
 A full example can be seen in [examples/multi_task_learning.py](examples/multi_task_learning.py).
@@ -285,7 +315,7 @@ Currently supported arms:
 You can then swap out the arm using `robot_configuration`:
 
 ```python
-env = Environment(action_mode=action_mode, robot_configuration='sawyer')
+env = Environment(action_mode=action_mode, robot_setup='sawyer')
 ```
 
 A full example (using the Sawyer) can be seen in [examples/swap_arm.py](examples/swap_arm.py).

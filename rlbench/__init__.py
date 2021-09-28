@@ -1,4 +1,4 @@
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 import numpy as np
 import pyrep
@@ -10,9 +10,8 @@ if pr_v.size < 4 or np.any(pr_v < np.array([4, 1, 0, 2])):
 
 
 from rlbench.environment import Environment
-from rlbench.action_modes import ArmActionMode
+from rlbench.action_modes.action_mode import ActionMode, ArmActionMode, GripperActionMode
 from rlbench.observation_config import ObservationConfig
 from rlbench.observation_config import CameraConfig
 from rlbench.sim2real.domain_randomization import RandomizeEvery
 from rlbench.sim2real.domain_randomization import VisualRandomizationConfig
-from rlbench.sim2real.domain_randomization_environment import DomainRandomizationEnvironment
