@@ -24,14 +24,15 @@ TASKS_PATH = join(dirname(abspath(__file__)), '../tasks')
 
 class Task(object):
 
-    def __init__(self, pyrep: PyRep, robot: Robot):
+    def __init__(self, pyrep: PyRep, robot: Robot, name: str = None):
         """Constructor.
 
         :param pyrep: Instance of PyRep.
         :param robot: Instance of Robot.
         """
         self.pyrep = pyrep
-        self.name = self.get_name()
+        self.name = name if name else re.sub(
+            '(?<!^)(?=[A-Z])', '_', self.__class__.__name__).lower()
         self.robot = robot
         self._waypoints = None
         self._success_conditions = []
@@ -253,7 +254,7 @@ class Task(object):
 
         :return: The name of the task.
         """
-        return re.sub('(?<!^)(?=[A-Z])', '_', self.__class__.__name__).lower()
+        return self.name
 
     def validate(self):
         """If the task placement is valid. """
@@ -291,8 +292,8 @@ class Task(object):
         return all_met, should_terminate
 
     def load(self) -> Object:
-        if Object.exists(self.get_name()):
-            return Dummy(self.get_name())
+        if Object.exists(self.name):
+            return Dummy(self.name)
         ttm_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             '../task_ttms/%s.ttm' % self.name)
@@ -322,7 +323,7 @@ class Task(object):
         self._waypoint_abilities_end = {}
 
     def get_base(self) -> Dummy:
-        self._base_object = Dummy(self.get_name())
+        self._base_object = Dummy(self.name)
         return self._base_object
 
     def get_state(self) -> Tuple[bytes, int]:

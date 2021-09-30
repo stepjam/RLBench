@@ -23,6 +23,7 @@ from rlbench.observation_config import ObservationConfig, CameraConfig
 from rlbench.backend.robot import Robot
 from rlbench.utils import name_to_task_class
 from task_validator import task_smoke, TaskValidationError
+import shutil
 
 CURRENT_DIR = dirname(abspath(__file__))
 
@@ -59,7 +60,8 @@ class LoadedTask(object):
 
     def _load_task_to_scene(self):
         self.scene.unload()
-        self.task = self.task_class(self.pr, self.robot)  # task constructor
+        self.task = self.task_class(
+            self.pr, self.robot, self.task_file.replace('.py', ''))
         try:
             # Try and load the task
             scene.load(self.task)
@@ -86,7 +88,7 @@ class LoadedTask(object):
                 self._create_python_file(task_file)
                 task_class = name_to_task_class(task_file)
             else:
-                print('Pick a defined task in that case...')
+                print('Please pick a defined task in that case.')
                 task_class, task_file = self._edit_new_task()
         return task_class, task_file
 
@@ -112,7 +114,8 @@ class LoadedTask(object):
             print_fail('The python file could not be loaded!')
             traceback.print_exc()
             return None, None
-        self.task = task_class(self.pr, self.robot)  # task constructor
+        self.task = task_class(
+            self.pr, self.robot, self.task_file.replace('.py', ''))
         self.scene.load(self.task)
 
     def new_task(self):
@@ -218,7 +221,48 @@ class LoadedTask(object):
         self.task_file = python_file
         self.reload_python()
         self.save_task()
-        print('Rename complete')
+        print('Rename complete!')
+
+    def duplicate_task(self):
+        print('Enter new name for duplicate (or q to abort).')
+        inp = input()
+        if inp == 'q':
+            return
+
+        name = inp.replace('.py', '')
+        new_python_file = name + '.py'
+
+        # Change the class name
+        old_file_path = join(CURRENT_DIR, '../rlbench/tasks', self.task_file)
+        old_class_name = self._file_to_class_name(self.task_file)
+        new_file_path = join(CURRENT_DIR, '../rlbench/tasks', new_python_file)
+        new_class_name = self._file_to_class_name(name)
+
+        if os.path.isfile(new_file_path):
+            print('File: %s already exists!' % new_file_path)
+            return
+
+        # Change name of base
+        handle = Dummy(self.task_file.replace('.py', ''))
+        handle.set_name(name)
+
+        with open(old_file_path, 'r') as f:
+            content = f.read()
+        content = content.replace(old_class_name, new_class_name)
+        with open(new_file_path, 'w') as f:
+            f.write(content)
+
+        # Rename .ttt
+        old_ttm_path = join(CURRENT_DIR, '../rlbench/task_ttms',
+                        self.task_file.replace('.py', '.ttm'))
+        new_ttm_path = join(CURRENT_DIR, '../rlbench/task_ttms',
+                            new_python_file.replace('.py', '.ttm'))
+        shutil.copy(old_ttm_path, new_ttm_path)
+
+        self.task_file = new_python_file
+        self.reload_python()
+        self.save_task()
+        print('Duplicate complete!')
 
 
 if __name__ == '__main__':
@@ -269,6 +313,7 @@ if __name__ == '__main__':
             print('(n) for new task.')
             print('(s) to save the .ttm')
             print('(r) to rename the task')
+            print('(u) to duplicate/copy the task')
 
         inp = input()
 
@@ -304,6 +349,8 @@ if __name__ == '__main__':
                 loaded_task.run_task_validator()
             elif inp == 'r':
                 loaded_task.rename()
+            elif inp == 'u':
+                loaded_task.duplicate_task()
 
     pr.stop()
     pr.shutdown()
