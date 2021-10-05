@@ -12,9 +12,10 @@ class BeatTheBuzz(Task):
         right_sensor = ProximitySensor('right_sensor')
         wand = Shape('wand')
         self.register_graspable_objects([wand])
+        self.register_fail_conditions(
+            [DetectedCondition(wand, middle_sensor)])
         self.register_success_conditions(
-            [DetectedCondition(wand, middle_sensor, negated=True),
-             DetectedCondition(wand, right_sensor),
+            [DetectedCondition(wand, right_sensor),
              NothingGrasped(self.robot.gripper)])
 
     def init_episode(self, index: int) -> List[str]:
