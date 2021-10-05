@@ -36,6 +36,7 @@ class Task(object):
         self.robot = robot
         self._waypoints = None
         self._success_conditions = []
+        self._fail_conditions = []
         self._graspable_objects = []
         self._base_object = None
         self._waypoint_additional_inits = {}
@@ -185,6 +186,18 @@ class Task(object):
         """
         self._success_conditions = condition
 
+    def register_fail_conditions(self, condition: List[Condition]):
+        """What conditions need to be met for the task to be classed as a fail.
+
+        Usually this is not needed, however, in some cases, it may be desirable
+        for tasks to be classed as a fail when certain conditions are met, e.g.
+        dropping a fragile object, touching something, etc.
+        Note: this replaces any previously registered conditions!
+
+        :param condition: A list of fail conditions.
+        """
+        self._fail_conditions = condition
+
     def register_graspable_objects(self, objects: List[Object]):
         """Register what objects can be grasped with a 'stable' grasp.
 
@@ -277,18 +290,13 @@ class Task(object):
         :return: Tuple containing 2 bools: first specifies if the task is currently successful,
             second specifies if the task should terminate (either from success or from broken constraints).
         """
-        all_met = True
-        should_terminate = False
-        for cond in self._success_conditions:
-            met, terminate = cond.condition_met()
-            if terminate:
-                # Broken constraint
-                should_terminate = True
-                break
-            all_met &= met
-        if all_met:
-            # All conditions met, so we can terminate
-            should_terminate = True
+        all_fails_met = np.all(
+            [cond.condition_met()[0] for cond in self._fail_conditions])
+        if len(self._fail_conditions) > 0 and all_fails_met:
+            return False, True
+        all_met = np.all(
+            [cond.condition_met()[0] for cond in self._success_conditions])
+        should_terminate = all_met
         return all_met, should_terminate
 
     def load(self) -> Object:
@@ -309,13 +317,14 @@ class Task(object):
         self.clear_registerings()
 
     def cleanup_(self) -> None:
-        for cond in self._success_conditions:
+        for cond in self._success_conditions + self._fail_conditions:
             cond.reset()
         self._waypoints = None
         self.cleanup()
 
     def clear_registerings(self) -> None:
         self._success_conditions = []
+        self._fail_conditions = []
         self._graspable_objects = []
         self._base_object = None
         self._waypoint_additional_inits = {}
