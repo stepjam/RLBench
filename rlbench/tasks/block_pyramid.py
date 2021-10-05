@@ -1,17 +1,17 @@
-from typing import List
+from typing import List, Tuple
+
 import numpy as np
-from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
+from pyrep.objects.shape import Shape
+from rlbench.backend.conditions import (DetectedSeveralCondition,
+                                        NothingGrasped, ConditionSet)
+from rlbench.backend.spawn_boundary import SpawnBoundary
 from rlbench.backend.task import Task
 from rlbench.const import colors
-from rlbench.backend.spawn_boundary import SpawnBoundary
-from rlbench.backend.conditions import DetectedSeveralCondition, NothingGrasped, ConditionSet
-
-
 
 
 class BlockPyramid(Task):
-        
+
     def init_task(self) -> None:
         self.blocks = [Shape('block_pyramid_block%d' % i) for i in range(6)]
         self.distractors = [Shape(
@@ -44,13 +44,18 @@ class BlockPyramid(Task):
             obj.set_color(rgb)
         self.spawn_boundary.clear()
         for ob in self.blocks + self.distractors:
-            self.spawn_boundary.sample(ob, min_distance=0.08)
+            self.spawn_boundary.sample(
+                ob, min_distance=0.08, min_rotation=(0.0, 0.0, -np.pi / 4),
+                max_rotation=(0.0, 0.0, np.pi / 4))
 
         return ['stack %s blocks in a pyramid' % color_name,
-                'create a pyramid with the %s objects' %color_name,
-                'make a pyramid out of %s cubes' %color_name,
-                'position the %s blocks in the shape of a pyramid' %color_name,
-                'use the %s blocks to build a pyramid' %color_name]
+                'create a pyramid with the %s objects' % color_name,
+                'make a pyramid out of %s cubes' % color_name,
+                'position the %s blocks in the shape of a pyramid' % color_name,
+                'use the %s blocks to build a pyramid' % color_name]
 
     def variation_count(self) -> int:
         return len(colors)
+
+    def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
+        return [0, 0, - np.pi / 8], [0, 0, np.pi / 8]
