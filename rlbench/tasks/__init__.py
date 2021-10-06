@@ -1,3 +1,4 @@
+from rlbench.tasks.basketball_in_hoop import BasketballInHoop
 from rlbench.tasks.beat_the_buzz import BeatTheBuzz
 from rlbench.tasks.block_pyramid import BlockPyramid
 from rlbench.tasks.change_channel import ChangeChannel
@@ -93,7 +94,6 @@ from rlbench.tasks.toilet_seat_down import ToiletSeatDown
 from rlbench.tasks.toilet_seat_up import ToiletSeatUp
 from rlbench.tasks.turn_oven_on import TurnOvenOn
 from rlbench.tasks.turn_tap import TurnTap
-from rlbench.tasks.tv_off import TvOff
 from rlbench.tasks.tv_on import TvOn
 from rlbench.tasks.unplug_charger import UnplugCharger
 from rlbench.tasks.water_plants import WaterPlants
@@ -126,7 +126,7 @@ FS25_V1 = {
     'train': FS10_V1['train'] + FS10_V1['test'] + [
         TurnTap,
         LightBulbIn,
-        TvOff,
+        BasketballInHoop,
         OpenWindow,
         CloseDoor,
         PushButton,
