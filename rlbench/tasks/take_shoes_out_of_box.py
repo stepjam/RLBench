@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import numpy as np
 from pyrep.objects.proximity_sensor import ProximitySensor
 from pyrep.objects.shape import Shape
 from rlbench.backend.task import Task
@@ -8,13 +9,12 @@ from rlbench.backend.conditions import DetectedCondition, NothingGrasped
 class TakeShoesOutOfBox(Task):
 
     def init_task(self) -> None:
-        shoe1 = Shape('shoe1')
-        shoe2 = Shape('shoe2')
+        shoe1, shoe2 = Shape('shoe1'), Shape('shoe2')
         self.register_graspable_objects([shoe1, shoe2])
-        success_sensor = ProximitySensor('success')
+        success_sensor = ProximitySensor('success_out_box')
         self.register_success_conditions([
-            DetectedCondition(shoe1, success_sensor, negated=True),
-            DetectedCondition(shoe2, success_sensor, negated=True),
+            DetectedCondition(shoe1, success_sensor),
+            DetectedCondition(shoe2, success_sensor),
             NothingGrasped(self.robot.gripper)])
 
     def init_episode(self, index: int) -> List[str]:
@@ -31,4 +31,4 @@ class TakeShoesOutOfBox(Task):
         return 1
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
-        return [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]
+        return [0, 0, -np.pi / 8], [0, 0, np.pi / 8]
