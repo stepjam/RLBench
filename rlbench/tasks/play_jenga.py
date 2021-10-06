@@ -1,8 +1,9 @@
 from typing import List, Tuple
+import numpy as np
 from pyrep.objects.proximity_sensor import ProximitySensor
 from pyrep.objects.shape import Shape
-from rlbench.backend.task import Task
 from rlbench.backend.conditions import DetectedCondition, NothingGrasped
+from rlbench.backend.task import Task
 
 
 class PlayJenga(Task):
@@ -32,4 +33,4 @@ class PlayJenga(Task):
         return 1
 
     def base_rotation_bounds(self) -> Tuple[List[float], List[float]]:
-        return [0, 0, 0], [0, 0, 3.14]
+        return [0, 0, -np.pi / 8], [0, 0, np.pi / 8]
