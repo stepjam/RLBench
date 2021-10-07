@@ -11,9 +11,9 @@ class OpenDrawer(Task):
     def init_task(self) -> None:
         self._options = ['bottom', 'middle', 'top']
         self._anchors = [Dummy('waypoint_anchor_%s' % opt)
-                         for opt in self.options]
+                         for opt in self._options]
         self._joints = [Joint('drawer_joint_%s' % opt)
-                        for opt in self.options]
+                        for opt in self._options]
         self._waypoint1 = Dummy('waypoint1')
 
     def init_episode(self, index: int) -> List[str]:
