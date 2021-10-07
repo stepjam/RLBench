@@ -3,7 +3,9 @@ from multiprocessing import Process, Manager
 from pyrep.const import RenderMode
 
 from rlbench import ObservationConfig
-from rlbench.action_modes import ActionMode
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.backend.utils import task_file_to_task_class
 from rlbench.environment import Environment
 import rlbench.backend.task as task
@@ -204,7 +206,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         obs_config.front_camera.render_mode = RenderMode.OPENGL
 
     rlbench_env = Environment(
-        action_mode=ActionMode(),
+        action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
         headless=True)
     rlbench_env.launch()
