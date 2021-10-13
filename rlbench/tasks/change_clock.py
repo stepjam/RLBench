@@ -1,18 +1,17 @@
 from typing import List
-from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
-from rlbench.backend.task import Task
+from pyrep.objects.shape import Shape
 from rlbench.backend.conditions import DetectedCondition, NothingGrasped
+from rlbench.backend.task import Task
 
 
 class ChangeClock(Task):
 
     def init_task(self) -> None:
-        needle_minute = Shape('clock_needle_minute')
-        success_detector = ProximitySensor('detector_minute0')
         self.register_success_conditions([
-            NothingGrasped(self.robot.gripper),
-            DetectedCondition(needle_minute, success_detector)])
+            DetectedCondition(Shape('clock_needle_minute'),
+                              ProximitySensor('detector_minute0'))
+        ])
 
     def init_episode(self, index: int) -> List[str]:
         return [
