@@ -9,7 +9,7 @@ from rlbench.backend.conditions import DetectedCondition, ConditionSet
 from rlbench.backend.spawn_boundary import SpawnBoundary
 
 
-class HannoiSquare(Task):
+class InsertOntoSquarePeg(Task):
 
     def init_task(self) -> None:
         self.square_ring = Shape('hannoi_square_ring')

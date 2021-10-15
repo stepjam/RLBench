@@ -1,7 +1,5 @@
 import os
 from typing import Type
-
-import cv2
 import numpy as np
 from absl import app
 from absl import flags
@@ -9,7 +7,9 @@ from pyrep.objects.dummy import Dummy
 from pyrep.objects.vision_sensor import VisionSensor
 
 from rlbench import Environment
-from rlbench.action_modes import ActionMode
+from rlbench.action_modes.action_mode import MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.backend.observation import Observation
 from rlbench.backend.task import TASKS_PATH
 from rlbench.backend.task import Task
@@ -95,8 +95,10 @@ class TaskRecorder(object):
     def save(self, path):
         print('Converting to video ...')
         os.makedirs(os.path.dirname(path), exist_ok=True)
+        # OpenCV QT version can conflict with PyRep, so import here
+        import cv2
         video = cv2.VideoWriter(
-                path, cv2.VideoWriter_fourcc(*'MJPG'), self._fps,
+                path, cv2.VideoWriter_fourcc('m', 'p', '4', 'v'), self._fps,
                 tuple(self._cam_motion.cam.get_resolution()))
         for image in self._snaps:
             video.write(cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
@@ -116,7 +118,9 @@ def main(argv):
         rand_every = RandomizeEvery.TRANSITION
         frequency = 10
 
-    env = Environment(ActionMode(), obs_config=obs_config,
+    action_mode = MoveArmThenGripper(
+        arm_action_mode=JointVelocity(), gripper_action_mode=Discrete())
+    env = Environment(action_mode, obs_config=obs_config,
                       randomize_every=rand_every, frequency=frequency,
                       visual_randomization_config=vrc, headless=FLAGS.headless)
     env.launch()
@@ -144,7 +148,7 @@ def main(argv):
             tr.save(os.path.join(FLAGS.save_dir, '%s.avi' % name))
 
     if not FLAGS.individual:
-        tr.save(os.path.join(FLAGS.save_dir, 'recorded_tasks.avi'))
+        tr.save(os.path.join(FLAGS.save_dir, 'recorded_tasks.mp4'))
     env.shutdown()
 
 
