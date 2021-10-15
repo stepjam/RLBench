@@ -174,3 +174,21 @@ class ConditionSet(Condition):
 
     def reset(self):
         self._current_condition_index = 0
+
+
+class OrConditions(Condition):
+    def __init__(self, conditions: List[Condition]):
+        """Logical or over all conditions"""
+        self._conditions = conditions
+
+    def condition_met(self):
+        met = False
+        for cond in self._conditions:
+            ismet, term = cond.condition_met()
+            met |= ismet
+            if met:
+                break
+        return met, False
+
+    def reset(self):
+        self._current_condition_index = 0
