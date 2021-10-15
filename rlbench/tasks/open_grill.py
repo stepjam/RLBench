@@ -1,20 +1,17 @@
 from typing import List, Tuple
+import numpy as np
+from pyrep.objects import Object
+from pyrep.objects.joint import Joint
 from pyrep.objects.shape import Shape
-from pyrep.objects.object import Object
-from pyrep.objects.proximity_sensor import ProximitySensor
+from rlbench.backend.conditions import JointCondition
 from rlbench.backend.task import Task
-from rlbench.backend.conditions import DetectedCondition
 
 
 class OpenGrill(Task):
 
     def init_task(self) -> None:
-        lid = Shape('lid')
         self.register_success_conditions([
-            DetectedCondition(lid, ProximitySensor('sensor_handle')),
-            # DetectedCondition(lid, ProximitySensor('sensor_grill_top'),
-            #                   negated=True)
-             ])
+            JointCondition(Joint('lid_joint'), np.deg2rad(50))])
 
     def init_episode(self, index: int) -> List[str]:
         return ['open the grill',
@@ -27,7 +24,7 @@ class OpenGrill(Task):
 
     def base_rotation_bounds(self) -> Tuple[Tuple[float, float, float],
                                             Tuple[float, float, float]]:
-        return (0.0, 0.0, -3.14/2), (0.0, 0.0, 3.14/2)
+        return (0.0, 0.0, -np.pi / 2), (0.0, 0.0, np.pi / 2)
 
     def boundary_root(self) -> Object:
         return Shape('grill_root')
