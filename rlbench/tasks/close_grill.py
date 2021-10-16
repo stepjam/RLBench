@@ -1,10 +1,8 @@
 from typing import List, Tuple
-
 import numpy as np
 from pyrep.objects.joint import Joint
 from pyrep.objects.object import Object
 from pyrep.objects.shape import Shape
-
 from rlbench.backend.conditions import JointCondition
 from rlbench.backend.task import Task
 
