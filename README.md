@@ -31,7 +31,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ### 28 September, 2021
 
-- **Version 1.2.0 is live!** Note: This release will cause code-breaking API changes. Changes include:
+- **Version 1.2.0 is currently under development!** Note: This release will cause code-breaking API changes. Changes include:
   - Improved API for action modes; custom action modes now much easier.
 
 ### 1 July, 2021
