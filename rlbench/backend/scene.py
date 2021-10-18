@@ -129,6 +129,8 @@ class Scene(object):
                 if (randomly_place and
                         not self.task.is_static_workspace()):
                     self._place_task()
+                    if self.robot.arm.check_arm_collision():
+                        raise BoundaryError()
                 self.task.validate()
                 break
             except (BoundaryError, WaypointError) as e:

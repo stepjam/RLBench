@@ -132,7 +132,8 @@ class LoadedTask(object):
         try:
             self._variation_index += 1
             descriptions = self.scene.init_episode(
-                self._variation_index % self.task.variation_count())
+                self._variation_index % self.task.variation_count(),
+                max_attempts=10)
             print('Task descriptions: ', descriptions)
         except (WaypointError, BoundaryError, Exception) as ex:
             traceback.print_exc()
@@ -142,7 +143,7 @@ class LoadedTask(object):
         try:
             descriptions = self.scene.init_episode(
                 self._variation_index % self.task.variation_count(),
-                max_attempts=1)
+                max_attempts=10)
             print('Task descriptions: ', descriptions)
         except (WaypointError, BoundaryError, Exception) as ex:
             traceback.print_exc()
