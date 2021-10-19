@@ -1,20 +1,16 @@
 from typing import List
-from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
-from rlbench.backend.task import Task
+from pyrep.objects.shape import Shape
 from rlbench.backend.conditions import DetectedCondition
+from rlbench.backend.task import Task
 
 
 class StraightenRope(Task):
 
     def init_task(self) -> None:
-        rope_head = Shape('head')
-        rope_tail = Shape('tail')
-        success_head = ProximitySensor('success_head')
-        success_tail = ProximitySensor('success_tail')
         self.register_success_conditions(
-            [DetectedCondition(rope_head, success_head),
-             DetectedCondition(rope_tail, success_tail)])
+            [DetectedCondition(Shape('head'), ProximitySensor('success_head')),
+             DetectedCondition(Shape('tail'), ProximitySensor('success_tail'))])
 
     def init_episode(self, index: int) -> List[str]:
         return ['straighten rope',
