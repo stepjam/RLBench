@@ -1,35 +1,35 @@
 from typing import List, Tuple
 from pyrep.objects.dummy import Dummy
-from pyrep.objects.shape import Shape
 from pyrep.objects.proximity_sensor import ProximitySensor
-from rlbench.backend.task import Task
-from rlbench.backend.spawn_boundary import SpawnBoundary
+from pyrep.objects.shape import Shape
 from rlbench.backend.conditions import ConditionSet, DetectedCondition, \
     NothingGrasped
+from rlbench.backend.spawn_boundary import SpawnBoundary
+from rlbench.backend.task import Task
 
 
 class PutKnifeInKnifeBlock(Task):
 
     def init_task(self) -> None:
         knife = Shape('knife')
-        self.knife_base = Dummy('knife_base')
-        success = ProximitySensor('success')
-        self.knife_block = Shape('knife_block')
-        self.chopping_board = Shape('chopping_board')
+        self._knife_base = Dummy('knife_base')
+        self._knife_block = Shape('knife_block')
+        self._chopping_board = Shape('chopping_board')
+        self._boundary = SpawnBoundary([Shape('boundary')])
+        self._knife_bound = SpawnBoundary([Shape('knife_boundary')])
         self.register_graspable_objects([knife])
-        set = ConditionSet([DetectedCondition(knife, success),
-                            NothingGrasped(self.robot.gripper)],
-                           order_matters=True)
-        self.register_success_conditions([set])
-        self.boundary = SpawnBoundary([Shape('boundary')])
-        self.knife_bound = SpawnBoundary([Shape('knife_boundary')])
+        self.register_success_conditions([
+            ConditionSet([
+                DetectedCondition(knife, ProximitySensor('success')),
+                NothingGrasped(self.robot.gripper)],
+                order_matters=True)])
 
     def init_episode(self, index: int) -> List[str]:
-        self.knife_bound.clear()
-        self.boundary.clear()
-        self.boundary.sample(self.knife_block)
-        self.boundary.sample(self.chopping_board)
-        self.knife_bound.sample(self.knife_base)
+        self._knife_bound.clear()
+        self._boundary.clear()
+        self._boundary.sample(self._knife_block)
+        self._boundary.sample(self._chopping_board)
+        self._knife_bound.sample(self._knife_base)
         return ['put the knife in the knife block',
                 'slide the knife into its slot in the knife block',
                 'place the knife in the knife block',
