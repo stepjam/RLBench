@@ -30,6 +30,7 @@ class StackBlocks(Task):
 
         self.register_waypoint_ability_start(0, self._move_above_next_target)
         self.register_waypoint_ability_start(3, self._move_above_drop_zone)
+        self.register_waypoint_ability_start(5, self._is_last)
         self.register_waypoints_should_repeat(self._repeat)
 
     def init_episode(self, index: int) -> List[str]:
@@ -88,7 +89,11 @@ class StackBlocks(Task):
         target = Shape('stack_blocks_target_plane')
         x, y, z = target.get_position()
         waypoint.get_waypoint_object().set_position(
-            [x, y, z + 0.08 + 0.06 * self.blocks_stacked])
+            [x, y, z + 0.08 + 0.06 * self.blocks_stacked + 0.05])
+
+    def _is_last(self, waypoint):
+        last = self.blocks_stacked == self.blocks_to_stack - 1
+        waypoint.skip = last
 
     def _repeat(self):
         self.blocks_stacked += 1

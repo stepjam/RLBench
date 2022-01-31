@@ -16,6 +16,7 @@ class Waypoint(object):
         self._linear_only = False
         self._start_of_path_func = start_of_path_func
         self._end_of_path_func = end_of_path_func
+        self.skip = False
         if len(self._ext) > 0:
             self._ignore_collisions = 'ignore_collision' in self._ext
             self._linear_only = 'linear' in self._ext

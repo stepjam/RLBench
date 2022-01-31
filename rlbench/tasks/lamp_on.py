@@ -27,5 +27,5 @@ class LampOn(Task):
         return 1
 
     def step(self) -> None:
-        if self.condition.condition_met() == (True, True):
+        if self.condition.condition_met()[0]:
             self.bulb_glass_visual.set_color([1, 1, 1])

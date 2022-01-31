@@ -340,6 +340,8 @@ class Scene(object):
             success = False
             for i, point in enumerate(waypoints):
                 point.start_of_path()
+                if point.skip:
+                    continue
                 grasped_objects = self.robot.gripper.get_grasped_objects()
                 colliding_shapes = [s for s in self.pyrep.get_objects_in_tree(
                     object_type=ObjectType.SHAPE) if s not in grasped_objects
