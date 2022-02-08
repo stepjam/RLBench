@@ -20,11 +20,11 @@ class SetupChess(Task):
 
     def init_task(self) -> None:
         self.board = Shape('chess_board_base')
-        self.pieces = [Shape(f'{color}_{piece}') for color in COLORS for piece in PIECES]
-        
+        self.pieces = [Shape(f'{color}_{piece}_dynamic') for color in COLORS for piece in PIECES]
+
         self.positions = [piece.get_position(self.board) for piece in self.pieces]
-        self.rotations = [self.pieces[0].get_orientation(self.board)]
-        
+        self.rotations = [piece.get_orientation(self.board) for piece in self.pieces]
+
         self.success_detectors = [ProximitySensor(f'detector_{file}{rank}') for file in 'abcdefgh' for rank in [1, 2, 7, 8]]
         self.success_conditions = [NothingGrasped(self.robot.gripper)]
 
@@ -33,8 +33,9 @@ class SetupChess(Task):
             z = detector.get_position(self.board)[2]
             detector.set_position((x, y, z), self.board)
             self.success_conditions.append(DetectedCondition(piece, detector))
-                
+
         self.register_success_conditions(self.success_conditions)
+        self.register_graspable_objects(self.pieces)
 
     def init_episode(self, index: int) -> List[str]:
         for piece, position, rotation in zip(self.pieces, self.positions, self.rotations):
@@ -42,9 +43,9 @@ class SetupChess(Task):
             piece.set_orientation(rotation, self.board)
 
         self.nsetup = 1 + index % self.MAX_DISPLACEMENTS
-        self.placed = 0
-        self.places = random.sample([(dx, dy) for dx in range(8) for dy in range(4)], self.nsetup)
-        
+        self.placed = -1
+        self.places = random.sample([(dx, dy) for dx in range(8) for dy in range(1, 3)], self.nsetup)
+
         self.register_waypoint_ability_start(0, self._move_above_next_target)
         self.register_waypoints_should_repeat(self._repeat)
 
@@ -55,7 +56,7 @@ class SetupChess(Task):
 
         for piece, (x, y) in zip(self.targets, self.places):
             x = -1.6759e-1 + x * delta
-            y = -7.1826e-2 + y * delta
+            y = -7.1825e-2 + y * delta
             z = piece.get_position(self.board)[2]
             piece.set_position([x, y, z], self.board, reset_dynamics = False)
 
@@ -79,11 +80,10 @@ class SetupChess(Task):
         return self.MAX_DISPLACEMENTS
 
     def _move_above_next_target(self, waypoint):
+        self.placed += 1
         index = self.indices[self.placed]
         piece = self.targets[self.placed]
         final = self.positions[index]
-
-        self.register_graspable_objects([piece])
 
         w1 = Dummy("waypoint1")
         w4 = Dummy("waypoint4")
@@ -92,12 +92,7 @@ class SetupChess(Task):
         xf, yf, zf = final                          # target position
 
         w1.set_position([xt, yt, zt], self.board, reset_dynamics = False)
-        w4.set_position([xf - 1e-3, yf, zf], self.board, reset_dynamics = False)
-
-        self.placed += 1
+        w4.set_position([xf - 1e-3, yf, zf + 0.1], self.board, reset_dynamics = False)
 
     def _repeat(self):
-        return self.placed < self.nsetup
-
-    def is_static_workspace(self):
-        return True
+        return self.placed + 1 < self.nsetup
