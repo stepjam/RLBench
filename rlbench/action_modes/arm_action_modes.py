@@ -187,6 +187,27 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
             action = calculate_delta_pose(scene.robot, action)
         relative_to = None if self._frame == 'world' else scene.robot.arm.get_tip()
         self._quick_boundary_check(scene, action)
+
+        colliding_shapes = []
+        if self._collision_checking:
+            if self._robot_shapes is None:
+                self._robot_shapes = scene.robot.arm.get_objects_in_tree(
+                    object_type=ObjectType.SHAPE)
+            # First check if we are colliding with anything
+            colliding = scene.robot.arm.check_arm_collision()
+            if colliding:
+                # Disable collisions with the objects that we are colliding with
+                grasped_objects = scene.robot.gripper.get_grasped_objects()
+                colliding_shapes = [
+                    s for s in scene.pyrep.get_objects_in_tree(
+                        object_type = ObjectType.SHAPE) if (
+                            s.is_collidable() and
+                            s not in self._robot_shapes and
+                            s not in grasped_objects and
+                            scene.robot.arm.check_arm_collision(
+                                s))]
+                [s.set_collidable(False) for s in colliding_shapes]
+
         try:
             path = scene.robot.arm.get_path(
                 action[:3],

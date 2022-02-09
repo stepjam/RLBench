@@ -31,9 +31,18 @@ class Discrete(GripperActionMode):
     will be  discretised to 0 (closed).
     """
 
-    def __init__(self, attach_grasped_objects: bool = True):
+    def __init__(self, attach_grasped_objects: bool = True,
+                 detach_before_open: bool = True):
         self._attach_grasped_objects = attach_grasped_objects
-    
+        self._detach_before_open = detach_before_open
+
+    def _actuate(self):
+        done = False
+        while not done:
+            done = scene.robot.gripper.actuate(action, velocity=0.2)
+            scene.pyrep.step()
+            scene.task.step()
+
     def action(self, scene: Scene, action: np.ndarray):
         assert_action_shape(action, self.action_shape(scene.robot))
         if 0.0 > action[0] > 1.0:
@@ -46,6 +55,8 @@ class Discrete(GripperActionMode):
 
         if current_ee != action:
             done = False
+            if not self._detach_before_open:
+                self._actuate()
             if action == 0.0 and self._attach_grasped_objects:
                 # If gripper close action, the check for grasp.
                 for g_obj in scene.task.get_graspable_objects():
@@ -53,10 +64,8 @@ class Discrete(GripperActionMode):
             else:
                 # If gripper open action, the check for un-grasp.
                 scene.robot.gripper.release()
-            while not done:
-                done = scene.robot.gripper.actuate(action, velocity=0.2)
-                scene.pyrep.step()
-                scene.task.step()
+            if self._detach_before_open:
+                self._actuate()
             if action == 1.0:
                 # Step a few more times to allow objects to drop
                 for _ in range(10):
