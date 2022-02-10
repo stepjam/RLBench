@@ -65,7 +65,7 @@ class Discrete(GripperActionMode):
                 # If gripper open action, the check for un-grasp.
                 scene.robot.gripper.release()
             if self._detach_before_open:
-                self._actuate()
+                self._actuate(action, scene)
             if action == 1.0:
                 # Step a few more times to allow objects to drop
                 for _ in range(10):
