@@ -38,6 +38,7 @@ from rlbench.tasks.open_window import OpenWindow
 from rlbench.tasks.open_wine_bottle import OpenWineBottle
 from rlbench.tasks.phone_on_base import PhoneOnBase
 from rlbench.tasks.pick_and_lift import PickAndLift
+from rlbench.tasks.pick_and_lift_small import PickAndLiftSmall
 from rlbench.tasks.pick_up_cup import PickUpCup
 from rlbench.tasks.place_cups import PlaceCups
 from rlbench.tasks.place_hanger_on_rack import PlaceHangerOnRack
@@ -72,6 +73,7 @@ from rlbench.tasks.scoop_with_spatula import ScoopWithSpatula
 from rlbench.tasks.screw_nail import ScrewNail
 from rlbench.tasks.set_the_table import SetTheTable
 from rlbench.tasks.setup_checkers import SetupCheckers
+from rlbench.tasks.setup_chess import SetupChess
 from rlbench.tasks.slide_block_to_target import SlideBlockToTarget
 from rlbench.tasks.slide_cabinet_open import SlideCabinetOpen
 from rlbench.tasks.slide_cabinet_open_and_place_cups import \

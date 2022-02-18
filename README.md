@@ -29,29 +29,28 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Announcements
 
-### 28 September, 2021
+### 18 February 2022
 
-- **Version 1.2.0 is currently under development!** Note: This release will cause code-breaking API changes. Changes include:
-  - Improved API for action modes; custom action modes now much easier.
+- **Version 1.2.0 is live!** Note: This release will cause code-breaking API changes for action modes.
 
-### 1 July, 2021
+### 1 July 2021
 
 - New instructions on headless GPU rendering [here](#running-headless)!
 
-### 8 September, 2020
+### 8 September 2020
 
 - New tutorial series on task creation [here](https://www.youtube.com/watch?v=bKaK_9O3v7Y&list=PLsffAlO5lBTRiBwnkw2-x0U7t6TrNCkfc)!
 
-### 1 April, 2020
+### 1 April 2020
 
 - We added a Discord channel to allow the RLBench community to help one another. Click the Discord badge above.
 
-### 28 January, 2020
+### 28 January 2020
 
 - RLBench has been accepted to RA-L with presentation at ICRA!
 - Ability to easily swap out arms added. [See here](#swapping-arms).
 
-### 17 December, 2019
+### 17 December 2019
 
 - Gym is now supported!
 
