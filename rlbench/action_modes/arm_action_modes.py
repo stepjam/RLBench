@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 import numpy as np
 from pyquaternion import Quaternion
-from pyrep.const import ConfigurationPathAlgorithms as Algos
+from pyrep.const import ConfigurationPathAlgorithms as Algos, ObjectType
 from pyrep.errors import ConfigurationPathError, IKError
 
 from rlbench.backend.exceptions import InvalidActionError
@@ -158,6 +158,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
         self._absolute_mode = absolute_mode
         self._frame = frame
         self._collision_checking = collision_checking
+        self._robot_shapes = None
         if frame not in ['world', 'end effector']:
             raise ValueError("Expected frame to one of: 'world, 'end effector'")
 
@@ -200,7 +201,7 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
                 grasped_objects = scene.robot.gripper.get_grasped_objects()
                 colliding_shapes = [
                     s for s in scene.pyrep.get_objects_in_tree(
-                        object_type = ObjectType.SHAPE) if (
+                        object_type=ObjectType.SHAPE) if (
                             s.is_collidable() and
                             s not in self._robot_shapes and
                             s not in grasped_objects and
@@ -220,7 +221,9 @@ class EndEffectorPoseViaPlanning(ArmActionMode):
                 trials_per_goal=5,
                 algorithm=Algos.RRTConnect
             )
+            [s.set_collidable(True) for s in colliding_shapes]
         except ConfigurationPathError as e:
+            [s.set_collidable(True) for s in colliding_shapes]
             raise InvalidActionError(
                 'A path could not be found. Most likely due to the target '
                 'being inaccessible or a collison was detected.') from e
