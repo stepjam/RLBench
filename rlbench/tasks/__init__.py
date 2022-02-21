@@ -21,6 +21,7 @@ from rlbench.tasks.insert_onto_square_peg import InsertOntoSquarePeg
 from rlbench.tasks.insert_usb_in_computer import InsertUsbInComputer
 from rlbench.tasks.lamp_off import LampOff
 from rlbench.tasks.lamp_on import LampOn
+from rlbench.tasks.lift_numbered_block import LiftNumberedBlock
 from rlbench.tasks.light_bulb_in import LightBulbIn
 from rlbench.tasks.light_bulb_out import LightBulbOut
 from rlbench.tasks.meat_off_grill import MeatOffGrill
