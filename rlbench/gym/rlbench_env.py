@@ -94,7 +94,9 @@ class RLBenchEnv(gym.Env):
                 'You passed in mode %s, but expected %s.' % (
                     mode, self._render_mode))
         if mode == 'rgb_array':
-            return self._gym_cam.capture_rgb()
+            frame = self._gym_cam.capture_rgb()
+            frame = np.clip((frame * 255.).astype(np.uint8), 0, 255)
+            return frame
 
     def reset(self) -> Dict[str, np.ndarray]:
         descriptions, obs = self.task.reset()
