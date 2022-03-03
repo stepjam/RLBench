@@ -81,6 +81,7 @@ from rlbench.tasks.slide_cabinet_open_and_place_cups import \
     SlideCabinetOpenAndPlaceCups
 from rlbench.tasks.solve_puzzle import SolvePuzzle
 from rlbench.tasks.stack_blocks import StackBlocks
+from rlbench.tasks.stack_chairs import StackChairs
 from rlbench.tasks.stack_cups import StackCups
 from rlbench.tasks.stack_wine import StackWine
 from rlbench.tasks.straighten_rope import StraightenRope
