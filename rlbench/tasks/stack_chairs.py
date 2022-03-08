@@ -46,11 +46,11 @@ class StackChairs(Task):
         ])
 
     def init_episode(self, index: int) -> List[str]:
-        indices = np.random.choice(np.arange(len(colors)), size = 3, replace = False)
+        indices = np.random.choice(np.arange(len(colors)), size = 2, replace = False)
 
-        color1, rgb1 = colors[indices[0]]
-        color2, rgb2 = colors[indices[1]]
-        color3, rgb3 = colors[indices[2]] # target chair color
+        color1, rgb1 = colors[index]
+        color2, rgb2 = colors[indices[0]]
+        color3, rgb3 = colors[indices[1]] # target chair color
 
         self.cushions1.set_color(rgb1)
         self.cushions2.set_color(rgb2)
