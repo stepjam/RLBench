@@ -35,6 +35,7 @@ from rlbench.tasks.open_grill import OpenGrill
 from rlbench.tasks.open_jar import OpenJar
 from rlbench.tasks.open_microwave import OpenMicrowave
 from rlbench.tasks.open_oven import OpenOven
+from rlbench.tasks.open_washing_machine import OpenWashingMachine
 from rlbench.tasks.open_window import OpenWindow
 from rlbench.tasks.open_wine_bottle import OpenWineBottle
 from rlbench.tasks.phone_on_base import PhoneOnBase
