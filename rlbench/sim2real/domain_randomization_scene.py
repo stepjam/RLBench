@@ -15,6 +15,7 @@ TEX_KWARGS = {
     'mapping_mode': TextureMappingMode.PLANE,
     'repeat_along_u': True,
     'repeat_along_v': True,
+    'uv_scaling': [4., 4.]
 }
 
 
@@ -47,6 +48,7 @@ class DomainRandomizationScene(Scene):
         self._scene_objects += self.robot.gripper.get_visuals()
         if self._visual_rand_config is not None:
             # Make the floor plane renderable (to cover old floor)
+            self._scene_objects[0].set_position([0, 0, 0.01])
             self._scene_objects[0].set_renderable(True)
 
     def _should_randomize_episode(self, index: int):
