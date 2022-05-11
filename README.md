@@ -29,6 +29,10 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Announcements
 
+### 11 May 2022
+
+- Shaped rewards added for: **reach_target** and **take_lid_off_saucepan**. Pass `shaped_rewards=True` to `Environement` class
+
 ### 18 February 2022
 
 - **Version 1.2.0 is live!** Note: This release will cause code-breaking API changes for action modes.
