@@ -39,6 +39,15 @@ class ArmActionMode(object):
     def action(self, scene: Scene, action: np.ndarray):
         pass
 
+    def action_step(self, scene: Scene, action: np.ndarray):
+        pass
+
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
+        pass
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
+        pass
+
     @abstractmethod
     def action_shape(self, scene: Scene):
         pass
@@ -52,11 +61,20 @@ class JointVelocity(ArmActionMode):
 
     Similar to the action space in many continious control OpenAI Gym envs.
     """
-    
+
     def action(self, scene: Scene, action: np.ndarray):
+        self.action_pre_step(scene, action)
+        self.action_step(scene, action)
+        self.action_post_step(scene, action)
+    
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
         assert_action_shape(action, self.action_shape(scene))
         scene.robot.arm.set_joint_target_velocities(action)
+
+    def action_step(self, scene: Scene, action: np.ndarray):
         scene.step()
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
         scene.robot.arm.set_joint_target_velocities(np.zeros_like(action))
 
     def action_shape(self, scene: Scene) -> tuple:
@@ -86,11 +104,20 @@ class JointPosition(ArmActionMode):
         self._absolute_mode = absolute_mode
 
     def action(self, scene: Scene, action: np.ndarray):
+        self.action_pre_step(scene, action)
+        self.action_step(scene, action)
+        self.action_post_step(scene, action)
+
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
         assert_action_shape(action, self.action_shape(scene))
         a = action if self._absolute_mode else np.array(
             scene.robot.arm.get_joint_positions()) + action
         scene.robot.arm.set_joint_target_positions(a)
+
+    def action_step(self, scene: Scene, action: np.ndarray):
         scene.step()
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
         scene.robot.arm.set_joint_target_positions(
             scene.robot.arm.get_joint_positions())
 
@@ -111,9 +138,18 @@ class JointTorque(ArmActionMode):
         robot.arm.set_joint_forces(np.abs(action))
 
     def action(self, scene: Scene, action: np.ndarray):
+        self.action_pre_step(scene, action)
+        self.action_step(scene, action)
+        self.action_post_step(scene, action)
+
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
         assert_action_shape(action, self.action_shape(scene))
         self._torque_action(scene.robot, action)
+
+    def action_step(self, scene: Scene, action: np.ndarray):
         scene.step()
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
         self._torque_action(scene.robot, scene.robot.arm.get_joint_forces())
         scene.robot.arm.set_joint_target_velocities(np.zeros_like(action))
 

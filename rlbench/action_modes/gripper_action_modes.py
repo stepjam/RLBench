@@ -19,8 +19,21 @@ class GripperActionMode(object):
     def action(self, scene: Scene, action: np.ndarray):
         pass
 
+    def action_step(self, scene: Scene, action: np.ndarray):
+        pass
+
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
+        pass
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
+        pass
+
     @abstractmethod
     def action_shape(self, scene: Scene):
+        pass
+
+    @abstractmethod
+    def action_bounds(self):
         pass
 
 
@@ -74,3 +87,67 @@ class Discrete(GripperActionMode):
 
     def action_shape(self, scene: Scene) -> tuple:
         return 1,
+
+    def action_bounds(self):
+        """Get the action bounds.
+
+        Returns: Returns the min and max of the action.
+        """
+        return np.array([0]), np.array([1])
+
+
+class GripperJointPosition(GripperActionMode):
+    """Control the target joint positions absolute or delta) of the gripper.
+
+    The action mode opoerates in absolute mode or delta mode, where delta
+    mode takes the current joint positions and adds the new joint positions
+    to get a set of target joint positions. The robot uses a simple control
+    loop to execute until the desired poses have been reached.
+    It os the users responsibility to ensure that the action lies within
+    a usuable range.
+
+    Control if the gripper is open or closed in a discrete manner.
+
+    Action values > 0.5 will be discretised to 1 (open), and values < 0.5
+    will be  discretised to 0 (closed).
+    """
+
+    def __init__(self, attach_grasped_objects: bool = True,
+                 detach_before_open: bool = True,
+                 absolute_mode: bool = True):
+        self._attach_grasped_objects = attach_grasped_objects
+        self._detach_before_open = detach_before_open
+        self._absolute_mode = absolute_mode
+        self._control_mode_set = False
+
+    def action(self, scene: Scene, action: np.ndarray):
+        self.action_pre_step(scene, action)
+        self.action_step(scene, action)
+        self.action_post_step(scene, action)
+
+    def action_pre_step(self, scene: Scene, action: np.ndarray):
+        if not self._control_mode_set:
+            scene.robot.gripper.set_control_loop_enabled(True)
+            self._control_mode_set = True
+        assert_action_shape(action, self.action_shape(scene.robot))
+        action = action.repeat(2)  # use same action for both joints
+        a = action if self._absolute_mode else np.array(
+            scene.robot.gripper.get_joint_positions())
+        scene.robot.gripper.set_joint_target_positions(a)
+
+    def action_step(self, scene: Scene, action: np.ndarray):
+        scene.step()
+
+    def action_post_step(self, scene: Scene, action: np.ndarray):
+        scene.robot.gripper.set_joint_target_positions(
+            scene.robot.gripper.get_joint_positions())
+
+    def action_shape(self, scene: Scene) -> tuple:
+        return 1,
+
+    def action_bounds(self):
+        """Get the action bounds.
+
+        Returns: Returns the min and max of the action.
+        """
+        return np.array([0]), np.array([0.04])
