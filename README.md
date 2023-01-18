@@ -75,7 +75,7 @@ pip install .
 ```
 Or you can install directly via pip
 ```bash
-pip install git+ssh://git@github.com/stepjam/RLBench.git
+pip install git+https://github.com/stepjam/RLBench.git
 ```
 
 And that's it!
