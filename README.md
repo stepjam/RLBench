@@ -73,6 +73,10 @@ Now lets install RLBench:
 pip install -r requirements.txt
 pip install .
 ```
+Or you can install directly via pip
+```bash
+pip install git+https://github.com/stepjam/RLBench.git
+```
 
 And that's it!
 
