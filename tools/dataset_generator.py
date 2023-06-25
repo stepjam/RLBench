@@ -163,7 +163,7 @@ def save_demo(demo, example_path):
 
     # Save the low-dimension data
     with open(os.path.join(example_path, LOW_DIM_PICKLE), 'wb') as f:
-        pickle.dump([obs.get_low_dim_data() for obs in demo], f)
+        pickle.dump(demo, f)
 
 
 def run(i, lock, task_index, variation_count, results, file_lock, tasks):
