@@ -25,12 +25,21 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
+core_requirements = [
+    "numpy",
+    "Pillow",
+    "pyquaternion",
+    "html-testRunner",
+    "natsort
+]
+
 setup(name='rlbench',
       version=get_version("rlbench/__init__.py"),
       description='RLBench',
       author='Stephen James',
       author_email='slj12@ic.ac.uk',
       url='https://www.doc.ic.ac.uk/~slj12',
+      install_requires=core_requirements,
       packages=[
             'rlbench',
             'rlbench.backend',
