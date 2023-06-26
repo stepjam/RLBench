@@ -30,7 +30,7 @@ core_requirements = [
     "Pillow",
     "pyquaternion",
     "html-testRunner",
-    "natsort
+    "natsort"
 ]
 
 setup(name='rlbench',
