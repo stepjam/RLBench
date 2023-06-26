@@ -243,7 +243,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
 
         task_env = rlbench_env.get_task(t)
         task_env.set_variation(my_variation_count)
-        obs, descriptions = task_env.reset()
+        descriptions, _ = task_env.reset()
 
         variation_path = os.path.join(
             FLAGS.save_path, task_env.get_name(),
