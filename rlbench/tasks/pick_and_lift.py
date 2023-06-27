@@ -52,3 +52,7 @@ class PickAndLift(Task):
 
     def variation_count(self) -> int:
         return len(colors)
+
+    def get_low_dim_state(self) -> np.ndarray:
+        # One of the few tasks that have a custom low_dim_state function.
+        return np.concatenate([self.target_block.get_position(), self.success_detector.get_position()], 0)
