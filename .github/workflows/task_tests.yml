@@ -15,7 +15,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       DISPLAY: :0
 
@@ -31,9 +31,9 @@ jobs:
           # start xvfb in the background
           sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           cur=`pwd`
-          wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz
-          tar -xf CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz
-          export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04"
+          wget http://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz
+          tar -xf CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz
+          export COPPELIASIM_ROOT="$cur/CoppeliaSim_Edu_V4_1_0_Ubuntu20_04"
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
           export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
