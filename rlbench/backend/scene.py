@@ -77,6 +77,7 @@ class Scene(object):
 
         self._robot_shapes = self.robot.arm.get_objects_in_tree(
             object_type=ObjectType.SHAPE)
+        self._execute_demo_joint_position_action = None
 
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
@@ -364,6 +365,7 @@ class Scene(object):
                 while not done:
                     done = path.step()
                     self.step()
+                    self._execute_demo_joint_position_action = path.get_executed_joint_position_action()
                     self._demo_record_step(demo, record, callable_each_step)
                     success, term = self.task.success()
 
@@ -539,4 +541,8 @@ class Scene(object):
         misc.update(_get_cam_data(self._cam_overhead, 'overhead_camera'))
         misc.update(_get_cam_data(self._cam_front, 'front_camera'))
         misc.update(_get_cam_data(self._cam_wrist, 'wrist_camera'))
+        if self._execute_demo_joint_position_action:
+            # Store the actual requested joint positions during demo collection
+            misc.update({"executed_demo_joint_position_action": self._execute_demo_joint_position_action})
+            self._execute_demo_joint_position_action = None
         return misc
