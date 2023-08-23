@@ -73,8 +73,8 @@ class VisualRandomizationConfig(RandomizationConfig):
             raise NotADirectoryError(
                 'The supplied image directory (%s) does not exist!' %
                 image_directory)
-        self._imgs = np.array([glob.glob(
-            os.path.join(image_directory, e)) for e in EXTENSIONS])
+        self._imgs = [glob.glob(
+            os.path.join(image_directory, e)) for e in EXTENSIONS]
         self._imgs = np.concatenate(self._imgs)
         if len(self._imgs) == 0:
             raise RuntimeError(
