@@ -95,6 +95,8 @@ echo -e 'Section "ServerFlags"\n\tOption "MaxClients" "2048"\nEndSection\n' \
     | sudo tee /etc/X11/xorg.conf.d/99-maxclients.conf
 ```
 
+Leave out `--use-display-device=None` if the GPU is headless, i.e. if it has no display outputs.
+
 ### Running X
 
 Then, whenever you want to run RLBench, spin up X.
