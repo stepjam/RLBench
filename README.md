@@ -82,29 +82,55 @@ And that's it!
 
 ## Running Headless
 
-You can run RLBench headlessly with VirtualGL. VirtualGL is an open source toolkit that gives any Unix or Linux remote display software the ability to run OpenGL applications **with full 3D hardware acceleration**.
-First insure that you have the nVidia proprietary driver installed. I.e. you should get an output when running `nvidia-smi`. Now run the following commands:
-```bash
-sudo apt-get install xorg libxcb-randr0-dev libxrender-dev libxkbcommon-dev libxkbcommon-x11-0 libavcodec-dev libavformat-dev libswscale-dev
-sudo nvidia-xconfig -a --use-display-device=None --virtual=1280x1024
-# Install VirtualGL
-wget https://sourceforge.net/projects/virtualgl/files/2.5.2/virtualgl_2.5.2_amd64.deb/download -O virtualgl_2.5.2_amd64.deb
-sudo dpkg -i virtualgl*.deb
-rm virtualgl*.deb
-```
-You will now need to reboot, and then start the X server:
-```bash
-sudo reboot
-nohup sudo X &
-```
-Now we are good to go! To render the application with the first GPU, you can do the following:
-```bash
-export DISPLAY=:0.0
-python my_pyrep_app.py
-```
-To render with the second GPU, you will insetad set display as: `export DISPLAY=:0.1`, and so on.
+If you are running on a machine without display (i.e. Cloud VMs, compute clusters),
+you can refer to the following guide to run RLBench headlessly with rendering.
 
-**Acknowledgement**: Special thanks to Boyuan Chen (UC Berkeley) for bringing VirtualGL to my attention!
+### Initial setup
+
+First, configure your X config. This should only be done once to set up.
+
+```bash
+sudo nvidia-xconfig -a --use-display-device=None --virtual=1280x1024
+echo -e 'Section "ServerFlags"\n\tOption "MaxClients" "2048"\nEndSection\n' \
+    | sudo tee /etc/X11/xorg.conf.d/99-maxclients.conf
+```
+
+Leave out `--use-display-device=None` if the GPU is headless, i.e. if it has no display outputs.
+
+### Running X
+
+Then, whenever you want to run RLBench, spin up X.
+
+```bash
+# nohup and disown is important for the X server to keep running in the background
+sudo nohup X :99 & disown
+```
+
+Test if your display works using glxgears.
+
+```bash
+DISPLAY=:99 glxgears
+```
+
+If you have multiple GPUs, you can select your GPU by doing the following.
+
+```bash
+DISPLAY=:99.<gpu_id> glxgears
+```
+
+### Running X without sudo
+
+To spin up X with non-sudo users, edit file '/etc/X11/Xwrapper.config' and replace line:
+
+```
+allowed_users=console
+```
+with lines:
+```
+allowed_users=anybody
+needs_root_rights=yes
+```
+If the file does not exist already, you can create it.
 
 ## Getting Started
 
