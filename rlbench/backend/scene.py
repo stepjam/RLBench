@@ -539,4 +539,5 @@ class Scene(object):
         misc.update(_get_cam_data(self._cam_overhead, 'overhead_camera'))
         misc.update(_get_cam_data(self._cam_front, 'front_camera'))
         misc.update(_get_cam_data(self._cam_wrist, 'wrist_camera'))
+        misc.update({"variation_index": self._variation_index})
         return misc
