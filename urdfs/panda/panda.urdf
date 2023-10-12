@@ -1,0 +1,560 @@
+<?xml version="1.0"?>
+<robot name="Panda">
+    <link name="robot_base">
+        <collision name="Panda">
+            <origin xyz="-0.308951 0.000000 0.820018" rpy="2.984763 -1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/robot_base_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link0_visual">
+            <origin xyz="-0.308813 -0.012797 0.820033" rpy="0.156830 -1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink0visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink0visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_target">
+            <origin xyz="-0.179547 -0.008170 1.565651" rpy="-0.000000 3.141593 0.000000" />
+            <geometry>
+                <box size="0.010000 0.010000 0.010000" />
+            </geometry>
+            <material name="Pandatarget_material">
+                <color rgba="1.000000 0.000000 0.000000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint1" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="87.0" upper="2.8973000049591" lower="-2.8973000049591" velocity="2.1749999523163" />
+        <parent link="robot_base" />
+        <child link="Pandalink1respondable" />
+        <origin xyz="-0.267962 -0.006392 1.083032" rpy="-3.141593 3.141593 -3.141593" />
+    </joint>
+    <link name="Pandalink1respondable">
+        <inertial>
+            <origin rpy="0.298997 3.140639 3.138002" xyz="0.000011 -0.031266 -0.069373" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="6.6439146800259e-20" iyz="-1.0842021724855e-18" iyy="0.099999997764826" ixz="0.0" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link1_respondable">
+            <origin xyz="0.000096 -0.034640 -0.075509" rpy="0.298997 3.140639 3.138002" />
+            <geometry>
+                <mesh filename="meshes/Pandalink1respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link1_visual">
+            <origin xyz="-0.000007 -0.037242 -0.068499" rpy="-3.141590 3.141587 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink1visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink1visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint2" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="87.0" upper="1.7627999782562" lower="-1.7627999782562" velocity="2.1749999523163" />
+        <parent link="Pandalink1respondable" />
+        <child link="Pandalink2respondable" />
+        <origin xyz="0.000000 -0.000000 0.000000" rpy="1.570796 3.141593 -3.141593" />
+    </joint>
+    <link name="Pandalink2respondable">
+        <inertial>
+            <origin rpy="-1.867903 3.164601 0.002340" xyz="-0.000013 -0.070322 0.031178" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="-2.668153783851e-19" iyz="0.0" iyy="0.099999997764826" ixz="0.0" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link2_respondable">
+            <origin xyz="0.000208 -0.076383 0.034440" rpy="-1.867903 3.164601 0.002340" />
+            <geometry>
+                <mesh filename="meshes/Pandalink2respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link2_visual">
+            <origin xyz="-0.000003 -0.069489 0.037185" rpy="1.570815 3.141593 -3.141586" />
+            <geometry>
+                <mesh filename="meshes/Pandalink2visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink2visual_material">
+                <color rgba="0.980000 0.980000 1.000000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint3" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="87.0" upper="2.8973000049591" lower="-2.8973000049591" velocity="2.1749999523163" />
+        <parent link="Pandalink2respondable" />
+        <child link="Pandalink3respondable" />
+        <origin xyz="0.000000 -0.316000 0.000000" rpy="-1.570797 3.141593 -3.141593" />
+    </joint>
+    <link name="Pandalink3respondable">
+        <inertial>
+            <origin rpy="2.437308 3.367734 1.805683" xyz="0.044348 0.024928 -0.038130" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="9.6222942808089e-18" iyz="0.0" iyy="0.099999997764826" ixz="-1.0842021724855e-18" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link3_respondable">
+            <origin xyz="0.033417 0.026635 -0.041390" rpy="2.437308 3.367734 1.805683" />
+            <geometry>
+                <mesh filename="meshes/Pandalink3respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link3_visual">
+            <origin xyz="0.033546 0.026996 -0.041713" rpy="2.413011 3.312717 1.843472" />
+            <geometry>
+                <mesh filename="meshes/Pandalink3visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink3visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link3_visual">
+            <origin xyz="0.033546 0.026996 -0.041713" rpy="2.413011 3.312717 1.843472" />
+            <geometry>
+                <mesh filename="meshes/Pandalink3visual_vis_2.dae" />
+            </geometry>
+            <material name="Pandalink3visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint4" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="87.0" upper="0.0" lower="-3.0020000934601" velocity="2.1749999523163" />
+        <parent link="Pandalink3respondable" />
+        <child link="Pandalink4respondable" />
+        <origin xyz="0.082500 -0.000000 -0.000000" rpy="-1.570796 3.141593 3.141593" />
+    </joint>
+    <link name="Pandalink4respondable">
+        <inertial>
+            <origin rpy="3.014416 4.390686 -0.783388" xyz="-0.038550 0.039526 0.024716" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="3.6591823321386e-18" iyz="2.168404344971e-18" iyy="0.099999997764826" ixz="-2.168404344971e-18" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link4_respondable">
+            <origin xyz="-0.049425 0.042430 0.026629" rpy="3.014416 4.390686 -0.783388" />
+            <geometry>
+                <mesh filename="meshes/Pandalink4respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link4_visual">
+            <origin xyz="-0.042981 0.050021 0.026925" rpy="3.123437 4.394695 -0.661518" />
+            <geometry>
+                <mesh filename="meshes/Pandalink4visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink4visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link4_visual">
+            <origin xyz="-0.042981 0.050021 0.026925" rpy="3.123437 4.394695 -0.661518" />
+            <geometry>
+                <mesh filename="meshes/Pandalink4visual_vis_2.dae" />
+            </geometry>
+            <material name="Pandalink4visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint5" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="12.0" upper="2.8973000049591" lower="-2.8973000049591" velocity="2.6099998950958" />
+        <parent link="Pandalink4respondable" />
+        <child link="Pandalink5respondable" />
+        <origin xyz="-0.082081 0.383554 -0.000219" rpy="1.570796 3.141591 -3.141592" />
+    </joint>
+    <link name="Pandalink5respondable">
+        <inertial>
+            <origin rpy="-3.126116 3.390447 1.553267" xyz="0.000256 0.057004 -0.098617" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="5.0821976835258e-20" iyz="0.0" iyy="0.099999997764826" ixz="5.4210108624275e-19" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_2.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_3.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_4.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_5.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_6.dae" />
+            </geometry>
+        </collision>
+        <collision name="Panda_link5_respondable">
+            <origin xyz="-0.001682 0.042777 -0.108705" rpy="-3.126116 3.390447 1.553267" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5respondable_coll_7.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link5_visual">
+            <origin xyz="0.000827 0.042090 -0.108562" rpy="0.046023 3.382035 1.396010" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink5visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link5_visual">
+            <origin xyz="0.000827 0.042090 -0.108562" rpy="0.046023 3.382035 1.396010" />
+            <geometry>
+                <mesh filename="meshes/Pandalink5visual_vis_2.dae" />
+            </geometry>
+            <material name="Pandalink5visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint6" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="12.0" upper="3.752499980852" lower="-0.017500000074506" velocity="2.6099998950958" />
+        <parent link="Pandalink5respondable" />
+        <child link="Pandalink6respondable" />
+        <origin xyz="0.000000 -0.000000 0.000000" rpy="-1.570795 3.141593 3.141593" />
+    </joint>
+    <link name="Pandalink6respondable">
+        <inertial>
+            <origin rpy="-3.136481 4.494420 3.134962" xyz="0.051002 0.006933 0.006169" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="-1.3552527156069e-19" iyz="-2.168404344971e-18" iyy="0.099999997764826" ixz="0.0" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link6_respondable">
+            <origin xyz="0.042092 0.015160 0.010259" rpy="-3.136481 4.494420 3.134962" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_2.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_3.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_4.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_5.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.300000 0.300000 0.300000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link6_visual">
+            <origin xyz="0.042200 0.014913 0.010711" rpy="-0.055967 1.789478 -0.056827" />
+            <geometry>
+                <mesh filename="meshes/Pandalink6visual_vis_6.dae" />
+            </geometry>
+            <material name="Pandalink6visual_material">
+                <color rgba="0.740000 0.740000 0.740000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandajoint7" type="revolute">
+        <axis xyz="0 0 1" />
+        <limit effort="12.0" upper="2.8973000049591" lower="-2.8973000049591" velocity="2.6099998950958" />
+        <parent link="Pandalink6respondable" />
+        <child link="Pandalink7respondable" />
+        <origin xyz="0.088000 0.000000 0.000000" rpy="-1.570797 3.141593 -3.141593" />
+    </joint>
+    <link name="Pandalink7respondable">
+        <inertial>
+            <origin rpy="0.785150 -1.570796 0.000000" xyz="0.010361 0.010359 0.079108" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="2.1175823681358e-21" iyz="1.6940658945086e-20" iyy="0.099999997764826" ixz="0.0" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_link7_respondable">
+            <origin xyz="0.012024 0.012042 0.079414" rpy="0.785150 -1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7respondable_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_link7_visual">
+            <origin xyz="0.012130 0.012099 0.079401" rpy="2.356442 1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7visual_vis_1.dae" />
+            </geometry>
+            <material name="Pandalink7visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link7_visual">
+            <origin xyz="0.012130 0.012099 0.079401" rpy="2.356442 1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7visual_vis_2.dae" />
+            </geometry>
+            <material name="Pandalink7visual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link7_visual">
+            <origin xyz="0.012130 0.012099 0.079401" rpy="2.356442 1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7visual_vis_3.dae" />
+            </geometry>
+            <material name="Pandalink7visual_material">
+                <color rgba="0.700000 0.700000 0.700000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link7_visual">
+            <origin xyz="0.012130 0.012099 0.079401" rpy="2.356442 1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7visual_vis_4.dae" />
+            </geometry>
+            <material name="Pandalink7visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_link7_visual">
+            <origin xyz="0.012130 0.012099 0.079401" rpy="2.356442 1.570796 0.000000" />
+            <geometry>
+                <mesh filename="meshes/Pandalink7visual_vis_5.dae" />
+            </geometry>
+            <material name="Pandalink7visual_material">
+                <color rgba="0.400000 0.400000 0.400000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandaattachment" type="fixed">
+        <axis xyz="0 0 1" />
+        <parent link="Pandalink7respondable" />
+        <child link="Pandagripper" />
+        <origin xyz="-0.000000 -0.000000 0.107000" rpy="-3.141592 3.141593 -1.570795" />
+    </joint>
+    <link name="Pandagripper">
+        <inertial>
+            <origin rpy="3.141592 3.141593 0.785397" xyz="0.000819 -0.000828 0.021778" />
+            <inertia izz="0.099999997764826" ixx="0.099999997764826" ixy="0.0" iyz="6.505213034913e-18" iyy="0.099999997764826" ixz="-5.6910026143648e-21" />
+            <mass value="0.625" />
+        </inertial>
+        <collision name="Panda_gripper">
+            <origin xyz="-0.000000 0.000002 0.017867" rpy="3.141592 3.141593 0.785397" />
+            <geometry>
+                <mesh filename="meshes/Pandagripper_coll_1.dae" />
+            </geometry>
+        </collision>
+        <visual name="Panda_gripper_visual">
+            <origin xyz="-0.000063 -0.000203 0.018002" rpy="-1.571379 3.159396 -2.356337" />
+            <geometry>
+                <mesh filename="meshes/Pandagrippervisual_vis_1.dae" />
+            </geometry>
+            <material name="Pandagrippervisual_material">
+                <color rgba="0.700000 0.700000 0.700000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_gripper_visual">
+            <origin xyz="-0.000063 -0.000203 0.018002" rpy="-1.571379 3.159396 -2.356337" />
+            <geometry>
+                <mesh filename="meshes/Pandagrippervisual_vis_2.dae" />
+            </geometry>
+            <material name="Pandagrippervisual_material">
+                <color rgba="0.100000 0.100000 0.100000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_gripper_visual">
+            <origin xyz="-0.000063 -0.000203 0.018002" rpy="-1.571379 3.159396 -2.356337" />
+            <geometry>
+                <mesh filename="meshes/Pandagrippervisual_vis_3.dae" />
+            </geometry>
+            <material name="Pandagrippervisual_material">
+                <color rgba="0.100000 0.100000 0.100000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_gripper_visual">
+            <origin xyz="-0.000063 -0.000203 0.018002" rpy="-1.571379 3.159396 -2.356337" />
+            <geometry>
+                <mesh filename="meshes/Pandagrippervisual_vis_4.dae" />
+            </geometry>
+            <material name="Pandagrippervisual_material">
+                <color rgba="0.700000 0.700000 0.700000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_gripper_visual">
+            <origin xyz="-0.000063 -0.000203 0.018002" rpy="-1.571379 3.159396 -2.356337" />
+            <geometry>
+                <mesh filename="meshes/Pandagrippervisual_vis_5.dae" />
+            </geometry>
+            <material name="Pandagrippervisual_material">
+                <color rgba="0.980000 0.980000 0.980000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="Pandagripperjoint1" type="prismatic">
+        <axis xyz="0 0 1" />
+        <limit effort="20.0" upper="0.03999999910593" lower="0.0" velocity="0.20000000298023" />
+        <parent link="Pandagripper" />
+        <child link="Pandaleftfingerrespondable" />
+        <origin xyz="0.001252 -0.001265 0.056248" rpy="1.570795 3.141593 0.785397" />
+    </joint>
+    <link name="Pandaleftfingerrespondable">
+        <inertial>
+            <origin rpy="1.570798 3.141593 3.141592" xyz="-0.000127 -0.032800 0.010514" />
+            <inertia izz="0.16384000411987" ixx="0.16384000411987" ixy="-3.0907193081338e-27" iyz="6.7762638998897e-24" iyy="0.16384000411987" ixz="0.0" />
+            <mass value="1.0240000486374" />
+        </inertial>
+        <collision name="Panda_leftfinger_respondable">
+            <origin xyz="-0.000127 -0.032800 0.010514" rpy="1.570798 3.141593 3.141592" />
+            <geometry>
+                <box size="0.020000 0.020000 0.040000" />
+            </geometry>
+        </collision>
+        <visual name="Panda_leftfinger_visible">
+            <origin xyz="0.000008 -0.026877 0.012377" rpy="0.012202 4.625336 1.558928" />
+            <geometry>
+                <mesh filename="meshes/Pandaleftfingervisible_vis_1.dae" />
+            </geometry>
+            <material name="Pandaleftfingervisible_material">
+                <color rgba="0.700000 0.700000 0.700000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_leftfinger_visible">
+            <origin xyz="0.000008 -0.026877 0.012377" rpy="0.012202 4.625336 1.558928" />
+            <geometry>
+                <mesh filename="meshes/Pandaleftfingervisible_vis_2.dae" />
+            </geometry>
+            <material name="Pandaleftfingervisible_material">
+                <color rgba="0.100000 0.100000 0.100000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="PandagrippertouchSensor1" type="fixed">
+        <axis xyz="0 0 1" />
+        <parent link="Pandaleftfingerrespondable" />
+        <child link="Pandaleftfingerforcecontact" />
+        <origin xyz="0.000669 -0.046486 0.003462" rpy="0.000000 3.141596 1.570792" />
+    </joint>
+    <link name="Pandaleftfingerforcecontact">
+        <inertial>
+            <origin rpy="0.560700 4.712387 1.010122" xyz="-0.001988 -0.000004 0.002996" />
+            <inertia izz="4.6681012360921e-09" ixx="9.2876131861735e-09" ixy="6.7222789648412e-19" iyz="-5.0338440924485e-24" iyy="4.668100896625e-09" ixz="-3.4552499796044e-17" />
+            <mass value="0.00018662401998881" />
+        </inertial>
+        <collision name="Panda_leftfinger_force_contact">
+            <origin xyz="-0.001988 -0.000004 0.002996" rpy="0.560700 4.712387 1.010122" />
+            <geometry>
+                <box size="0.001250 0.017280 0.017280" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="Pandagripperjoint2" type="prismatic">
+        <axis xyz="0 0 1" />
+        <limit effort="20.0" upper="0.03999999910593" lower="0.0" velocity="0.20000000298023" />
+        <parent link="Pandagripper" />
+        <child link="Pandarightfingerrespondable" />
+        <origin xyz="0.001252 -0.001265 0.056248" rpy="-1.570797 3.141593 0.785397" />
+    </joint>
+    <link name="Pandarightfingerrespondable">
+        <inertial>
+            <origin rpy="-1.570796 3.141593 -3.141592" xyz="-0.000035 0.032737 0.010537" />
+            <inertia izz="0.16383998504639" ixx="0.16383998504639" ixy="-1.6035710940696e-27" iyz="0.0" iyy="0.16383998504639" ixz="2.1175822221965e-25" />
+            <mass value="1.0239999294281" />
+        </inertial>
+        <collision name="Panda_rightfinger_respondable">
+            <origin xyz="-0.000035 0.032737 0.010537" rpy="-1.570796 3.141593 -3.141592" />
+            <geometry>
+                <box size="0.020000 0.020000 0.040000" />
+            </geometry>
+        </collision>
+        <visual name="Panda_rightfinger_visual">
+            <origin xyz="-0.000004 0.026907 0.012652" rpy="-3.132696 4.641150 -1.579601" />
+            <geometry>
+                <mesh filename="meshes/Pandarightfingervisual_vis_1.dae" />
+            </geometry>
+            <material name="Pandarightfingervisual_material">
+                <color rgba="0.700000 0.700000 0.700000 1.0" />
+            </material>
+        </visual>
+        <visual name="Panda_rightfinger_visual">
+            <origin xyz="-0.000004 0.026907 0.012652" rpy="-3.132696 4.641150 -1.579601" />
+            <geometry>
+                <mesh filename="meshes/Pandarightfingervisual_vis_2.dae" />
+            </geometry>
+            <material name="Pandarightfingervisual_material">
+                <color rgba="0.100000 0.100000 0.100000 1.0" />
+            </material>
+        </visual>
+    </link>
+    <joint name="PandagrippertouchSensor0" type="fixed">
+        <axis xyz="0 0 1" />
+        <parent link="Pandarightfingerrespondable" />
+        <child link="Pandarightfingerforcecontact" />
+        <origin xyz="0.000703 0.046397 0.003536" rpy="0.000000 3.141593 -1.570796" />
+    </joint>
+    <link name="Pandarightfingerforcecontact">
+        <inertial>
+            <origin rpy="0.560700 4.712387 1.010122" xyz="-0.001988 -0.000004 0.002996" />
+            <inertia izz="4.6681012360921e-09" ixx="9.2876131861735e-09" ixy="6.7222789648412e-19" iyz="-5.0338440924485e-24" iyy="4.668100896625e-09" ixz="-3.4552499796044e-17" />
+            <mass value="0.00018662401998881" />
+        </inertial>
+        <collision name="Panda_rightfinger_force_contact">
+            <origin xyz="-0.001988 -0.000004 0.002996" rpy="0.560700 4.712387 1.010122" />
+            <geometry>
+                <box size="0.001250 0.017280 0.017280" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="Pandatip" />
+    <joint name="Pandatipjoint" type="fixed">
+        <parent link="Pandagripper" />
+        <child link="Pandatip" />
+        <origin xyz="0.001418 -0.001408 0.109935" rpy="-3.141592 3.141591 -2.356195" />
+    </joint>
+</robot>
