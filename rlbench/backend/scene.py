@@ -77,6 +77,7 @@ class Scene(object):
 
         self._robot_shapes = self.robot.arm.get_objects_in_tree(
             object_type=ObjectType.SHAPE)
+        self._execute_demo_joint_position_action = None
 
     def load(self, task: Task) -> None:
         """Loads the task and positions at the centre of the workspace.
@@ -111,7 +112,7 @@ class Scene(object):
         self._variation_index = 0
 
     def init_episode(self, index: int, randomly_place: bool=True,
-                     max_attempts: int = 5) -> List[str]:
+                     max_attempts: int = 5, place_demo: bool = False) -> List[str]:
         """Calls the task init_episode and puts randomly in the workspace.
         """
 
@@ -121,9 +122,9 @@ class Scene(object):
             self.init_task()
 
         # Try a few times to init and place in the workspace
-        attempts = 0
+        self._attempts = 0
         descriptions = None
-        while attempts < max_attempts:
+        while self._attempts < max_attempts:
             descriptions = self.task.init_episode(index)
             try:
                 if (randomly_place and
@@ -131,13 +132,14 @@ class Scene(object):
                     self._place_task()
                     if self.robot.arm.check_arm_collision():
                         raise BoundaryError()
-                self.task.validate()
+                if not place_demo:
+                    self.task.validate()
                 break
             except (BoundaryError, WaypointError) as e:
                 self.task.cleanup_()
                 self.task.restore_state(self._initial_task_state)
-                attempts += 1
-                if attempts >= max_attempts:
+                self._attempts += 1
+                if self._attempts >= max_attempts:
                     raise e
 
         # Let objects come to rest
@@ -364,6 +366,7 @@ class Scene(object):
                 while not done:
                     done = path.step()
                     self.step()
+                    self._execute_demo_joint_position_action = path.get_executed_joint_position_action()
                     self._demo_record_step(demo, record, callable_each_step)
                     success, term = self.task.success()
 
@@ -437,7 +440,9 @@ class Scene(object):
         if not success:
             raise DemoError('Demo was completed, but was not successful.',
                             self.task)
-        return Demo(demo)
+        processed_demo = Demo(demo)
+        processed_demo.num_reset_attempts = self._attempts + 1
+        return processed_demo
 
     def get_observation_config(self) -> ObservationConfig:
         return self._obs_config
@@ -540,4 +545,8 @@ class Scene(object):
         misc.update(_get_cam_data(self._cam_front, 'front_camera'))
         misc.update(_get_cam_data(self._cam_wrist, 'wrist_camera'))
         misc.update({"variation_index": self._variation_index})
+        if self._execute_demo_joint_position_action is not None:
+            # Store the actual requested joint positions during demo collection
+            misc.update({"executed_demo_joint_position_action": self._execute_demo_joint_position_action})
+            self._execute_demo_joint_position_action = None
         return misc
