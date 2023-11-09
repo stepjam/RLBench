@@ -204,6 +204,12 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         obs_config.overhead_camera.render_mode = RenderMode.OPENGL
         obs_config.wrist_camera.render_mode = RenderMode.OPENGL
         obs_config.front_camera.render_mode = RenderMode.OPENGL
+    elif FLAGS.renderer == 'opengl3':
+        obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL3
+        obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL3
+        obs_config.overhead_camera.render_mode = RenderMode.OPENGL3
+        obs_config.wrist_camera.render_mode = RenderMode.OPENGL3
+        obs_config.front_camera.render_mode = RenderMode.OPENGL3
 
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
