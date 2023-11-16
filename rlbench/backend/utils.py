@@ -220,7 +220,12 @@ def task_file_to_task_class(task_file):
 def rgb_handles_to_mask(rgb_coded_handles):
   # rgb_coded_handles should be (w, h, c)
   # Handle encoded as : handle = R + G * 256 + B * 256 * 256
-  rgb_coded_handles *= 255  # takes rgb range to 0 -> 255
+  
+  # If reading from a PIL image, the values will already be on the 
+  # range [0, 255] and uint8. However, if rgb_coded_handles is read directly from 
+  # a sensor, it will be on the range [0, 1].
+  if rgb_coded_handles.dtype != np.uint8:
+    rgb_coded_handles *= 255  # takes rgb range to 0 -> 255
   rgb_coded_handles.astype(int)
   return (rgb_coded_handles[:, :, 0] +
           rgb_coded_handles[:, :, 1] * 256 +
