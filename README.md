@@ -61,19 +61,19 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Install
 
-RLBench is built around PyRep and V-REP. First head to the 
-[PyRep github](https://github.com/stepjam/PyRep) page and install.
+RLBench is built around CoppeliaSim v4.1.0 [PyRep](https://github.com/stepjam/PyRep).
 
-**If you previously had PyRep installed, you will need to update your installation!**
-
-Hopefully you have now installed PyRep and have run one of the PyRep examples.
-Now lets install RLBench:
+First, install CoppeliaSim:
 
 ```bash
-pip install -r requirements.txt
-pip install .
+export COPPELIASIM_ROOT=${HOME}/CoppeliaSim
+wget https://www.coppeliarobotics.com/files/V4_1_0/CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz
+mkdir -p $COPPELIASIM_ROOT && tar -xf CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz -C $COPPELIASIM_ROOT --strip-components 1
+rm -rf CoppeliaSim_Edu_V4_1_0_Ubuntu20_04.tar.xz
 ```
-Or you can install directly via pip
+
+To install the RLBench python package:
+
 ```bash
 pip install git+https://github.com/stepjam/RLBench.git
 ```
