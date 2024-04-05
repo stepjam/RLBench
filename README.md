@@ -61,7 +61,7 @@ few-shot learning. [Click here for website and paper.](https://sites.google.com/
 
 ## Install
 
-RLBench is built around CoppeliaSim v4.1.0 [PyRep](https://github.com/stepjam/PyRep).
+RLBench is built around CoppeliaSim v4.1.0 and [PyRep](https://github.com/stepjam/PyRep).
 
 First, install CoppeliaSim:
 
