@@ -37,15 +37,5 @@ jobs:
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
           export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
-          # Install PyRep
-          git clone https://github.com/stepjam/PyRep.git
-          cd PyRep
-          pip3 install setuptools
-          pip3 install ".[dev]"
-
-          # Gym needed for some of unit tests
-          pip3 install gym
-
-          cd ../
-          pip3 install ".[dev]"
+          pip install ".[dev]"
           python3 -m unittest discover tests/demos

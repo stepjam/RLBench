@@ -60,7 +60,7 @@ setup(name='rlbench',
             'rlbench.gym'
       ],
       extras_require={
-          "dev": ["html-testRunner"]
+          "dev": ["html-testRunner", "gym"]
       },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
