@@ -1,6 +1,15 @@
 import codecs
 import os.path
 
+# cffi required by pyrep
+# dynamically install cffi before anything else
+try:
+    import cffi
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'cffi==1.14.2'])
+
 from setuptools import setup
 
 
@@ -24,12 +33,11 @@ def get_version(rel_path):
     else:
         raise RuntimeError("Unable to find version string.")
 
-
 core_requirements = [
+    "pyrep @ git+https://github.com/stepjam/PyRep.git@076ca15c57f2495a4194da03565891ab1aaa317e",
     "numpy",
     "Pillow",
     "pyquaternion",
-    "html-testRunner",
     "natsort"
 ]
 
@@ -51,6 +59,9 @@ setup(name='rlbench',
             'rlbench.assets',
             'rlbench.gym'
       ],
+      extras_require={
+          "dev": ["html-testRunner", "gym"]
+      },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
       )
