@@ -39,4 +39,4 @@ jobs:
 
           pip install ".[dev]"
           pip install "pytest-xdist[psutil]"
-          pytest -n auto tests/unit
+          pytest -v -n auto tests/unit
