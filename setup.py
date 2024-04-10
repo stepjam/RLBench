@@ -34,7 +34,7 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 core_requirements = [
-    "pyrep @ git+https://github.com/stepjam/PyRep.git@076ca15c57f2495a4194da03565891ab1aaa317e",
+    "pyrep @ git+https://github.com/eugeneteoh/PyRep.git@e42cd73c73b95d63a706b9879c0ca85a2b79b3d0",
     "numpy",
     "Pillow",
     "pyquaternion",
