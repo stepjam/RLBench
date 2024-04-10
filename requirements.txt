@@ -1,6 +1,0 @@
-numpy
-Pillow
-pyquaternion
-html-testRunner
-setuptools
-natsort
