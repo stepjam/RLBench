@@ -266,25 +266,27 @@ class TestEnvironment(unittest.TestCase):
 
     def test_executed_jp_action(self):
         for task_cls in [ReachTarget, TakeLidOffSaucepan]:
-            task = self.get_task(
-                task_cls, JointPosition(True))
-            demos = task.get_demos(5, live_demos=True)
-            # Check if executed joint position action is stored
-            for demo in demos:
-                jp_action = []
-                self.assertTrue("joint_position_action" not in demo[0].misc)
-                for t, obs in enumerate(demo):
-                    if t == 0:
-                        # First timestep should not have an action
-                        self.assertTrue('joint_position_action' not in obs.misc)
-                    else:
-                        self.assertTrue("joint_position_action" in obs.misc)
-                        jp_action.append(obs.misc["joint_position_action"])
+            with self.subTest(task_cls=task_cls):
+                task = self.get_task(
+                    task_cls, JointPosition(True))
+                demos = task.get_demos(5, live_demos=True)
+                # Check if executed joint position action is stored
+                for demo in demos:
+                    jp_action = []
+                    self.assertTrue("joint_position_action" not in demo[0].misc)
+                    for t, obs in enumerate(demo):
+                        if t == 0:
+                            # First timestep should not have an action
+                            self.assertTrue('joint_position_action' not in obs.misc)
+                        else:
+                            self.assertTrue("joint_position_action" in obs.misc)
+                            jp_action.append(obs.misc["joint_position_action"])
 
-                task.reset_to_demo(demo)
-                for t, action in enumerate(jp_action):
-                    obs, reward, term = task.step(action)
-                    if term:
-                        break
-                self.assertEqual(reward, 1.0)
+                    task.reset_to_demo(demo)
+                    for t, action in enumerate(jp_action):
+                        obs, reward, term = task.step(action)
+                        if term:
+                            break
+                    self.assertEqual(reward, 1.0)
+                self.env.shutdown()
                     
