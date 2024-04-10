@@ -34,7 +34,7 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 core_requirements = [
-    "pyrep @ git+https://github.com/stepjam/PyRep.git@076ca15c57f2495a4194da03565891ab1aaa317e",
+    "pyrep @ git+https://github.com/stepjam/PyRep.git@cd9830b58ef09538562b785fc0c257f528f1762b",
     "numpy",
     "Pillow",
     "pyquaternion",
@@ -60,7 +60,7 @@ setup(name='rlbench',
             'rlbench.gym'
       ],
       extras_require={
-          "dev": ["html-testRunner", "gym"]
+          "dev": ["pytest", "html-testRunner", "gym"]
       },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},

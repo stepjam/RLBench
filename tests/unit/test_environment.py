@@ -263,3 +263,35 @@ class TestEnvironment(unittest.TestCase):
                     robot_setup=robot_config)
                 self.env.launch()
                 self.env.shutdown()
+
+    def test_executed_jp_action(self):
+        for task_cls in [ReachTarget, TakeLidOffSaucepan]:
+            with self.subTest(task_cls=task_cls):
+                task = self.get_task(
+                    task_cls, JointPosition(True))
+                num_episodes = 20
+                demos = task.get_demos(num_episodes, live_demos=True)
+                total_reward = 0.0
+                # Check if executed joint position action is stored
+                for demo in demos:
+                    jp_action = []
+                    self.assertTrue("joint_position_action" not in demo[0].misc)
+                    for t, obs in enumerate(demo):
+                        if t == 0:
+                            # First timestep should not have an action
+                            self.assertTrue('joint_position_action' not in obs.misc)
+                        else:
+                            self.assertTrue("joint_position_action" in obs.misc)
+                            jp_action.append(obs.misc["joint_position_action"])
+
+                    task.reset_to_demo(demo)
+                    for t, action in enumerate(jp_action):
+                        obs, reward, term = task.step(action)
+                        if term:
+                            break
+                    total_reward += reward
+                
+                success_rate = total_reward / num_episodes
+                self.assertTrue(success_rate >= 0.9)
+                self.env.shutdown()
+                    

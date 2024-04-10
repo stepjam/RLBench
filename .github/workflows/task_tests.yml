@@ -38,4 +38,5 @@ jobs:
           export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
           pip install ".[dev]"
-          python3 -m unittest discover tests/demos
+          pip install "pytest-xdist[psutil]"
+          pytest -v -n auto tests/unit
