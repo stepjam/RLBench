@@ -283,7 +283,6 @@ class TestEnvironment(unittest.TestCase):
 
                 task.reset_to_demo(demo)
                 for t, action in enumerate(jp_action):
-                    # action = np.append(action, 1)
                     obs, reward, term = task.step(action)
                     if term:
                         break
