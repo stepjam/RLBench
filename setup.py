@@ -38,6 +38,7 @@ core_requirements = [
     "numpy",
     "Pillow",
     "pyquaternion",
+    "scipy",
     "natsort"
 ]
 
