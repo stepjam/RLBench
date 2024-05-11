@@ -1,4 +1,5 @@
-from gym.envs.registration import register
+# from gym.envs.registration import register
+from gymnasium import register
 import rlbench.backend.task as task
 import os
 from rlbench.utils import name_to_task_class

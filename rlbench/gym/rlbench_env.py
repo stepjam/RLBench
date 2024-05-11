@@ -1,14 +1,14 @@
 from typing import Union, Dict, Tuple
 
-import gym
+import gymnasium as gym
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 from pyrep.const import RenderMode
 from pyrep.objects.dummy import Dummy
 from pyrep.objects.vision_sensor import VisionSensor
 
-from rlbench.action_modes.action_mode import MoveArmThenGripper
-from rlbench.action_modes.arm_action_modes import JointVelocity
+from rlbench.action_modes.action_mode import JointPositionActionMode, MoveArmThenGripper
+from rlbench.action_modes.arm_action_modes import JointPosition
 from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.environment import Environment
 from rlbench.observation_config import ObservationConfig
@@ -17,10 +17,10 @@ from rlbench.observation_config import ObservationConfig
 class RLBenchEnv(gym.Env):
     """An gym wrapper for RLBench."""
 
-    metadata = {'render.modes': ['human', 'rgb_array']}
+    metadata = {'render_modes': ['human', 'rgb_array']}
 
     def __init__(self, task_class, observation_mode='state',
-                 render_mode: Union[None, str] = None):
+                 render_mode: Union[None, str] = None, action_mode=None):
         self._observation_mode = observation_mode
         self._render_mode = render_mode
         obs_config = ObservationConfig()
@@ -33,7 +33,8 @@ class RLBenchEnv(gym.Env):
             raise ValueError(
                 'Unrecognised observation_mode: %s.' % observation_mode)
 
-        action_mode = MoveArmThenGripper(JointVelocity(), Discrete())
+        if action_mode is None:
+            action_mode = JointPositionActionMode()
         self.env = Environment(
             action_mode, obs_config=obs_config, headless=True)
         self.env.launch()
@@ -41,8 +42,9 @@ class RLBenchEnv(gym.Env):
 
         _, obs = self.task.reset()
 
+        action_bounds = action_mode.action_bounds()
         self.action_space = spaces.Box(
-            low=-1.0, high=1.0, shape=self.env.action_shape)
+            low=action_bounds[0], high=action_bounds[1], shape=self.env.action_shape)
 
         if observation_mode == 'state':
             self.observation_space = spaces.Box(
@@ -84,28 +86,22 @@ class RLBenchEnv(gym.Env):
                 "front_rgb": obs.front_rgb,
             }
 
-    def render(self, mode='human') -> Union[None, np.ndarray]:
-        if mode != self._render_mode:
-            raise ValueError(
-                'The render mode must match the render mode selected in the '
-                'constructor. \nI.e. if you want "human" render mode, then '
-                'create the env by calling: '
-                'gym.make("reach_target-state-v0", render_mode="human").\n'
-                'You passed in mode %s, but expected %s.' % (
-                    mode, self._render_mode))
-        if mode == 'rgb_array':
+    def render(self) -> Union[None, np.ndarray]:
+        if self.render_mode == 'rgb_array':
             frame = self._gym_cam.capture_rgb()
             frame = np.clip((frame * 255.).astype(np.uint8), 0, 255)
             return frame
 
-    def reset(self) -> Dict[str, np.ndarray]:
+    def reset(self, seed=None, options=None):
+        super().reset(seed=seed)
         descriptions, obs = self.task.reset()
-        del descriptions  # Not used.
-        return self._extract_obs(obs)
+        return self._extract_obs(obs), {"text_descriptions": descriptions}
 
     def step(self, action) -> Tuple[Dict[str, np.ndarray], float, bool, dict]:
-        obs, reward, terminate = self.task.step(action)
-        return self._extract_obs(obs), reward, terminate, {}
+        obs, reward, success, _terminate = self.task.step(action)
+        terminated = success
+        truncated = _terminate and not success
+        return self._extract_obs(obs), reward, terminated, truncated, {"success": success}
 
     def close(self) -> None:
         self.env.shutdown()
