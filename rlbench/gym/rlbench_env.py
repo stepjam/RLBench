@@ -52,30 +52,35 @@ class RLBenchEnv(gym.Env):
                 self.gym_cam.set_render_mode(RenderMode.OPENGL3)
         _, obs = self.rlbench_task_env.reset()
 
-        self.observation_space = {
-            "state": spaces.Box(
-                low=-np.inf, high=np.inf, shape=obs.get_low_dim_data().shape),
-        }
-        if observation_mode == 'vision':
-            self.observation_space.update({
-                "left_shoulder_rgb": spaces.Box(
-                    low=0, high=255, shape=obs.left_shoulder_rgb.shape, dtype=np.uint8),
-                "right_shoulder_rgb": spaces.Box(
-                    low=0, high=255, shape=obs.right_shoulder_rgb.shape, dtype=np.uint8),
-                "wrist_rgb": spaces.Box(
-                    low=0, high=255, shape=obs.wrist_rgb.shape, dtype=np.uint8),
-                "front_rgb": spaces.Box(
-                    low=0, high=255, shape=obs.front_rgb.shape, dtype=np.uint8),
-            })
+        # self.observation_space = {
+        #     "state": spaces.Box(
+        #         low=-np.inf, high=np.inf, shape=obs.get_low_dim_data().shape),
+        # }
+        gym_obs = self._extract_obs(obs)
+        self.observation_space = {}
+        for key, value in gym_obs.items():
+            if "rgb" in key:
+                self.observation_space[key] = spaces.Box(
+                    low=0, high=255, shape=value.shape, dtype=value.dtype)
+            else:
+                self.observation_space[key] = spaces.Box(
+                    low=-np.inf, high=np.inf, shape=value.shape, dtype=value.dtype)
         self.observation_space = spaces.Dict(self.observation_space)
-        
+
         action_low, action_high = action_mode.action_bounds()
         self.action_space = spaces.Box(
             low=action_low, high=action_high, shape=self.rlbench_env.action_shape)
 
     def _extract_obs(self, rlbench_obs):
         gym_obs = {} 
-        gym_obs["state"] = np.float32(rlbench_obs.get_low_dim_data())
+        for state_name in ["joint_velocities", "joint_positions", "joint_forces", "gripper_open", "gripper_pose", "gripper_joint_positions", "gripper_touch_forces", "task_low_dim_state"]:
+            state_data = getattr(rlbench_obs, state_name)
+            if state_data is not None:
+                state_data = np.float32(state_data)
+                if np.isscalar(state_data):
+                    state_data = np.asarray([state_data])
+                gym_obs[state_name] = state_data
+                
         if self._observation_mode == 'vision':
             gym_obs.update({
                 "left_shoulder_rgb": rlbench_obs.left_shoulder_rgb,
