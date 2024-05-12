@@ -52,10 +52,6 @@ class RLBenchEnv(gym.Env):
                 self.gym_cam.set_render_mode(RenderMode.OPENGL3)
         _, obs = self.rlbench_task_env.reset()
 
-        # self.observation_space = {
-        #     "state": spaces.Box(
-        #         low=-np.inf, high=np.inf, shape=obs.get_low_dim_data().shape),
-        # }
         gym_obs = self._extract_obs(obs)
         self.observation_space = {}
         for key, value in gym_obs.items():
