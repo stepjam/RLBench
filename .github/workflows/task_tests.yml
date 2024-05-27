@@ -39,4 +39,4 @@ jobs:
 
           pip install ".[gym,dev]"
           pip install "pytest-xdist[psutil]"
-          pytest -v -n auto tests/unit
+          pytest -v -n auto tests/demos
