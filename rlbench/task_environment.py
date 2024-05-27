@@ -106,7 +106,7 @@ class TaskEnvironment(object):
                 raise RuntimeError(
                     'User requested shaped rewards, but task %s does not have '
                     'a defined reward() function.' % self._task.get_name())
-        return self._scene.get_observation(), reward, success, terminate
+        return self._scene.get_observation(), reward, terminate
 
     def get_demos(self, amount: int, live_demos: bool = False,
                   image_paths: bool = False,

@@ -104,10 +104,8 @@ class RLBenchEnv(gym.Env):
         return self._extract_obs(obs), {"text_descriptions": descriptions}
 
     def step(self, action):
-        obs, reward, success, _terminate = self.rlbench_task_env.step(action)
-        terminated = success
-        truncated = _terminate and not success
-        return self._extract_obs(obs), reward, terminated, truncated, {"success": success}
+        obs, reward, terminated = self.rlbench_task_env.step(action)
+        return self._extract_obs(obs), reward, terminated, False, {}
 
     def close(self) -> None:
         self.rlbench_env.shutdown()

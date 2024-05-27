@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-import gym
+import gymnasium as gym
 import rlbench.gym
 
 

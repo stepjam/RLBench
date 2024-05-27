@@ -60,8 +60,8 @@ setup(name='rlbench',
             'rlbench.gym'
       ],
       extras_require={
-        "gymnasium": ["gymnasium==1.0.0a1"],
-        "dev": ["pytest", "html-testRunner"]
+        "gym": ["gymnasium==1.0.0a2"],
+        "dev": ["pytest"]
       },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
