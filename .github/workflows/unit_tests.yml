@@ -38,6 +38,6 @@ jobs:
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$COPPELIASIM_ROOT:$COPPELIASIM_ROOT/platforms
           export QT_QPA_PLATFORM_PLUGIN_PATH=$COPPELIASIM_ROOT
 
-          pip install ".[dev]"
+          pip install ".[gym,dev]"
           pip install "pytest-xdist[psutil]"
           pytest -v -n auto tests/unit
