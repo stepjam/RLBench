@@ -94,7 +94,13 @@ class RLBenchEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-        descriptions, obs = self.rlbench_task_env.reset()
+        if options is not None:
+            reset_to_demo = options.get("reset_to_demo", None)
+
+        if reset_to_demo is None:
+            descriptions, obs = self.rlbench_task_env.reset()
+        else:
+            descriptions, obs = self.rlbench_task_env.reset(reset_to_demo=reset_to_demo)
         return self._extract_obs(obs), {"text_descriptions": descriptions}
 
     def step(self, action):
