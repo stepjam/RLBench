@@ -38,6 +38,10 @@ flags.DEFINE_integer('episodes_per_task', 10,
                      'The number of episodes to collect per task.')
 flags.DEFINE_integer('variations', -1,
                      'Number of variations to collect per task. -1 for all.')
+flags.DEFINE_float('arm_max_velocity', 1.0,
+                   'Max arm velocity used for motion planning.')
+flags.DEFINE_float('arm_max_acceleration', 4.0,
+                   'Max arm acceleration used for motion planning.')
 
 
 def check_and_make(dir):
@@ -214,6 +218,8 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
+        arm_max_velocity=FLAGS.arm_max_velocity,
+        arm_max_acceleration=FLAGS.arm_max_acceleration,
         headless=True)
     rlbench_env.launch()
 
