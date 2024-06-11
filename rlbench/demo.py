@@ -13,7 +13,7 @@ class Demo(object):
     def __len__(self):
         return len(self._observations)
 
-    def __getitem__(self, i):
+    def __getitem__(self, i) -> Observation:
         return self._observations[i]
 
     def restore_state(self):
