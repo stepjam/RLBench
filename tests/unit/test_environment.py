@@ -7,7 +7,7 @@ from pyrep.objects import Dummy
 from rlbench import environment
 from rlbench.action_modes.action_mode import MoveArmThenGripper
 from rlbench.action_modes.arm_action_modes import JointVelocity, JointPosition, \
-    EndEffectorPoseViaPlanning, JointTorque, EndEffectorPoseViaIK
+    EndEffectorPoseViaPlanning, JointTorque, EndEffectorPoseViaIK, ERJointViaIK, RelativeFrame
 from rlbench.action_modes.gripper_action_modes import Discrete
 from rlbench.observation_config import ObservationConfig
 from rlbench.task_environment import TaskEnvironment
@@ -179,7 +179,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_ee_pose_ik_world_frame(self):
         task = self.get_task(
-            ReachTarget, EndEffectorPoseViaIK(True, 'world'))
+            ReachTarget, EndEffectorPoseViaIK(True, RelativeFrame.WORLD))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -190,7 +190,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_delta_ee_pose_ik_world_frame(self):
         task = self.get_task(
-            ReachTarget, EndEffectorPoseViaIK(False, 'world'))
+            ReachTarget, EndEffectorPoseViaIK(False, RelativeFrame.WORLD))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -202,7 +202,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_abs_ee_pose_plan_world_frame(self):
         task = self.get_task(
-            ReachTarget, EndEffectorPoseViaPlanning(True, 'world'))
+            ReachTarget, EndEffectorPoseViaPlanning(True, RelativeFrame.WORLD))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = np.append(init_pose, 1.0)  # for gripper
@@ -213,7 +213,7 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_delta_ee_pose_plan_world_frame(self):
         task = self.get_task(
-            ReachTarget, EndEffectorPoseViaPlanning(False, 'world'))
+            ReachTarget, EndEffectorPoseViaPlanning(False, RelativeFrame.WORLD))
         _, obs = task.reset()
         init_pose = obs.gripper_pose
         new_pose = [0, 0, -0.1, 0, 0, 0, 1.0, 1.0]  # 10cm down
@@ -225,7 +225,25 @@ class TestEnvironment(unittest.TestCase):
 
     def test_action_mode_ee_pose_ik_ee_frame(self):
         task = self.get_task(
-            ReachTarget, EndEffectorPoseViaIK(True, 'end effector'))
+            ReachTarget, EndEffectorPoseViaIK(True, RelativeFrame.EE))
+        _, obs = task.reset()
+        print(f"{task._robot.arm.get_tip().get_position()=}")
+        print(f"{obs.gripper_pose=}")
+        print("-"*80)
+        dummy = Dummy.create()
+        dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
+        action = [0, 0, 0.05, 0, 0, 0, 1, 1]
+        obs, reward, term = task.step(action)
+        print(f"{task._robot.arm.get_tip().get_position()=}")
+        print(f"{obs.gripper_pose=}")
+        print(f"{dummy.get_position()=}")
+        [self.assertAlmostEqual(a, p, delta=0.01)
+         for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
+
+
+    def test_action_mode_ee_pose_plan_ee_frame(self):
+        task = self.get_task(
+            ReachTarget, EndEffectorPoseViaPlanning(True, RelativeFrame.EE))
         _, obs = task.reset()
         dummy = Dummy.create()
         dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
@@ -234,16 +252,60 @@ class TestEnvironment(unittest.TestCase):
         [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
 
-    def test_action_mode_ee_pose_plan_ee_frame(self):
-        task = self.get_task(
-            ReachTarget, EndEffectorPoseViaPlanning(True, 'end effector'))
+    def test_action_mode_abs_erj_ik_world_frame_j0(self):
+        commanded_joint = 0
+        task = self.get_task(ReachTarget, ERJointViaIK(
+            absolute_mode=True,
+            frame=RelativeFrame.WORLD,
+            commanded_joints=[commanded_joint]
+        ))
         _, obs = task.reset()
+        init_pose = obs.gripper_pose
+        expected_pose = list(init_pose)
+        expected_pose[2] -= 0.1
+        new_pose = expected_pose.copy()
+        angle = np.random.uniform(-np.pi/4, np.pi/4)
+        obs, _, _ = task.step(new_pose + [angle, 1.0])
+        [self.assertAlmostEqual(a, p, delta=0.01)
+            for a, p in zip(expected_pose, obs.gripper_pose)]
+        self.assertAlmostEqual(angle, obs.joint_positions[commanded_joint], delta=0.01)
+
+    def test_action_mode_delta_erj_ik_world_frame(self):
+        commanded_joint = 0
+        task = self.get_task(ReachTarget, ERJointViaIK(
+            absolute_mode=False,
+            frame=RelativeFrame.WORLD,
+            commanded_joints=[commanded_joint]
+        ))
+        _, obs = task.reset()
+        init_pose = obs.gripper_pose
+        new_pose = [0, 0, -0.1, 0, 0, 0, 1.0]  # 10cm down
+        expected_pose = list(init_pose)
+        expected_pose[2] -= 0.1
+        angle = np.random.uniform(-np.pi/4, np.pi/4)
+        obs, _, _ = task.step(new_pose + [angle, 1.0])
+        [self.assertAlmostEqual(a, p, delta=0.01)
+            for a, p in zip(expected_pose, obs.gripper_pose)]
+        self.assertAlmostEqual(angle, obs.joint_positions[commanded_joint], delta=0.01)
+
+    def test_action_mode_abs_erj_ik_ee_frame(self):
+        commanded_joint = 0
+        task = self.get_task(
+            ReachTarget, ERJointViaIK(
+                absolute_mode=True,
+                frame=RelativeFrame.EE,
+                commanded_joints=[commanded_joint],
+            ))
+        _, obs = task.reset()
+        delta_pos = [0, 0, 0.05]
         dummy = Dummy.create()
-        dummy.set_position([0, 0, 0.05], relative_to=task._robot.arm.get_tip())
-        action = [0, 0, 0.05, 0, 0, 0, 1, 1]
-        obs, reward, term = task.step(action)
+        dummy.set_position(delta_pos, relative_to=task._robot.arm.get_tip())
+        action = delta_pos + [0, 0, 0, 1]
+        angle = np.random.uniform(-np.pi/4, np.pi/4)
+        obs, _, _ = task.step(action + [angle, 1.0])
         [self.assertAlmostEqual(a, p, delta=0.01)
          for a, p in zip(dummy.get_position(), obs.gripper_pose[:3])]
+        self.assertAlmostEqual(angle, obs.joint_positions[commanded_joint], delta=0.01)
 
     def test_action_mode_abs_joint_torque(self):
         task = self.get_task(

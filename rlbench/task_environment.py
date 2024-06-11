@@ -77,7 +77,7 @@ class TaskEnvironment(object):
         try:
             place_demo = demo != None and hasattr(demo, 'num_reset_attempts') and demo.num_reset_attempts != None
             desc = self._scene.init_episode(
-                self._variation_number, max_attempts=_MAX_RESET_ATTEMPTS,
+                self._variation_number, max_attempts=_MAX_RESET_ATTEMPTS if not place_demo else demo.num_reset_attempts,
                 randomly_place=not self._static_positions, place_demo=place_demo)
         except (BoundaryError, WaypointError) as e:
             raise TaskEnvironmentError(
