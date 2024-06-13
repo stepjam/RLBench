@@ -1,5 +1,6 @@
 import gymnasium as gym
 from gymnasium.utils.performance import benchmark_step
+import rlbench.gym
 
 env = gym.make('rlbench/reach_target-vision-v0', render_mode="rgb_array")
 
