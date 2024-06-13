@@ -134,7 +134,10 @@ class Scene(object):
                         raise BoundaryError()
                 if not place_demo:
                     self.task.validate()
-                break
+                    break
+                else:
+                    # Placing demo, run the number of attempts for correct demo reset
+                    self._attempts += 1
             except (BoundaryError, WaypointError) as e:
                 self.task.cleanup_()
                 self.task.restore_state(self._initial_task_state)
