@@ -12,6 +12,11 @@ from rlbench.action_modes.action_mode import JointPositionActionMode
 from rlbench.environment import Environment
 from rlbench.observation_config import ObservationConfig
 
+def convert_dtype_to_float32_if_float(dtype):
+    if issubclass(dtype.type, np.floating):
+        return np.float32
+    return dtype
+
 class RLBenchEnv(gym.Env):
     """An gym wrapper for RLBench."""
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
@@ -19,8 +24,9 @@ class RLBenchEnv(gym.Env):
     def __init__(self, task_class, observation_mode='state',
                  render_mode: Union[None, str] = None, action_mode=None):
         self.task_class = task_class
-        self._observation_mode = observation_mode
-        self._render_mode = render_mode
+        self.observation_mode = observation_mode
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
         obs_config = ObservationConfig()
         if observation_mode == 'state':
             obs_config.set_all_high_dim(False)
@@ -65,7 +71,7 @@ class RLBenchEnv(gym.Env):
 
         action_low, action_high = action_mode.action_bounds()
         self.action_space = spaces.Box(
-            low=action_low, high=action_high, shape=self.rlbench_env.action_shape)
+            low=np.float32(action_low), high=np.float32(action_high), shape=self.rlbench_env.action_shape, dtype=np.float32)
 
     def _extract_obs(self, rlbench_obs):
         gym_obs = {} 
@@ -77,7 +83,7 @@ class RLBenchEnv(gym.Env):
                     state_data = np.asarray([state_data])
                 gym_obs[state_name] = state_data
                 
-        if self._observation_mode == 'vision':
+        if self.observation_mode == 'vision':
             gym_obs.update({
                 "left_shoulder_rgb": rlbench_obs.left_shoulder_rgb,
                 "right_shoulder_rgb": rlbench_obs.right_shoulder_rgb,
@@ -94,6 +100,9 @@ class RLBenchEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        # TODO: Remove this and use seed from super()
+        np.random.seed(seed=seed)
+        reset_to_demo = None
         if options is not None:
             reset_to_demo = options.get("reset_to_demo", None)
 

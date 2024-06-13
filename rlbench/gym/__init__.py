@@ -11,19 +11,13 @@ TASKS = [t for t in os.listdir(task.TASKS_PATH)
 for task_file in TASKS:
     task_name = task_file.split('.py')[0]
     task_class = name_to_task_class(task_name)
-    register(
-        id='%s-state-v0' % task_name,
-        entry_point='rlbench.gym:RLBenchEnv',
-        kwargs={
-            'task_class': task_class,
-            'observation_mode': 'state'
-        }
-    )
-    register(
-        id='%s-vision-v0' % task_name,
-        entry_point='rlbench.gym:RLBenchEnv',
-        kwargs={
-            'task_class': task_class,
-            'observation_mode': 'vision'
-        }
-    )
+    for obs_mode in ['state', 'vision']:
+        register(
+            id=f'rlbench/{task_name}-{obs_mode}-v0',
+            entry_point='rlbench.gym:RLBenchEnv',
+            kwargs={
+                'task_class': task_class,
+                'observation_mode': obs_mode,
+            },
+            nondeterministic=True
+        )
