@@ -2,10 +2,7 @@ import numpy as np
 import gymnasium as gym
 import pytest
 from gymnasium.utils.env_checker import check_env
-
-import numpy as np
-
-import gymnasium as gym
+import rlbench.gym
 
 @pytest.mark.parametrize("env_id", ['rlbench/reach_target-state-v0', ])
 def test_env(env_id):
@@ -22,5 +19,4 @@ def test_env(env_id):
         assert np.allclose(obs["joint_positions"], obs2["joint_positions"], atol=1e-3)
         assert np.allclose(obs["task_low_dim_state"], obs2["task_low_dim_state"])
 
-    breakpoint()
     env.close()
