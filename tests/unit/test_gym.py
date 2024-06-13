@@ -1,13 +1,7 @@
 import numpy as np
 import gymnasium as gym
-import rlbench.gym
 import pytest
-from gymnasium.utils.passive_env_checker import check_obs
 from gymnasium.utils.env_checker import check_env
-import threading
-
-import inspect
-from copy import deepcopy
 
 import numpy as np
 

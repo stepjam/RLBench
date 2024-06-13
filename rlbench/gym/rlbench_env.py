@@ -104,6 +104,7 @@ class RLBenchEnv(gym.Env):
         np.random.seed(seed=seed)
         reset_to_demo = None
         if options is not None:
+            # TODO: Write test for this
             reset_to_demo = options.get("reset_to_demo", None)
 
         if reset_to_demo is None:
