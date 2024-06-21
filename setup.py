@@ -1,15 +1,5 @@
 import codecs
 import os.path
-
-# cffi required by pyrep
-# dynamically install cffi before anything else
-try:
-    import cffi
-except ImportError:
-    import subprocess
-    import sys
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'cffi==1.14.2'])
-
 from setuptools import setup
 
 
@@ -34,7 +24,7 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 core_requirements = [
-    "pyrep @ git+https://github.com/stepjam/PyRep.git@fe521cedbf608ed81593241779692c48962ac4cb",
+    "pyrep @ git+https://github.com/stepjam/PyRep.git@fix-cffi-dependency",
     "numpy",
     "Pillow",
     "pyquaternion",
