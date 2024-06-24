@@ -1,8 +1,10 @@
-import numpy as np
 import gymnasium as gym
+import numpy as np
 import pytest
 from gymnasium.utils.env_checker import check_env
-import rlbench.gym
+
+import rlbench
+
 
 @pytest.mark.parametrize("env_id", ['rlbench/reach_target-state-v0', ])
 def test_env(env_id):

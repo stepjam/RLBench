@@ -1,7 +1,6 @@
 import time
 import gymnasium as gym
-import rlbench.gym
-from gymnasium.utils.performance import benchmark_step
+import rlbench
 
 
 def benchmark_vector_step(env, target_duration: int = 5, seed=None) -> float:

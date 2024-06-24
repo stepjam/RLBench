@@ -1,6 +1,6 @@
 import codecs
 import os.path
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 # Version meaning (X.Y.Z)
@@ -39,17 +39,7 @@ setup(name='rlbench',
       author_email='slj12@ic.ac.uk',
       url='https://www.doc.ic.ac.uk/~slj12',
       install_requires=core_requirements,
-      packages=[
-            'rlbench',
-            'rlbench.backend',
-            'rlbench.action_modes',
-            'rlbench.tasks',
-            'rlbench.task_ttms',
-            'rlbench.robot_ttms',
-            'rlbench.sim2real',
-            'rlbench.assets',
-            'rlbench.gym'
-      ],
+      packages=find_packages(),
       extras_require={
         "gym": ["gymnasium==1.0.0a2"],
         "dev": ["pytest"]

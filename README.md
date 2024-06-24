@@ -309,7 +309,7 @@ the observation mode: 'state' or 'vision'.
 
 ```python
 import gym
-import rlbench.gym
+import rlbench
 
 env = gym.make('reach_target-state-v0')
 # Alternatively, for vision:
