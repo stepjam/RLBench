@@ -40,6 +40,7 @@ setup(name='rlbench',
       url='https://www.doc.ic.ac.uk/~slj12',
       install_requires=core_requirements,
       packages=find_packages(),
+      include_package_data=True,
       extras_require={
         "gym": ["gymnasium==1.0.0a2"],
         "dev": ["pytest"]
