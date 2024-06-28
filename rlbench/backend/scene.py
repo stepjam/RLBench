@@ -556,4 +556,6 @@ class Scene(object):
         if self._joint_position_action is not None:
             # Store the actual requested joint positions during demo collection
             misc.update({"joint_position_action": self._joint_position_action})
+        joint_poses = [j.get_pose() for j in self.robot.arm.joints]
+        misc.update({'joint_poses': joint_poses})
         return misc
