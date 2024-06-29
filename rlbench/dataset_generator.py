@@ -1,45 +1,21 @@
-from multiprocessing import Process, Manager
+import argparse
+import os
+import pickle
+from multiprocessing import Manager, Process
 
+import numpy as np
+from PIL import Image
 from pyrep.const import RenderMode
 
+import rlbench.backend.task as task
 from rlbench import ObservationConfig
 from rlbench.action_modes.action_mode import MoveArmThenGripper
 from rlbench.action_modes.arm_action_modes import JointVelocity
 from rlbench.action_modes.gripper_action_modes import Discrete
-from rlbench.backend.utils import task_file_to_task_class
-from rlbench.environment import Environment
-import rlbench.backend.task as task
-
-import os
-import pickle
-from PIL import Image
 from rlbench.backend import utils
 from rlbench.backend.const import *
-import numpy as np
-import argparse
-
-
-# from absl import app
-# from absl import flags
-
-# FLAGS = flags.FLAGS
-
-# flags.DEFINE_string('save_path',
-#                     '/tmp/rlbench_data/',
-#                     'Where to save the demos.')
-# flags.DEFINE_list('tasks', [],
-#                   'The tasks to collect. If empty, all tasks are collected.')
-# flags.DEFINE_list('image_size', [128, 128],
-#                   'The size of the images tp save.')
-# flags.DEFINE_enum('renderer',  'opengl3', ['opengl', 'opengl3'],
-#                   'The renderer to use. opengl does not include shadows, '
-#                   'but is faster.')
-# flags.DEFINE_integer('processes', 1,
-#                      'The number of parallel processes during collection.')
-# flags.DEFINE_integer('episodes_per_task', 10,
-#                      'The number of episodes to collect per task.')
-# flags.DEFINE_integer('variations', -1,
-#                      'Number of variations to collect per task. -1 for all.')
+from rlbench.backend.utils import task_file_to_task_class
+from rlbench.environment import Environment
 
 
 def check_and_make(dir):
