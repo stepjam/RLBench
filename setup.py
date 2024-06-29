@@ -47,4 +47,9 @@ setup(name='rlbench',
       },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
-      )
+      entry_points={
+          "console_scripts": [
+              "rlbench-generate-dataset = rlbench.dataset_generator:main"
+          ]
+      }
+)
