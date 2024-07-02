@@ -192,8 +192,8 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks, args):
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
-        arm_max_velocity=FLAGS.arm_max_velocity,
-        arm_max_acceleration=FLAGS.arm_max_acceleration,
+        arm_max_velocity=args.arm_max_velocity,
+        arm_max_acceleration=args.arm_max_acceleration,
         headless=True)
     rlbench_env.launch()
 
