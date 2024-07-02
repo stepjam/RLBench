@@ -134,7 +134,10 @@ class Scene(object):
                         raise BoundaryError()
                 if not place_demo:
                     self.task.validate()
-                break
+                    break
+                else:
+                    # Placing demo, run the number of attempts for correct demo reset
+                    self._attempts += 1
             except (BoundaryError, WaypointError) as e:
                 self.task.cleanup_()
                 self.task.restore_state(self._initial_task_state)
@@ -553,4 +556,6 @@ class Scene(object):
         if self._joint_position_action is not None:
             # Store the actual requested joint positions during demo collection
             misc.update({"joint_position_action": self._joint_position_action})
+        joint_poses = [j.get_pose() for j in self.robot.arm.joints]
+        misc.update({'joint_poses': joint_poses})
         return misc

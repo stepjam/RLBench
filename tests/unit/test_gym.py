@@ -1,40 +1,24 @@
-import unittest
+import gymnasium as gym
 import numpy as np
-import gym
-import rlbench.gym
+import pytest
+from gymnasium.utils.env_checker import check_env
+
+import rlbench
 
 
-class TestGym(unittest.TestCase):
+@pytest.mark.parametrize("env_id", ['rlbench/reach_target-state-v0', ])
+def test_env(env_id):
+    env = gym.make(env_id, render_mode="rgb_array")
+    check_env(env, skip_render_check=True, skip_close_check=True)
+    img = env.render()
+    assert np.sum(img) > 0 
+    env.close()
 
-    def test_state_env(self):
-        env = gym.make('reach_target-state-v0')
-        env.reset()
-        obs, _, _, _ = env.step(env.action_space.sample())
-        self.assertEqual(env.observation_space.shape,
-                         obs.shape)
-        env.close()
+    env = gym.make(env_id, render_mode="rgb_array")
+    for i in range(10):
+        obs, _ = env.reset(seed=i)
+        obs2, _ = env.reset(seed=i)
+        assert np.allclose(obs["joint_positions"], obs2["joint_positions"], atol=1e-3)
+        assert np.allclose(obs["task_low_dim_state"], obs2["task_low_dim_state"])
 
-    def test_vision_env(self):
-        env = gym.make('reach_target-vision-v0')
-        env.reset()
-        obs, _, _, _ = env.step(env.action_space.sample())
-        self.assertEqual(env.observation_space['state'].shape,
-                         obs['state'].shape)
-        self.assertEqual(env.observation_space['left_shoulder_rgb'].shape,
-                         obs['left_shoulder_rgb'].shape)
-        self.assertEqual(env.observation_space['right_shoulder_rgb'].shape,
-                         obs['right_shoulder_rgb'].shape)
-        self.assertEqual(env.observation_space['wrist_rgb'].shape,
-                         obs['wrist_rgb'].shape)
-        self.assertEqual(env.observation_space['front_rgb'].shape,
-                         obs['front_rgb'].shape)
-        env.close()
-
-    def test_env_render(self):
-        env = gym.make('reach_target-vision-v0', render_mode='rgb_array')
-        env.reset()
-        obs, _, _, _ = env.step(env.action_space.sample())
-        img = env.render('rgb_array')
-        self.assertGreater(np.mean(img), 0)
-        env.close()
-
+    env.close()
