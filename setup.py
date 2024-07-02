@@ -1,16 +1,6 @@
 import codecs
 import os.path
-
-# cffi required by pyrep
-# dynamically install cffi before anything else
-try:
-    import cffi
-except ImportError:
-    import subprocess
-    import sys
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'cffi==1.14.2'])
-
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 # Version meaning (X.Y.Z)
@@ -34,7 +24,7 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 core_requirements = [
-    "pyrep @ git+https://github.com/stepjam/PyRep.git@fe521cedbf608ed81593241779692c48962ac4cb",
+    "pyrep @ git+https://github.com/stepjam/PyRep.git",
     "numpy",
     "Pillow",
     "pyquaternion",
@@ -49,20 +39,17 @@ setup(name='rlbench',
       author_email='slj12@ic.ac.uk',
       url='https://www.doc.ic.ac.uk/~slj12',
       install_requires=core_requirements,
-      packages=[
-            'rlbench',
-            'rlbench.backend',
-            'rlbench.action_modes',
-            'rlbench.tasks',
-            'rlbench.task_ttms',
-            'rlbench.robot_ttms',
-            'rlbench.sim2real',
-            'rlbench.assets',
-            'rlbench.gym'
-      ],
+      packages=find_packages(),
+      include_package_data=True,
       extras_require={
-          "dev": ["pytest", "html-testRunner", "gym"]
+        "gym": ["gymnasium==1.0.0a2"],
+        "dev": ["pytest"]
       },
       package_data={'': ['*.ttm', '*.obj', '**/**/*.ttm', '**/**/*.obj'],
                     'rlbench': ['task_design.ttt']},
-      )
+      entry_points={
+          "console_scripts": [
+              "rlbench-generate-dataset = rlbench.dataset_generator:main"
+          ]
+      }
+)

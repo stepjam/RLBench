@@ -1,43 +1,21 @@
-from multiprocessing import Process, Manager
+import argparse
+import os
+import pickle
+from multiprocessing import Manager, Process
 
+import numpy as np
+from PIL import Image
 from pyrep.const import RenderMode
 
+import rlbench.backend.task as task
 from rlbench import ObservationConfig
 from rlbench.action_modes.action_mode import MoveArmThenGripper
 from rlbench.action_modes.arm_action_modes import JointVelocity
 from rlbench.action_modes.gripper_action_modes import Discrete
-from rlbench.backend.utils import task_file_to_task_class
-from rlbench.environment import Environment
-import rlbench.backend.task as task
-
-import os
-import pickle
-from PIL import Image
 from rlbench.backend import utils
 from rlbench.backend.const import *
-import numpy as np
-
-from absl import app
-from absl import flags
-
-FLAGS = flags.FLAGS
-
-flags.DEFINE_string('save_path',
-                    '/tmp/rlbench_data/',
-                    'Where to save the demos.')
-flags.DEFINE_list('tasks', [],
-                  'The tasks to collect. If empty, all tasks are collected.')
-flags.DEFINE_list('image_size', [128, 128],
-                  'The size of the images tp save.')
-flags.DEFINE_enum('renderer',  'opengl3', ['opengl', 'opengl3'],
-                  'The renderer to use. opengl does not include shadows, '
-                  'but is faster.')
-flags.DEFINE_integer('processes', 1,
-                     'The number of parallel processes during collection.')
-flags.DEFINE_integer('episodes_per_task', 10,
-                     'The number of episodes to collect per task.')
-flags.DEFINE_integer('variations', -1,
-                     'Number of variations to collect per task. -1 for all.')
+from rlbench.backend.utils import task_file_to_task_class
+from rlbench.environment import Environment
 
 
 def check_and_make(dir):
@@ -166,7 +144,7 @@ def save_demo(demo, example_path):
         pickle.dump(demo, f)
 
 
-def run(i, lock, task_index, variation_count, results, file_lock, tasks):
+def run(i, lock, task_index, variation_count, results, file_lock, tasks, args):
     """Each thread will choose one task and variation, and then gather
     all the episodes_per_task for that variation."""
 
@@ -174,7 +152,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     np.random.seed(None)
     num_tasks = len(tasks)
 
-    img_size = list(map(int, FLAGS.image_size))
+    img_size = list(map(int, args.image_size))
 
     obs_config = ObservationConfig()
     obs_config.set_all(True)
@@ -198,13 +176,13 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     obs_config.wrist_camera.masks_as_one_channel = False
     obs_config.front_camera.masks_as_one_channel = False
 
-    if FLAGS.renderer == 'opengl':
+    if args.renderer == 'opengl':
         obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL
         obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL
         obs_config.overhead_camera.render_mode = RenderMode.OPENGL
         obs_config.wrist_camera.render_mode = RenderMode.OPENGL
         obs_config.front_camera.render_mode = RenderMode.OPENGL
-    elif FLAGS.renderer == 'opengl3':
+    elif args.renderer == 'opengl3':
         obs_config.right_shoulder_camera.render_mode = RenderMode.OPENGL3
         obs_config.left_shoulder_camera.render_mode = RenderMode.OPENGL3
         obs_config.overhead_camera.render_mode = RenderMode.OPENGL3
@@ -233,8 +211,8 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
             t = tasks[task_index.value]
             task_env = rlbench_env.get_task(t)
             var_target = task_env.variation_count()
-            if FLAGS.variations >= 0:
-                var_target = np.minimum(FLAGS.variations, var_target)
+            if args.variations >= 0:
+                var_target = np.minimum(args.variations, var_target)
             if my_variation_count >= var_target:
                 # If we have reached the required number of variations for this
                 # task, then move on to the next task.
@@ -252,7 +230,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         descriptions, _ = task_env.reset()
 
         variation_path = os.path.join(
-            FLAGS.save_path, task_env.get_name(),
+            args.save_path, task_env.get_name(),
             VARIATIONS_FOLDER % my_variation_count)
 
         check_and_make(variation_path)
@@ -265,7 +243,7 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
         check_and_make(episodes_path)
 
         abort_variation = False
-        for ex_idx in range(FLAGS.episodes_per_task):
+        for ex_idx in range(args.episodes_per_task):
             print('Process', i, '// Task:', task_env.get_name(),
                   '// Variation:', my_variation_count, '// Demo:', ex_idx)
             attempts = 10
@@ -300,16 +278,29 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks):
     rlbench_env.shutdown()
 
 
-def main(argv):
+def parse_args():
+    parser = argparse.ArgumentParser(description="RLBench Dataset Generator")
+    parser.add_argument('--save_path', type=str, default='/tmp/rlbench_data/', help='Where to save the demos.')
+    parser.add_argument('--tasks', nargs='*', default=[], help='The tasks to collect. If empty, all tasks are collected.')
+    parser.add_argument('--image_size', nargs=2, type=int, default=[128, 128], help='The size of the images to save.')
+    parser.add_argument('--renderer', type=str, choices=['opengl', 'opengl3'], default='opengl3', help='The renderer to use. opengl does not include shadows, but is faster.')
+    parser.add_argument('--processes', type=int, default=1, help='The number of parallel processes during collection.')
+    parser.add_argument('--episodes_per_task', type=int, default=10, help='The number of episodes to collect per task.')
+    parser.add_argument('--variations', type=int, default=-1, help='Number of variations to collect per task. -1 for all.')
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
 
     task_files = [t.replace('.py', '') for t in os.listdir(task.TASKS_PATH)
                   if t != '__init__.py' and t.endswith('.py')]
 
-    if len(FLAGS.tasks) > 0:
-        for t in FLAGS.tasks:
+    if len(args.tasks) > 0:
+        for t in args.tasks:
             if t not in task_files:
                 raise ValueError('Task %s not recognised!.' % t)
-        task_files = FLAGS.tasks
+        task_files = args.tasks
 
     tasks = [task_file_to_task_class(t) for t in task_files]
 
@@ -322,20 +313,20 @@ def main(argv):
     variation_count = manager.Value('i', 0)
     lock = manager.Lock()
 
-    check_and_make(FLAGS.save_path)
+    check_and_make(args.save_path)
 
     processes = [Process(
         target=run, args=(
             i, lock, task_index, variation_count, result_dict, file_lock,
-            tasks))
-        for i in range(FLAGS.processes)]
+            tasks, args))
+        for i in range(args.processes)]
     [t.start() for t in processes]
     [t.join() for t in processes]
 
     print('Data collection done!')
-    for i in range(FLAGS.processes):
+    for i in range(args.processes):
         print(result_dict[i])
 
 
 if __name__ == '__main__':
-  app.run(main)
+    main()
