@@ -192,6 +192,8 @@ def run(i, lock, task_index, variation_count, results, file_lock, tasks, args):
     rlbench_env = Environment(
         action_mode=MoveArmThenGripper(JointVelocity(), Discrete()),
         obs_config=obs_config,
+        arm_max_velocity=args.arm_max_velocity,
+        arm_max_acceleration=args.arm_max_acceleration,
         headless=True)
     rlbench_env.launch()
 
@@ -287,6 +289,8 @@ def parse_args():
     parser.add_argument('--processes', type=int, default=1, help='The number of parallel processes during collection.')
     parser.add_argument('--episodes_per_task', type=int, default=10, help='The number of episodes to collect per task.')
     parser.add_argument('--variations', type=int, default=-1, help='Number of variations to collect per task. -1 for all.')
+    parser.add_argument('--arm_max_velocity', type=float, default=1.0, help='Max arm velocity used for motion planning.')
+    parser.add_argument('--arm_max_acceleration', type=float, default=1.0, help='Max arm acceleration used for motion planning.')
     return parser.parse_args()
 
 
