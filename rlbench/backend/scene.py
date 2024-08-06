@@ -369,6 +369,7 @@ class Scene(object):
                 done = False
                 success = False
                 while not done:
+                    gripper_open = 1.0
                     done = path.step()
                     self.step()
                     self._joint_position_action = np.append(path.get_executed_joint_position_action(), gripper_open)
