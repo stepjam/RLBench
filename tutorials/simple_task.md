@@ -11,7 +11,7 @@ The design of a task must be given careful consideration. Ideally they would be 
 
 
 ## Variations and their Episodes
-At this point it is worth talking about episodes and variations. Every task has various textual descriptions asscosciated with them, to be used for linguistic learning in robotic tasks if desired. The picture below shows the various task descriptions returned from the init_episode() function in task *toilet_seat_up* for its single variation. Ideally these will between them include all possible ways of using the English language to describe a task; for example two of the various descriptions given for a particular episode of stack are 'stack the other cups on top of the red cup' and 'pick up and set the cups down into the red cup'. 
+At this point it is worth talking about episodes and variations. Every task has various textual descriptions associated with them, to be used for linguistic learning in robotic tasks if desired. The picture below shows the various task descriptions returned from the init_episode() function in task *toilet_seat_up* for its single variation. Ideally these will between them include all possible ways of using the English language to describe a task; for example two of the various descriptions given for a particular episode of stack are 'stack the other cups on top of the red cup' and 'pick up and set the cups down into the red cup'. 
 
 <img src="tutorial_images/task_descriptions.png">
 
