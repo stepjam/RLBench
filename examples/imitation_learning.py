@@ -36,7 +36,7 @@ task = env.get_task(ReachTarget)
 il = ImitationLearning()
 
 demos = task.get_demos(2, live_demos=live_demos)  # -> List[List[Observation]]
-demos = np.array(demos).flatten()
+demos = np.array(demos, dtype=object).flatten()
 
 # An example of using the demos to 'train' using behaviour cloning loss.
 for i in range(100):
