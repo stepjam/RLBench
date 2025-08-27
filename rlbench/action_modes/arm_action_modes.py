@@ -328,11 +328,15 @@ class EndEffectorPoseViaIK(ArmActionMode):
                 'Could not perform IK via Jacobian; most likely due to current '
                 'end-effector pose being too far from the given target pose. '
                 'Try limiting/bounding your action space.') from e
+
         done = False
         prev_values = None
+        max_steps = 50
+        steps = 0
+
         # Move until reached target joint positions or until we stop moving
         # (e.g. when we collide wth something)
-        while not done:
+        while not done and steps < max_steps:
             scene.step()
             cur_positions = scene.robot.arm.get_joint_positions()
             reached = np.allclose(cur_positions, joint_positions, atol=0.01)
@@ -342,9 +346,11 @@ class EndEffectorPoseViaIK(ArmActionMode):
                     cur_positions, prev_values, atol=0.001)
             prev_values = cur_positions
             done = reached or not_moving
+            steps += 1
 
     def action_shape(self, scene: Scene) -> tuple:
         return 7,
+
 
 class ERJointViaIK(ArmActionMode):
     """High-level action where target EE pose + Elbow angle is given in ER 
