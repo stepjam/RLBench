@@ -1,10 +1,11 @@
+from itertools import combinations
 from typing import List, Tuple
 import numpy as np
 from pyrep.objects.dummy import Dummy
 from pyrep.objects.proximity_sensor import ProximitySensor
 from pyrep.objects.shape import Shape
 from rlbench.backend.conditions import DetectedCondition, NothingGrasped, \
-    OrConditions
+    OrConditions, ConditionSet
 from rlbench.backend.spawn_boundary import SpawnBoundary
 from rlbench.backend.task import Task
 
@@ -32,8 +33,12 @@ class PlaceCups(Task):
         self._index = index
         b = SpawnBoundary([self._cups_boundary])
         [b.sample(c, min_distance=0.10) for c in self._cups]
-        success_conditions = [NothingGrasped(self.robot.gripper)
-                              ] + self._on_peg_conditions[:index + 1]
+        # Descriptions specify a count, not particular cup identities.
+        success_conditions = [
+            NothingGrasped(self.robot.gripper),
+            OrConditions([ConditionSet(list(cups)) for cups in
+                          combinations(self._on_peg_conditions, index + 1)])
+        ]
         self.register_success_conditions(success_conditions)
         self.register_waypoint_ability_start(
             0, self._move_above_next_target)
