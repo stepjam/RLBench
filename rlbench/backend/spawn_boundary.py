@@ -49,10 +49,13 @@ class BoundingBox(object):
 
 class BoundaryObject(object):
 
-    def __init__(self, boundary: Object):
+    def __init__(self, boundary: Object, rng=None):
         self._boundary = boundary
         self._is_plane = False
         self._contained_objects = []
+        # An optional source of randomness exposing the numpy RandomState /
+        # Generator interface (uniform, choice). Defaults to np.random.
+        self._rng = rng if rng is not None else np.random
 
         if boundary.is_model():
             (minx, maxx, miny,
@@ -69,16 +72,16 @@ class BoundaryObject(object):
 
     def _get_position_within_boundary(self, obj: Object, obj_bbox: BoundingBox
                                       ) -> List[float]:
-        x = np.random.uniform(
+        x = self._rng.uniform(
             self._boundary_bbox.min_x + np.abs(obj_bbox.min_x),
             self._boundary_bbox.max_x - np.abs(obj_bbox.max_x))
-        y = np.random.uniform(
+        y = self._rng.uniform(
             self._boundary_bbox.min_y + np.abs(obj_bbox.min_y),
             self._boundary_bbox.max_y - np.abs(obj_bbox.max_y))
         if self._is_plane:
             _, _, z = obj.get_position(self._boundary)
         else:
-            z = np.random.uniform(
+            z = self._rng.uniform(
                 self._boundary_bbox.min_z + np.abs(obj_bbox.min_z),
                 self._boundary_bbox.max_z - np.abs(obj_bbox.max_z))
         return [x, y, z]
@@ -100,7 +103,7 @@ class BoundaryObject(object):
         else:
             bb = obj.get_bounding_box()
         obj_bbox = BoundingBox(*bb)
-        rotation = np.random.uniform(list(min_rotation), list(max_rotation))
+        rotation = self._rng.uniform(list(min_rotation), list(max_rotation))
         obj_bbox = obj_bbox.rotate(rotation)
 
         if not obj_bbox.within_boundary(self._boundary_bbox, self._is_plane):
@@ -135,11 +138,21 @@ class SpawnBoundary(object):
 
     MAX_SAMPLES = 100
 
-    def __init__(self, boundaries: List[Object]):
+    def __init__(self, boundaries: List[Object], rng=None):
+        """Creates a spawner for sampling object placements within boundaries.
+
+        :param boundaries: The boundaries to sample placements within.
+        :param rng: Optional source of randomness exposing the numpy
+            RandomState/Generator interface (e.g. `np.random.default_rng(seed)`).
+            If given, all sampling draws are taken from it, making placements
+            reproducible independent of the global numpy random state.
+            Defaults to `np.random`, preserving the previous behavior.
+        """
+        self._rng = rng if rng is not None else np.random
         self._boundaries = []
         areas = []
         for b in boundaries:
-            bo = BoundaryObject(b)
+            bo = BoundaryObject(b, rng=self._rng)
             areas.append(bo.get_area())
             self._boundaries.append(bo)
         self._probabilities = np.array(areas) / np.sum(areas)
@@ -156,7 +169,7 @@ class SpawnBoundary(object):
         """
         collision_fails = boundary_fails = self.MAX_SAMPLES
         while collision_fails > 0 and boundary_fails > 0:
-            sampled_boundary = np.random.choice(self._boundaries,
+            sampled_boundary = self._rng.choice(self._boundaries,
                                                 p=self._probabilities)
             result = sampled_boundary.add(
                 obj, ignore_collisions, min_rotation, max_rotation, min_distance)
