@@ -42,6 +42,7 @@ class Environment(object):
                  shaped_rewards: bool = False,
                  arm_max_velocity: float = 1.0,
                  arm_max_acceleration: float = 4.0,
+                 rng=None,
                  ):
 
         self._dataset_root = dataset_root
@@ -50,6 +51,10 @@ class Environment(object):
         self._headless = headless
         self._static_positions = static_positions
         self._robot_setup = robot_setup.lower()
+        # Optional source of randomness (e.g. np.random.default_rng(seed))
+        # used by the scene when sampling object placements. If None, the
+        # global numpy random state is used, as before.
+        self._rng = rng
 
         self._randomize_every = randomize_every
         self._frequency = frequency
@@ -123,13 +128,15 @@ class Environment(object):
         self._robot = Robot(arm, gripper)
         if self._randomize_every is None:
             self._scene = Scene(
-                self._pyrep, self._robot, self._obs_config, self._robot_setup)
+                self._pyrep, self._robot, self._obs_config, self._robot_setup,
+                rng=self._rng)
         else:
             self._scene = DomainRandomizationScene(
                 self._pyrep, self._robot, self._obs_config, self._robot_setup,
                 self._randomize_every, self._frequency,
                 self._visual_randomization_config,
-                self._dynamics_randomization_config)
+                self._dynamics_randomization_config,
+                rng=self._rng)
 
         self._action_mode.arm_action_mode.set_control_mode(self._robot)
 

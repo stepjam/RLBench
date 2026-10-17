@@ -31,7 +31,8 @@ class Scene(object):
                  pyrep: PyRep,
                  robot: Robot,
                  obs_config: ObservationConfig = ObservationConfig(),
-                 robot_setup: str = 'panda'):
+                 robot_setup: str = 'panda',
+                 rng=None):
         self.pyrep = pyrep
         self.robot = robot
         self.robot_setup = robot_setup
@@ -40,8 +41,9 @@ class Scene(object):
         self._initial_task_state = None
         self._start_arm_joint_pos = robot.arm.get_joint_positions()
         self._starting_gripper_joint_pos = robot.gripper.get_joint_positions()
+        self._rng = rng
         self._workspace = Shape('workspace')
-        self._workspace_boundary = SpawnBoundary([self._workspace])
+        self._workspace_boundary = SpawnBoundary([self._workspace], rng=rng)
         self._cam_over_shoulder_left = VisionSensor('cam_over_shoulder_left')
         self._cam_over_shoulder_right = VisionSensor('cam_over_shoulder_right')
         self._cam_overhead = VisionSensor('cam_overhead')

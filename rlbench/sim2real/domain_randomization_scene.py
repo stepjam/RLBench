@@ -29,8 +29,9 @@ class DomainRandomizationScene(Scene):
                  randomize_every: RandomizeEvery=RandomizeEvery.EPISODE,
                  frequency: int=1,
                  visual_randomization_config=None,
-                 dynamics_randomization_config=None):
-        super().__init__(pyrep, robot, obs_config, robot_setup)
+                 dynamics_randomization_config=None,
+                 rng=None):
+        super().__init__(pyrep, robot, obs_config, robot_setup, rng=rng)
         self._randomize_every = randomize_every
         self._frequency = frequency
         self._visual_rand_config = visual_randomization_config
